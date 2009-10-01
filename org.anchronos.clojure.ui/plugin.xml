@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Clojure Editor"
+            extensions="clj"
+            icon="icons/clojure.png"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            class="org.anchronos.clojure.ui.editor.ClojureEditor"
+            id="org.anchronos.clojure.ui.editor.ClojureEditor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.anchronos.clojure.ui.preferences.ClojureBasePage"
+            class="org.anchronos.clojure.ui.preferences.ClojureEditorPreferencePage"
+            id="org.anchronos.clojure.ui.preferences.ClojureEditorPreferencePage"
+            name="Editor">
+      </page>
+      <page
+            class="org.anchronos.clojure.ui.preferences.ClojureBasePreferencePage"
+            id="org.anchronos.clojure.ui.preferences.ClojureBasePage"
+            name="Clojure">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.anchronos.clojure.ui.preferences.ClojurePreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>
