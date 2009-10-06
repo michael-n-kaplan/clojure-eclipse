@@ -5,6 +5,17 @@ import org.eclipse.dltk.ui.AbstractDLTKUILanguageToolkit;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class ClojureUILanguageToolkit extends AbstractDLTKUILanguageToolkit {
+    private static ClojureUILanguageToolkit instance;
+
+    private ClojureUILanguageToolkit() {
+    }
+
+    public static ClojureUILanguageToolkit getDefault() {
+	if (instance == null) {
+	    instance = new ClojureUILanguageToolkit();
+	}
+	return instance;
+    }
 
     @Override
     public IDLTKLanguageToolkit getCoreToolkit() {

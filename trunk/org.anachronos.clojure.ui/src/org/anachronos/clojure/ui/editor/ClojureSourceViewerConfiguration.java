@@ -5,10 +5,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.anachronos.clojure.core.parser.ClojureLexer;
+import org.anachronos.clojure.ui.completion.ClojureContentAssistPreference;
 import org.anachronos.clojure.ui.preferences.ClojureColorConstants;
-import org.anachronos.clojure.ui.preferences.ColorManager;
 import org.anachronos.clojure.ui.syntaxcoloring.AntlrTokenScanner;
+import org.eclipse.dltk.ui.text.IColorManager;
+import org.eclipse.dltk.ui.text.ScriptSourceViewerConfiguration;
+import org.eclipse.dltk.ui.text.completion.ContentAssistPreference;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -19,7 +25,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Configures source viewer for clojure script editing.
@@ -27,11 +34,12 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
  * @author km
  */
 public class ClojureSourceViewerConfiguration extends
-	TextSourceViewerConfiguration {
-    private final ColorManager colorManager;
+	ScriptSourceViewerConfiguration {
 
-    public ClojureSourceViewerConfiguration(final ColorManager colorManager) {
-	this.colorManager = colorManager;
+    public ClojureSourceViewerConfiguration(IColorManager colorManager,
+	    IPreferenceStore preferenceStore, ITextEditor editor) {
+	super(colorManager, preferenceStore, editor,
+		IDocument.DEFAULT_CONTENT_TYPE);
     }
 
     @Override
@@ -109,7 +117,26 @@ public class ClojureSourceViewerConfiguration extends
     }
 
     private IToken createToken(final RGB foreground, final int style) {
-	final Color fgColor = colorManager.getColor(foreground);
+	final Color fgColor = getColorManager().getColor(foreground);
 	return new Token(new TextAttribute(fgColor, null, style));
+    }
+
+    @Override
+    protected IInformationControlCreator getOutlinePresenterControlCreator(
+	    final ISourceViewer sourceViewer, final String commandId) {
+	return new IInformationControlCreator() {
+	    public IInformationControl createInformationControl(
+		    final Shell parent) {
+		final int shellStyle = SWT.RESIZE;
+		final int treeStyle = SWT.V_SCROLL | SWT.H_SCROLL;
+		return new ClojureOutlineInformationControl(parent, shellStyle,
+			treeStyle, commandId);
+	    }
+	};
+    }
+
+    @Override
+    protected ContentAssistPreference getContentAssistPreference() {
+	return ClojureContentAssistPreference.getDefault();
     }
 }
