@@ -78,7 +78,7 @@ public class AntlrTokenScanner implements ITokenScanner {
 	    return Token.EOF;
 	}
 	final IToken token = antlrTokenTypeToIToken.get(type);
-	return token;
+	return token == null ? Token.UNDEFINED : token;
     }
 
     /**
