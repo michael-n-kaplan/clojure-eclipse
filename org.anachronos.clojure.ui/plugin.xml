@@ -80,5 +80,18 @@
             label="Clojure Console">
       </consoleFactory>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.anachronos.clojure.ui.editor.ClojureEditor"
+            default="false"
+            icon="icons/clojure.png"
+            id="org.anachronos.clojure.ui.editor"
+            name="Clojure Editor">
+         <contentTypeBinding
+               contentTypeId="org.anachronos.clojure.ui.content-type">
+         </contentTypeBinding>
+      </editor>
+   </extension>
 
 </plugin>
