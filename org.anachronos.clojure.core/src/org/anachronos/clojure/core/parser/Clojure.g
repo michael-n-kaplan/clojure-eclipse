@@ -12,7 +12,16 @@ tokens {
   META_DATA;
   REGEX;
   VAR_QUOTE;
-  VECTOR;  
+  VECTOR;
+  
+  LPAREN = '(';
+  RPAREN = ')';
+  
+  LBRACKET = '[';
+  RBRACKET = ']';
+  
+  LCURLY = '{';
+  RCURLY = '}';  
 }
 
 @header {
@@ -120,4 +129,4 @@ WS:
   (' '|'\n'|'\t'|'\r'|',')+ { $channel = HIDDEN; };
 
 COMMENT:
-  ';' .* '\n' { $channel = HIDDEN; };
+  ';' ~('\n')* ('\n'|EOF) { $channel = HIDDEN; };
