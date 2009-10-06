@@ -67,15 +67,27 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            class="org.anachronos.clojure.ui.preferences.ClojurePreferencePage"
+            id="org.anchronos.clojure.ui.preferences.clojure"
+            name="Clojure">
+      </page>
+      <page
             category="org.anchronos.clojure.ui.preferences.clojure"
             class="org.anachronos.clojure.ui.preferences.ClojureInterpreterPreferencePage"
             id="org.anachronos.clojure.ui.preferences.interpreters"
             name="Interpreters">
       </page>
       <page
-            class="org.anchronos.clojure.ui.preferences.ClojureBasePreferencePage"
-            id="org.anchronos.clojure.ui.preferences.clojure"
-            name="Clojure">
+            category="org.anchronos.clojure.ui.preferences.clojure"
+            class="org.anachronos.clojure.ui.preferences.ClojureEditorPreferencePage"
+            id="org.anachronos.clojure.ui.editor"
+            name="Editor">
+      </page>
+      <page
+            category="org.anachronos.clojure.ui.editor"
+            class="org.anachronos.clojure.ui.preferences.ClojureSyntaxColoringPreferencePage"
+            id="org.anachronos.clojure.ui.page1"
+            name="Syntax Coloring">
       </page>
    </extension>
    <extension
