@@ -1,5 +1,9 @@
 package org.anachronos.clojure.ui.editor;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.anachronos.clojure.core.parser.ClojureLexer;
 import org.anachronos.clojure.ui.preferences.ClojureColorConstants;
 import org.anachronos.clojure.ui.preferences.ColorManager;
@@ -12,16 +16,18 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
 /**
  * Configures source viewer for clojure script editing.
  * 
  * @author km
  */
-public class ClojureSourceViewerConfiguration extends SourceViewerConfiguration {
+public class ClojureSourceViewerConfiguration extends
+	TextSourceViewerConfiguration {
     private final ColorManager colorManager;
 
     public ClojureSourceViewerConfiguration(final ColorManager colorManager) {
@@ -48,41 +54,62 @@ public class ClojureSourceViewerConfiguration extends SourceViewerConfiguration 
 
     private AntlrTokenScanner initTokenScanner() {
 	final AntlrTokenScanner scanner = AntlrTokenScanner
-		.createTokenScanner(new ClojureLexer());
+		.createTokenScanner(createLexer());
 
 	scanner.addToken(ClojureLexer.CHARACTER,
-		createAttribute(ClojureColorConstants.CHARACTER));
+		createToken(ClojureColorConstants.CHARACTER));
 	scanner.addToken(ClojureLexer.COMMENT,
-		createAttribute(ClojureColorConstants.COMMENT));
+		createToken(ClojureColorConstants.COMMENT));
 	scanner.addToken(ClojureLexer.KEYWORD,
-		createAttribute(ClojureColorConstants.KEYWORD));
+		createToken(ClojureColorConstants.KEYWORD));
 	scanner.addToken(ClojureLexer.NUMBER,
-		createAttribute(ClojureColorConstants.NUMBER));
+		createToken(ClojureColorConstants.NUMBER));
 	scanner.addToken(ClojureLexer.STRING,
-		createAttribute(ClojureColorConstants.STRING));
+		createToken(ClojureColorConstants.STRING));
 
 	scanner.addToken(ClojureLexer.LPAREN,
-		createAttribute(ClojureColorConstants.LIST));
+		createToken(ClojureColorConstants.LIST));
 	scanner.addToken(ClojureLexer.RPAREN,
-		createAttribute(ClojureColorConstants.LIST));
+		createToken(ClojureColorConstants.LIST));
 
 	scanner.addToken(ClojureLexer.LBRACKET,
-		createAttribute(ClojureColorConstants.VECTOR));
+		createToken(ClojureColorConstants.VECTOR));
 	scanner.addToken(ClojureLexer.RBRACKET,
-		createAttribute(ClojureColorConstants.VECTOR));
+		createToken(ClojureColorConstants.VECTOR));
 
 	scanner.addToken(ClojureLexer.LCURLY,
-		createAttribute(ClojureColorConstants.MAP));
+		createToken(ClojureColorConstants.MAP));
 	scanner.addToken(ClojureLexer.RCURLY,
-		createAttribute(ClojureColorConstants.MAP));
+		createToken(ClojureColorConstants.MAP));
 
 	scanner.addToken(ClojureLexer.SYMBOL,
-		createAttribute(ClojureColorConstants.SYMBOL));
+		createToken(ClojureColorConstants.SYMBOL));
+	scanner.addToken(ClojureLexer.PREDEFINED_SYMBOL, createToken(
+		ClojureColorConstants.PREDEFINED_SYMBOL, SWT.BOLD));
+
 	return scanner;
     }
 
-    private IToken createAttribute(final RGB foreground) {
+    private ClojureLexer createLexer() {
+	final ClojureLexer lexer = new ClojureLexer();
+	final Set<String> predefinedSymbols = new HashSet<String>(Arrays
+		.asList(new String[] { "catch", "def", "do", "defmethod",
+			"defmulti", "defmacro", "defstruct", "defn", "finally",
+			"fn", "fn*", "if", "identical?", "in-ns", "let",
+			"let*", "loop", "loop*", "new", "monitor-enter",
+			"monitor-exit", "quote", "recur", "the-var", "throw",
+			"try", "set!" }));
+
+	lexer.setPredefinedSymbols(predefinedSymbols);
+	return lexer;
+    }
+
+    private IToken createToken(final RGB foreground) {
+	return createToken(foreground, SWT.NONE);
+    }
+
+    private IToken createToken(final RGB foreground, final int style) {
 	final Color fgColor = colorManager.getColor(foreground);
-	return new Token(new TextAttribute(fgColor));
+	return new Token(new TextAttribute(fgColor, null, style));
     }
 }

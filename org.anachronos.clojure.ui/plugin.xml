@@ -67,10 +67,15 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.anchronos.clojure.ui.preferences.ClojureBasePage"
+            category="org.anchronos.clojure.ui.preferences.clojure"
             class="org.anachronos.clojure.ui.preferences.ClojureInterpreterPreferencePage"
             id="org.anachronos.clojure.ui.preferences.interpreters"
             name="Interpreters">
+      </page>
+      <page
+            class="org.anchronos.clojure.ui.preferences.ClojureBasePreferencePage"
+            id="org.anchronos.clojure.ui.preferences.clojure"
+            name="Clojure">
       </page>
    </extension>
    <extension
