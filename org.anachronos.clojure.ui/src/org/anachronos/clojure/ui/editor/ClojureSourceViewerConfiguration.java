@@ -21,10 +21,10 @@ import org.eclipse.swt.graphics.RGB;
  * 
  * @author km
  */
-public class ClojureConfiguration extends SourceViewerConfiguration {
+public class ClojureSourceViewerConfiguration extends SourceViewerConfiguration {
     private final ColorManager colorManager;
 
-    public ClojureConfiguration(final ColorManager colorManager) {
+    public ClojureSourceViewerConfiguration(final ColorManager colorManager) {
 	this.colorManager = colorManager;
     }
 
@@ -50,12 +50,32 @@ public class ClojureConfiguration extends SourceViewerConfiguration {
 	final AntlrTokenScanner scanner = AntlrTokenScanner
 		.createTokenScanner(new ClojureLexer());
 
+	scanner.addToken(ClojureLexer.CHARACTER,
+		createAttribute(ClojureColorConstants.CHARACTER));
 	scanner.addToken(ClojureLexer.COMMENT,
 		createAttribute(ClojureColorConstants.COMMENT));
 	scanner.addToken(ClojureLexer.KEYWORD,
-		createAttribute(ClojureColorConstants.LITERAL));
+		createAttribute(ClojureColorConstants.KEYWORD));
+	scanner.addToken(ClojureLexer.NUMBER,
+		createAttribute(ClojureColorConstants.NUMBER));
 	scanner.addToken(ClojureLexer.STRING,
 		createAttribute(ClojureColorConstants.STRING));
+
+	scanner.addToken(ClojureLexer.LPAREN,
+		createAttribute(ClojureColorConstants.LIST));
+	scanner.addToken(ClojureLexer.RPAREN,
+		createAttribute(ClojureColorConstants.LIST));
+
+	scanner.addToken(ClojureLexer.LBRACKET,
+		createAttribute(ClojureColorConstants.VECTOR));
+	scanner.addToken(ClojureLexer.RBRACKET,
+		createAttribute(ClojureColorConstants.VECTOR));
+
+	scanner.addToken(ClojureLexer.LCURLY,
+		createAttribute(ClojureColorConstants.MAP));
+	scanner.addToken(ClojureLexer.RCURLY,
+		createAttribute(ClojureColorConstants.MAP));
+
 	scanner.addToken(ClojureLexer.SYMBOL,
 		createAttribute(ClojureColorConstants.SYMBOL));
 	return scanner;

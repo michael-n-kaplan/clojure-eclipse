@@ -19,7 +19,7 @@ public class ClojureEditor extends TextEditor {
     public ClojureEditor() {
 	super();
 	colorManager = new ColorManager();
-	setSourceViewerConfiguration(new ClojureConfiguration(colorManager));
+	setSourceViewerConfiguration(new ClojureSourceViewerConfiguration(colorManager));
 	setDocumentProvider(new FileDocumentProvider());
 	setPreferenceStore(Activator.getDefault().getPreferenceStore());
     }
