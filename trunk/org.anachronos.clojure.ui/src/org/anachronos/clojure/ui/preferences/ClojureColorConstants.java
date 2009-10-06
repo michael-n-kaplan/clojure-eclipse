@@ -17,4 +17,5 @@ public interface ClojureColorConstants {
     RGB STRING = new RGB(0, 128, 0);
     RGB SYMBOL = new RGB(0, 0, 128);
     RGB VECTOR = new RGB(0, 128, 128);
+    RGB PREDEFINED_SYMBOL = new RGB(0, 0, 192);
 }

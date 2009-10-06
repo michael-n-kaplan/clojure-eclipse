@@ -14,6 +14,8 @@ tokens {
   VAR_QUOTE;
   VECTOR;
   
+  PREDEFINED_SYMBOL;
+  
   LPAREN = '(';
   RPAREN = ')';
   
@@ -29,7 +31,22 @@ package org.anachronos.clojure.core.parser;
 }
   
 @lexer::header {
-package org.anachronos.clojure.core.parser;  
+package org.anachronos.clojure.core.parser;
+
+import java.util.HashSet;
+import java.util.Set;  
+}
+
+@lexer::members {
+  private Set<String> predefinedSymbols = new HashSet<String>();
+  
+  public void setPredefinedSymbols(final Set<String> predefinedSymbols) {
+    this.predefinedSymbols = predefinedSymbols;
+  }
+  
+  private boolean isPredefinedSymbol(final String symbol) {
+    return predefinedSymbols.contains(symbol);
+  }
 }
 
 file: 
@@ -106,7 +123,7 @@ KEYWORD:
 SYMBOL: 
   '.' | 
   '/' |   
-  NAME ('/' NAME)?;
+  NAME ('/' NAME)? { $type = isPredefinedSymbol($text) ? PREDEFINED_SYMBOL : SYMBOL; };
 
 PARAM_NAME:
   '%' (('1'..'9')('0'..'9')*)?;
@@ -126,7 +143,7 @@ SYMBOL_REST:
   '.';  
   
 WS:
-  (' '|'\n'|'\t'|'\r'|',')+ { $channel = HIDDEN; };
+  (' '|'\n'|'\t'|'\r'|',') { $channel = HIDDEN; };
 
 COMMENT:
   ';' ~('\n')* ('\n'|EOF) { $channel = HIDDEN; };
