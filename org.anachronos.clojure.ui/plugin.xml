@@ -44,6 +44,13 @@
       </interpreterInstallType>
    </extension>
    <extension
+         point="org.eclipse.dltk.console.scriptInterpreter">
+      <scriptInterpreter
+            class="org.anachronos.clojure.ui.ClojureScriptInterpreter"
+            natureID="org.anachronos.clojure.ui.nature">
+      </scriptInterpreter>
+   </extension>
+   <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             category="org.anachronos.clojure.ui.category"
@@ -65,6 +72,13 @@
             id="org.anachronos.clojure.ui.preferences.interpreters"
             name="Interpreters">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consoleFactories">
+      <consoleFactory
+            class="org.anachronos.clojure.ui.console.ClojureConsoleFactory"
+            label="Clojure Console">
+      </consoleFactory>
    </extension>
 
 </plugin>
