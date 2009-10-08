@@ -6,16 +6,23 @@ options {
 }
 
 tokens {
+  DEREF = '@';
   LAMBDA;
   LIST;
   MAP;
+  META = '^';
   META_DATA;
-  REGEX;
-  VAR_QUOTE;
-  VECTOR;
-  
   PREDEFINED_SYMBOL;
-  
+  QUOTE = '\'';
+  REGEX;
+  SET;
+  SYNTAX_QUOTE = '`';
+  UNQUOTE = '~';
+  UNQUOTE_SPLICING = '~@';
+  VAR_QUOTE;
+  VAR_ARG = '&';
+  VECTOR;
+    
   LPAREN = '(';
   RPAREN = ')';
   
@@ -56,19 +63,23 @@ form:
   literal |
   
   list |
-  vector |
   map |
+  set |
+  vector |
   
   reader_macro;
   
 list:
   '(' form* ')' -> ^(LIST form*);
-  
-vector:
-  '[' form* ']' -> ^(VECTOR form*);
-  
+
+set:
+  '#{' form* '}' -> ^(SET form*);
+    
 map:
   '{' (form form)* '}' -> ^(MAP (form form)*);
+  
+vector:
+  '[' form* ('&' form)? ']' -> ^(VECTOR form*);
 
 special_form:
   ('\'' | '`' | '~' | '~@' | '^' | '@') form;
