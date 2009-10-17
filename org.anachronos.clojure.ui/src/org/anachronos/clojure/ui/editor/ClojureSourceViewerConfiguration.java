@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.anachronos.clojure.core.parser.ClojureLexer;
+import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.completion.ClojureContentAssistPreference;
 import org.anachronos.clojure.ui.preferences.ClojureColorConstants;
 import org.anachronos.clojure.ui.syntaxcoloring.AntlrTokenScanner;
@@ -15,16 +16,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -35,6 +32,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class ClojureSourceViewerConfiguration extends
 	ScriptSourceViewerConfiguration {
+
+    private AntlrTokenScanner scanner;
 
     public ClojureSourceViewerConfiguration(IColorManager colorManager,
 	    IPreferenceStore preferenceStore, ITextEditor editor) {
@@ -52,7 +51,7 @@ public class ClojureSourceViewerConfiguration extends
 	    final ISourceViewer sourceViewer) {
 	final PresentationReconciler reconciler = new PresentationReconciler();
 
-	final AntlrTokenScanner scanner = initTokenScanner();
+	scanner = initTokenScanner();
 	final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(scanner);
 	reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 	reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -60,43 +59,57 @@ public class ClojureSourceViewerConfiguration extends
 	return reconciler;
     }
 
+    @Override
+    public void handlePropertyChangeEvent(PropertyChangeEvent event) {
+	if (scanner.affectsBehavior(event))
+	    scanner.adaptToPreferenceChange(event);
+    }
+
+    @Override
+    public boolean affectsTextPresentation(PropertyChangeEvent event) {
+	return scanner.affectsBehavior(event)
+		|| super.affectsTextPresentation(event);
+    }
+
     private AntlrTokenScanner initTokenScanner() {
-	final AntlrTokenScanner scanner = AntlrTokenScanner
-		.createTokenScanner(createLexer());
+	final AntlrTokenScanner scanner = AntlrTokenScanner.createTokenScanner(
+		createLexer(), getColorManager(), ClojureUIPlugin.getDefault()
+			.getPreferenceStore());
 
 	scanner.addToken(ClojureLexer.CHARACTER,
-		createToken(ClojureColorConstants.CHARACTER));
+		ClojureColorConstants.CHARACTER_COLOR_PREF_KEY);
 	scanner.addToken(ClojureLexer.COMMENT,
-		createToken(ClojureColorConstants.COMMENT));
+		ClojureColorConstants.COMMENT_PREF_KEY);
 	scanner.addToken(ClojureLexer.KEYWORD,
-		createToken(ClojureColorConstants.KEYWORD));
+		ClojureColorConstants.KEYWORD_PREF_KEY);
 	scanner.addToken(ClojureLexer.NUMBER,
-		createToken(ClojureColorConstants.NUMBER));
+		ClojureColorConstants.NUMBER_PREF_KEY);
 	scanner.addToken(ClojureLexer.STRING,
-		createToken(ClojureColorConstants.STRING));
+		ClojureColorConstants.STRING_PREF_KEY);
 
 	scanner.addToken(ClojureLexer.LPAREN,
-		createToken(ClojureColorConstants.LIST));
+		ClojureColorConstants.LIST_PREF_KEY);
 	scanner.addToken(ClojureLexer.RPAREN,
-		createToken(ClojureColorConstants.LIST));
+		ClojureColorConstants.LIST_PREF_KEY);
 
 	scanner.addToken(ClojureLexer.LBRACKET,
-		createToken(ClojureColorConstants.VECTOR));
+		ClojureColorConstants.VECTOR_PREF_KEY);
 	scanner.addToken(ClojureLexer.RBRACKET,
-		createToken(ClojureColorConstants.VECTOR));
+		ClojureColorConstants.VECTOR_PREF_KEY);
 
 	scanner.addToken(ClojureLexer.SET,
-		createToken(ClojureColorConstants.MAP));
+ ClojureColorConstants.MAP_PREF_KEY);
 	scanner.addToken(ClojureLexer.LCURLY,
-		createToken(ClojureColorConstants.MAP));
+		ClojureColorConstants.MAP_PREF_KEY);
 	scanner.addToken(ClojureLexer.RCURLY,
-		createToken(ClojureColorConstants.MAP));
+		ClojureColorConstants.MAP_PREF_KEY);
 
 	scanner.addToken(ClojureLexer.SYMBOL,
-		createToken(ClojureColorConstants.SYMBOL));
-	scanner.addToken(ClojureLexer.PREDEFINED_SYMBOL, createToken(
-		ClojureColorConstants.PREDEFINED_SYMBOL, SWT.BOLD));
+		ClojureColorConstants.SYMBOL_PREF_KEY);
+	scanner.addToken(ClojureLexer.PREDEFINED_SYMBOL,
+		ClojureColorConstants.PREDEFINED_SYMBOL_PREF_KEY);
 
+	scanner.initialize();
 	return scanner;
     }
 
@@ -112,15 +125,6 @@ public class ClojureSourceViewerConfiguration extends
 
 	lexer.setPredefinedSymbols(predefinedSymbols);
 	return lexer;
-    }
-
-    private IToken createToken(final RGB foreground) {
-	return createToken(foreground, SWT.NONE);
-    }
-
-    private IToken createToken(final RGB foreground, final int style) {
-	final Color fgColor = getColorManager().getColor(foreground);
-	return new Token(new TextAttribute(fgColor, null, style));
     }
 
     @Override

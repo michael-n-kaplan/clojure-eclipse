@@ -44,41 +44,48 @@ public class ClojureSyntaxColoringBlock extends
     protected String[][] getSyntaxColorListModel() {
 	return new String[][] {
 		new String[] {
-			"Symbol",
-			"Symbol",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
-			"Predefined Symbol",
-			"Predefined Symbol",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
-			"Number",
-			"Number",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
-			"String",
-			"String",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
 			"Character",
-			"Character",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
-			"List",
-			"List",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
-			"Vector",
-			"Vector",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
-		new String[] {
-			"Map",
-			"Map",
+			ClojureColorConstants.CHARACTER_COLOR_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"Comment",
-			"Comment",
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTKdoc } };
+			ClojureColorConstants.COMMENT_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTKdoc },
+
+		new String[] {
+			"Number",
+			ClojureColorConstants.NUMBER_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+		new String[] {
+			"String",
+			ClojureColorConstants.STRING_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+
+		new String[] {
+			"List",
+			ClojureColorConstants.LIST_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+		new String[] {
+			"Map",
+			ClojureColorConstants.MAP_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+		new String[] {
+			"Vector",
+			ClojureColorConstants.VECTOR_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+
+		new String[] {
+			"Keyword",
+			ClojureColorConstants.KEYWORD_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+		new String[] {
+			"Symbol",
+			ClojureColorConstants.SYMBOL_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
+		new String[] {
+			"Predefined Symbol",
+			ClojureColorConstants.PREDEFINED_SYMBOL_PREF_KEY,
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK } };
     }
 
     @Override
