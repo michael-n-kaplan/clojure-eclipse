@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.editor;
 
-import org.anachronos.clojure.ui.Activator;
+import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.ClojureUILanguageToolkit;
 import org.anachronos.clojure.ui.preferences.ClojurePreferenceConstants;
 import org.eclipse.dltk.ui.text.IColorManager;
@@ -19,7 +19,7 @@ public class ClojureEditor extends TextEditor {
 
     public ClojureEditor() {
 	super();
-	final IColorManager colorManager = Activator.getDefault()
+	final IColorManager colorManager = ClojureUIPlugin.getDefault()
 		.getTextTools()
 		.getColorManager();
 	final IPreferenceStore preferenceStore = ClojureUILanguageToolkit
@@ -30,7 +30,7 @@ public class ClojureEditor extends TextEditor {
 		this);
 	setSourceViewerConfiguration(configuration);
 	setDocumentProvider(new FileDocumentProvider());
-	setPreferenceStore(Activator.getDefault().getPreferenceStore());
+	setPreferenceStore(ClojureUIPlugin.getDefault().getPreferenceStore());
     }
 
     @Override

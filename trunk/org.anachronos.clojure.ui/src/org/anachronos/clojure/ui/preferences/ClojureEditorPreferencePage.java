@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.preferences;
 
-import org.anachronos.clojure.ui.Activator;
+import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -12,7 +12,7 @@ public class ClojureEditorPreferencePage extends FieldEditorPreferencePage
 
     public ClojureEditorPreferencePage() {
 	super(GRID);
-	setPreferenceStore(Activator.getDefault().getPreferenceStore());
+	setPreferenceStore(ClojureUIPlugin.getDefault().getPreferenceStore());
     }
 
     @Override

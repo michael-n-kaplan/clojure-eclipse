@@ -1,7 +1,9 @@
-package org.anachronos.clojure.ui;
+package org.anachronos.clojure.ui.launching;
 
 import java.io.IOException;
 
+import org.anachronos.clojure.ui.ClojureUIPlugin;
+import org.anachronos.clojure.ui.ClojureNature;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.dltk.core.environment.IDeployment;
@@ -23,12 +25,12 @@ public class ClojureInterpreterInstallType extends
 
     @Override
     protected ILog getLog() {
-	return Activator.getDefault().getLog();
+	return ClojureUIPlugin.getDefault().getLog();
     }
 
     @Override
     protected String getPluginId() {
-	return Activator.PLUGIN_ID;
+	return ClojureUIPlugin.PLUGIN_ID;
     }
 
     @Override

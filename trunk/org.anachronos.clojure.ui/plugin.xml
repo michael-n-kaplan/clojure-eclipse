@@ -39,14 +39,14 @@
    <extension
          point="org.eclipse.dltk.launching.interpreterInstallTypes">
       <interpreterInstallType
-            class="org.anachronos.clojure.ui.ClojureInterpreterInstallType"
+            class="org.anachronos.clojure.ui.launching.ClojureInterpreterInstallType"
             id="org.anachronos.clojure.ui.interpreterInstallType">
       </interpreterInstallType>
    </extension>
    <extension
          point="org.eclipse.dltk.console.scriptInterpreter">
       <scriptInterpreter
-            class="org.anachronos.clojure.ui.ClojureScriptInterpreter"
+            class="org.anachronos.clojure.ui.launching.ClojureScriptInterpreter"
             natureID="org.anachronos.clojure.ui.nature">
       </scriptInterpreter>
    </extension>

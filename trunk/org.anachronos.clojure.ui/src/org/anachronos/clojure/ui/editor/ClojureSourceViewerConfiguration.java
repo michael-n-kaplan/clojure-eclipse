@@ -85,6 +85,8 @@ public class ClojureSourceViewerConfiguration extends
 	scanner.addToken(ClojureLexer.RBRACKET,
 		createToken(ClojureColorConstants.VECTOR));
 
+	scanner.addToken(ClojureLexer.SET,
+		createToken(ClojureColorConstants.MAP));
 	scanner.addToken(ClojureLexer.LCURLY,
 		createToken(ClojureColorConstants.MAP));
 	scanner.addToken(ClojureLexer.RCURLY,
