@@ -4,7 +4,7 @@ import org.eclipse.dltk.core.AbstractLanguageToolkit;
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 
 public class ClojureLanguageToolkit extends AbstractLanguageToolkit {
-    public static final String CLOJURE_CONTENT_TYPE = Activator.PLUGIN_ID
+    public static final String CLOJURE_CONTENT_TYPE = ClojureUIPlugin.PLUGIN_ID
 	    + ".content-type";
 
     private static IDLTKLanguageToolkit toolkit;

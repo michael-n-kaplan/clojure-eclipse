@@ -24,6 +24,6 @@ public class ClojureUILanguageToolkit extends AbstractDLTKUILanguageToolkit {
 
     @Override
     public IPreferenceStore getPreferenceStore() {
-	return Activator.getDefault().getPreferenceStore();
+	return ClojureUIPlugin.getDefault().getPreferenceStore();
     }
 }

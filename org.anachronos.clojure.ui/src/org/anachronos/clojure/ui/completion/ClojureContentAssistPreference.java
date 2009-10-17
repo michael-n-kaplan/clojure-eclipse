@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.completion;
 
-import org.anachronos.clojure.ui.Activator;
+import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.eclipse.dltk.ui.text.ScriptTextTools;
 import org.eclipse.dltk.ui.text.completion.ContentAssistPreference;
 
@@ -19,6 +19,6 @@ public class ClojureContentAssistPreference extends ContentAssistPreference {
 
     @Override
     protected ScriptTextTools getTextTools() {
-	return Activator.getDefault().getTextTools();
+	return ClojureUIPlugin.getDefault().getTextTools();
     }
 }

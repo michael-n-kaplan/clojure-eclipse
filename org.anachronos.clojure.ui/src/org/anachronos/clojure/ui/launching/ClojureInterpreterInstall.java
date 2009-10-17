@@ -1,5 +1,6 @@
-package org.anachronos.clojure.ui;
+package org.anachronos.clojure.ui.launching;
 
+import org.anachronos.clojure.ui.ClojureNature;
 import org.eclipse.dltk.launching.AbstractInterpreterInstall;
 import org.eclipse.dltk.launching.IInterpreterInstallType;
 import org.eclipse.dltk.launching.IInterpreterRunner;

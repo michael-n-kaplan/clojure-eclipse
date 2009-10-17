@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.editor;
 
-import org.anachronos.clojure.ui.Activator;
+import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.eclipse.dltk.ui.text.ScriptOutlineInformationControl;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -15,6 +15,6 @@ public class ClojureOutlineInformationControl extends
 
     @Override
     protected IPreferenceStore getPreferenceStore() {
-	return Activator.getDefault().getPreferenceStore();
+	return ClojureUIPlugin.getDefault().getPreferenceStore();
     }
 }

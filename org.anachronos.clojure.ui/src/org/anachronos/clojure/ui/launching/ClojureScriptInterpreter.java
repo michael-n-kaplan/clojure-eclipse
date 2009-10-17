@@ -1,4 +1,4 @@
-package org.anachronos.clojure.ui;
+package org.anachronos.clojure.ui.launching;
 
 import java.io.IOException;
 import java.io.InputStream;
