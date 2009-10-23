@@ -1,12 +1,13 @@
-package org.anachronos.clojure.core.parser.dltk;
+package org.anachronos.clojure.core.parser.antlr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.anachronos.clojure.core.parser.ClojureLexer;
-import org.anachronos.clojure.core.parser.ClojureParser;
+import org.anachronos.clojure.core.parser.antlr.ASTNodeConverter;
+import org.anachronos.clojure.core.parser.antlr.ClojureLexer;
+import org.anachronos.clojure.core.parser.antlr.ClojureParser;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.Lexer;

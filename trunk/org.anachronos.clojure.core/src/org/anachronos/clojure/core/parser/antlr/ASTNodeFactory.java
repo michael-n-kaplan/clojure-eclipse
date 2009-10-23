@@ -1,4 +1,4 @@
-package org.anachronos.clojure.core.parser.dltk;
+package org.anachronos.clojure.core.parser.antlr;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.dltk.ast.declarations.Argument;

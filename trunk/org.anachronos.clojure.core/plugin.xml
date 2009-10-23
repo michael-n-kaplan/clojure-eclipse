@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="clj"
+            id="org.anachronos.clojure.ui.content-type"
+            name="Clojure File"
+            priority="high">
+      </content-type>
+   </extension>
+   <extension
+         id="nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.anachronos.clojure.ui.ClojureNature">
+         </run>
+      </runtime>
+   </extension>
+
+   <extension
+         point="org.eclipse.dltk.core.sourceParsers">
+      <parserContribution
+            natureId="org.anachronos.clojure.core.nature">
+         <parser
+               class="org.anachronos.clojure.core.parser.ClojureSourceParserFactory"
+               description="Clojure Parser"
+               id="org.anachronos.clojure.core.parser"
+               name="Clojure Parser"
+               priority="0">
+         </parser>
+      </parserContribution>
+   </extension>
+   <extension
+         point="org.eclipse.dltk.core.sourceElementParsers">
+      <parser
+            class="org.anachronos.clojure.core.parser.ClojureSourceElementParser"
+            nature="org.anachronos.clojure.core.nature"
+            priority="0">
+      </parser>
+   </extension>
+
+</plugin>

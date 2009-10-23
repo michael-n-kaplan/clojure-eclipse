@@ -56,11 +56,11 @@ tokens {
 }
 
 @header {
-package org.anachronos.clojure.core.parser;
+package org.anachronos.clojure.core.parser.antlr;
 }
   
 @lexer::header {
-package org.anachronos.clojure.core.parser;
+package org.anachronos.clojure.core.parser.antlr;
 
 import java.util.HashSet;
 import java.util.Set;  
