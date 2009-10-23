@@ -50,7 +50,7 @@ public class ClojureSyntaxColoringBlock extends
 		new String[] {
 			"Comment",
 			ClojureColorConstants.COMMENT_PREF_KEY,
-			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTKdoc },
+			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_comments },
 
 		new String[] {
 			"Number",
