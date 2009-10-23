@@ -27,6 +27,8 @@ tokens {
   
   QUOTE = '\'';
   
+  PARAMS;
+  
   REGEX;
   REQUIRE = 'require';
   REFER = 'refer';
@@ -70,7 +72,7 @@ file:
 form: 
   literal |
   
-  defn | fn | var | let |
+  def | defn | fn | var | let |
   
   require | refer | use | in_ns | import__ | ns |
   
@@ -85,20 +87,24 @@ def:
   -> ^(DEF $name $initialValue);
   
 defn:
-  '(' DEFN name=SYMBOL doc=STRING? meta=map? params=vector body+=form+ ')' 
-  -> ^(DEFN $name $meta $params $body);
+  '(' DEFN SYMBOL STRING? map? params body+=form+ ')' 
+  -> ^(DEFN SYMBOL STRING? map? params $body);
+   
+params:
+  '[' args+=SYMBOL* ']'
+  -> ^(PARAMS $args);
    
 fn:
-  '(' FN params=vector body+=form+ ')'
-  -> ^(FN $params $body);
+  '(' FN params body+=form+ ')'
+  -> ^(FN params $body);
 
 lambda:
   LAMBDA body+=form+ ')' 
   -> ^(LAMBDA $body);
   
 let:
-  '(' LET params=vector body+=form* ')'
-  -> ^(LET $params $body);
+  '(' LET bindings=vector body+=form* ')'
+  -> ^(LET $bindings $body);
 
 // References 
   
