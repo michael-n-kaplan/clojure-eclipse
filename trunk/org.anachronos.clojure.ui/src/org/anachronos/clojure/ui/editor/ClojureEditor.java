@@ -1,15 +1,17 @@
 package org.anachronos.clojure.ui.editor;
 
+import org.anachronos.clojure.ui.ClojureLanguageToolkit;
 import org.anachronos.clojure.ui.ClojureUILanguageToolkit;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.preferences.ClojurePreferenceConstants;
+import org.eclipse.dltk.core.IDLTKLanguageToolkit;
+import org.eclipse.dltk.internal.ui.editor.ScriptEditor;
 import org.eclipse.dltk.ui.text.IColorManager;
 import org.eclipse.dltk.ui.text.ScriptSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
-import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 /**
@@ -17,7 +19,8 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
  * 
  * @author km
  */
-public class ClojureEditor extends TextEditor {
+public class ClojureEditor extends ScriptEditor {
+    private static final String ID = "org.anachronos.clojure.ui.editor";
 
     public ClojureEditor() {
 	super();
@@ -68,5 +71,20 @@ public class ClojureEditor extends TextEditor {
 		ClojurePreferenceConstants.HIGHLIGHT_MATCHING_BRACKETS,
 		ClojurePreferenceConstants.MATCHING_BRACKETS_COLOR);
 	support.install(getPreferenceStore());
+    }
+
+    @Override
+    public String getEditorId() {
+	return ID;
+    }
+
+    @Override
+    public IDLTKLanguageToolkit getLanguageToolkit() {
+	return ClojureLanguageToolkit.getDefault();
+    }
+
+    @Override
+    protected IPreferenceStore getScriptPreferenceStore() {
+	return ClojureUIPlugin.getDefault().getPreferenceStore();
     }
 }
