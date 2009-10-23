@@ -1,9 +1,5 @@
 package org.anachronos.clojure.ui.editor;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.anachronos.clojure.core.parser.ClojureLexer;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.completion.ClojureContentAssistPreference;
@@ -76,38 +72,25 @@ public class ClojureSourceViewerConfiguration extends
 		createLexer(), getColorManager(), ClojureUIPlugin.getDefault()
 			.getPreferenceStore());
 
-	scanner.addToken(ClojureLexer.CHARACTER,
-		ClojureColorConstants.CHARACTER_COLOR_PREF_KEY);
-	scanner.addToken(ClojureLexer.COMMENT,
-		ClojureColorConstants.COMMENT_PREF_KEY);
-	scanner.addToken(ClojureLexer.KEYWORD,
-		ClojureColorConstants.KEYWORD_PREF_KEY);
-	scanner.addToken(ClojureLexer.NUMBER,
-		ClojureColorConstants.NUMBER_PREF_KEY);
-	scanner.addToken(ClojureLexer.STRING,
-		ClojureColorConstants.STRING_PREF_KEY);
-
-	scanner.addToken(ClojureLexer.LPAREN,
-		ClojureColorConstants.LIST_PREF_KEY);
-	scanner.addToken(ClojureLexer.RPAREN,
-		ClojureColorConstants.LIST_PREF_KEY);
-
-	scanner.addToken(ClojureLexer.LBRACKET,
-		ClojureColorConstants.VECTOR_PREF_KEY);
-	scanner.addToken(ClojureLexer.RBRACKET,
-		ClojureColorConstants.VECTOR_PREF_KEY);
-
-	scanner.addToken(ClojureLexer.SET,
- ClojureColorConstants.MAP_PREF_KEY);
-	scanner.addToken(ClojureLexer.LCURLY,
-		ClojureColorConstants.MAP_PREF_KEY);
-	scanner.addToken(ClojureLexer.RCURLY,
-		ClojureColorConstants.MAP_PREF_KEY);
-
-	scanner.addToken(ClojureLexer.SYMBOL,
-		ClojureColorConstants.SYMBOL_PREF_KEY);
-	scanner.addToken(ClojureLexer.PREDEFINED_SYMBOL,
-		ClojureColorConstants.PREDEFINED_SYMBOL_PREF_KEY);
+	scanner.addTokenPrefKey(ClojureColorConstants.CHARACTER_COLOR_PREF_KEY, ClojureLexer.CHARACTER);
+	scanner.addTokenPrefKey(ClojureColorConstants.COMMENT_PREF_KEY, ClojureLexer.COMMENT);
+	scanner.addTokenPrefKey(ClojureColorConstants.KEYWORD_PREF_KEY, ClojureLexer.KEYWORD);
+	scanner.addTokenPrefKey(ClojureColorConstants.NUMBER_PREF_KEY, ClojureLexer.NUMBER);
+	scanner.addTokenPrefKey(ClojureColorConstants.STRING_PREF_KEY, ClojureLexer.STRING);
+	scanner.addTokenPrefKey(ClojureColorConstants.LIST_PREF_KEY,
+		ClojureLexer.LPAREN, ClojureLexer.RPAREN);
+	scanner.addTokenPrefKey(ClojureColorConstants.VECTOR_PREF_KEY,
+		ClojureLexer.LBRACKET, ClojureLexer.RBRACKET);
+	scanner.addTokenPrefKey(ClojureColorConstants.MAP_PREF_KEY,
+		ClojureLexer.SET, ClojureLexer.LCURLY, ClojureLexer.RCURLY);
+	scanner.addTokenPrefKey(ClojureColorConstants.SYMBOL_PREF_KEY, ClojureLexer.SYMBOL);
+	scanner.addTokenPrefKey(
+		ClojureColorConstants.PREDEFINED_SYMBOL_PREF_KEY,
+		ClojureLexer.DEF, ClojureLexer.DEFN, 
+		ClojureLexer.FN,  
+		ClojureLexer.IMPORT, ClojureLexer.IN_NS, ClojureLexer.LET,
+		ClojureLexer.NS, ClojureLexer.REFER, ClojureLexer.REQUIRE,
+		ClojureLexer.USE, ClojureLexer.VAR);
 
 	scanner.initialize();
 	return scanner;
@@ -115,15 +98,6 @@ public class ClojureSourceViewerConfiguration extends
 
     private ClojureLexer createLexer() {
 	final ClojureLexer lexer = new ClojureLexer();
-	final Set<String> predefinedSymbols = new HashSet<String>(Arrays
-		.asList(new String[] { "catch", "def", "do", "defmethod",
-			"defmulti", "defmacro", "defstruct", "defn", "finally",
-			"fn", "fn*", "if", "identical?", "in-ns", "let",
-			"let*", "loop", "loop*", "new", "monitor-enter",
-			"monitor-exit", "quote", "recur", "the-var", "throw",
-			"try", "set!" }));
-
-	lexer.setPredefinedSymbols(predefinedSymbols);
 	return lexer;
     }
 

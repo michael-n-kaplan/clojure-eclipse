@@ -7,18 +7,38 @@ options {
 
 tokens {
   DEREF = '@';
-  LAMBDA;
+  DEF = 'def';
+  DEFN = 'defn';
+  
+  FN = 'fn';
+  
+  IMPORT = 'import';
+  IN_NS = 'in-ns';
+  
+  LAMBDA = '#(';
+  LET = 'let';
   LIST;
+  
   MAP;
   META = '^';
   META_DATA;
-  PREDEFINED_SYMBOL;
+  
+  NS = 'ns';
+  
   QUOTE = '\'';
+  
   REGEX;
+  REQUIRE = 'require';
+  REFER = 'refer';
+  
   SET;
   SYNTAX_QUOTE = '`';
+  
+  USE = 'use';
   UNQUOTE = '~';
   UNQUOTE_SPLICING = '~@';
+  
+  VAR = 'var';
   VAR_QUOTE;
   VAR_ARG = '&';
   VECTOR;
@@ -44,57 +64,118 @@ import java.util.HashSet;
 import java.util.Set;  
 }
 
-@lexer::members {
-  private Set<String> predefinedSymbols = new HashSet<String>();
-  
-  public void setPredefinedSymbols(final Set<String> predefinedSymbols) {
-    this.predefinedSymbols = predefinedSymbols;
-  }
-  
-  private boolean isPredefinedSymbol(final String symbol) {
-    return predefinedSymbols.contains(symbol);
-  }
-}
-
 file: 
-  list*;
+  form*;
   
 form: 
   literal |
   
-  list |
-  map |
-  set |
-  vector |
+  defn | fn | var | let |
+  
+  require | refer | use | in_ns | import__ | ns |
+  
+  list | map | set | vector |
   
   reader_macro;
   
+// Definitions
+
+def:
+  '(' DEF name=SYMBOL initialValue=form? ')'
+  -> ^(DEF $name $initialValue);
+  
+defn:
+  '(' DEFN name=SYMBOL doc=STRING? meta=map? params=vector body+=form+ ')' 
+  -> ^(DEFN $name $meta $params $body);
+   
+fn:
+  '(' FN params=vector body+=form+ ')'
+  -> ^(FN $params $body);
+
+lambda:
+  LAMBDA body+=form+ ')' 
+  -> ^(LAMBDA $body);
+  
+let:
+  '(' LET params=vector body+=form* ')'
+  -> ^(LET $params $body);
+
+// References 
+  
+var:
+  '(' VAR symbol=SYMBOL ')' |
+  '#\'' symbol=SYMBOL
+  -> ^(VAR $symbol);
+  
+
+// Module\Namespace handling
+
+require:
+  '(' REQUIRE namespace=quoted_namespace_symbol ')'
+  -> ^(REQUIRE $namespace);
+
+refer:
+  '(' REFER namespace=quoted_namespace_symbol ')'
+  -> ^(REFER $namespace);
+  
+use:
+  '(' USE ':reload-all'? namespace=quoted_namespace_symbol ')'
+  -> ^(USE $namespace);
+  
+in_ns:
+  '(' IN_NS namespace=quoted_namespace_symbol ')'
+  -> ^(IN_NS $namespace);
+  
+import__:
+  '(' IMPORT '(' pkg=SYMBOL classes+=SYMBOL ')' ')'
+  -> ^(IMPORT $pkg $classes);
+  
+ns:
+  '(' NS name=SYMBOL namespace_references+=namespace_reference+ ')'
+  -> ^(NS $name $namespace_references);
+  
+namespace_reference:
+  '(' ':use' packages+=SYMBOL+ ')' 
+  |
+  '(' ':import' '(' pkg=SYMBOL cls+=SYMBOL+ ')';
+  
+quoted_namespace_symbol:
+  QUOTE namespace=SYMBOL
+  -> ^($namespace);
+  
+// Data types
+  
 list:
-  '(' form* ')' -> ^(LIST form*);
+  '(' form* ')' 
+  -> ^(LIST form*);
 
 set:
-  '#{' form* '}' -> ^(SET form*);
+  '#{' form* '}' 
+  -> ^(SET form*);
     
 map:
-  '{' (form form)* '}' -> ^(MAP (form form)*);
+  '{' (form form)* '}' 
+  -> ^(MAP (form form)*);
   
 vector:
-  '[' form* ('&' form)? ']' -> ^(VECTOR form*);
+  '[' form* ('&' form)? ']' 
+  -> ^(VECTOR form*);
 
 special_form:
   ('\'' | '`' | '~' | '~@' | '^' | '@') form;
   
-lambda:
-  '#(' form* ')' -> ^(LAMBDA form*);
   
 meta_data:
-  '#^' map form -> ^(META_DATA map form);
+  '#^' map form 
+  -> ^(META_DATA map form);
   
 var_quote:
-  '\'#' SYMBOL -> ^(VAR_QUOTE SYMBOL);
+  '\'#' SYMBOL 
+  -> ^(VAR_QUOTE SYMBOL);
   
 regex:
-  '#' STRING -> ^(REGEX STRING);
+  '#' STRING 
+  -> ^(REGEX STRING);
   
 reader_macro:
   lambda |
@@ -134,7 +215,7 @@ KEYWORD:
 SYMBOL: 
   '.' | 
   '/' |   
-  NAME ('/' NAME)? { $type = isPredefinedSymbol($text) ? PREDEFINED_SYMBOL : SYMBOL; };
+  NAME ('/' NAME)?;
 
 PARAM_NAME:
   '%' (('1'..'9')('0'..'9')*)?;

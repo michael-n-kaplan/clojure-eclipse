@@ -70,14 +70,16 @@ public class AntlrTokenScanner implements ITokenScanner {
     }
 
     /**
-     * Adds a mapping from the ANTLR token type to the corresponding eclipse
-     * token used for syntax coloring.
+     * Adds the preference key to use for the given antlr tokens.
      * 
-     * @param antlrTokenType
      * @param tokenPrefKey
+     * @param antlrTokenTypes
      */
-    public void addToken(final int antlrTokenType, final String tokenPrefKey) {
-	antlrTokenTypeToTokenPrefKey.put(antlrTokenType, tokenPrefKey);
+    public void addTokenPrefKey(final String tokenPrefKey,
+	    final int... antlrTokenTypes) {
+	for (int antlrTokenType : antlrTokenTypes) {
+	    antlrTokenTypeToTokenPrefKey.put(antlrTokenType, tokenPrefKey);
+	}
     }
 
     /**
