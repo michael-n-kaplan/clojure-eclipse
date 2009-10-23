@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.editor;
 
-import org.anachronos.clojure.core.parser.ClojureLexer;
+import org.anachronos.clojure.core.parser.antlr.ClojureLexer;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.completion.ClojureContentAssistPreference;
 import org.anachronos.clojure.ui.preferences.ClojureColorConstants;

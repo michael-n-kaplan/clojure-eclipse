@@ -7,7 +7,7 @@ options {
 }
 
 @header {
-package org.anachronos.clojure.core.parser.dltk;
+package org.anachronos.clojure.core.parser.antlr;
 
 import java.util.ArrayList;
 import java.util.List;
