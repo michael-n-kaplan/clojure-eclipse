@@ -13,7 +13,7 @@
          point="org.eclipse.dltk.ui.language">
       <language
             class="org.anachronos.clojure.ui.ClojureUILanguageToolkit"
-            nature="org.anachronos.clojure.ui.nature"
+            nature="org.anachronos.clojure.core.nature"
             priority="0">
       </language>
    </extension>
@@ -28,14 +28,14 @@
          point="org.eclipse.dltk.console.scriptInterpreter">
       <scriptInterpreter
             class="org.anachronos.clojure.ui.launching.ClojureScriptInterpreter"
-            natureID="org.anachronos.clojure.ui.nature">
+            natureID="org.anachronos.clojure.core.nature">
       </scriptInterpreter>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
             category="org.anachronos.clojure.ui.category"
-            class="org.eclipse.dltk.ui.wizards.GenericDLTKProjectWizard:org.anachronos.clojure.ui.nature"
+            class="org.eclipse.dltk.ui.wizards.GenericDLTKProjectWizard:org.anachronos.clojure.core.nature"
             id="org.anachronos.clojure.ui.wizard"
             name="New Clojure Project"
             project="true">

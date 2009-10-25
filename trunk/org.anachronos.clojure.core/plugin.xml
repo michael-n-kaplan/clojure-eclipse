@@ -16,7 +16,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.anachronos.clojure.ui.ClojureNature">
+               class="org.anachronos.clojure.core.ClojureNature">
          </run>
       </runtime>
    </extension>

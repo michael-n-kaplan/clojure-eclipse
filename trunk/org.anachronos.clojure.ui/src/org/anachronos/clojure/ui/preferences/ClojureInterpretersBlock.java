@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.preferences;
 
-import org.anachronos.clojure.ui.ClojureNature;
+import org.anachronos.clojure.core.ClojureNature;
 import org.eclipse.dltk.core.environment.IEnvironment;
 import org.eclipse.dltk.internal.debug.ui.interpreters.IScriptInterpreterDialog;
 import org.eclipse.dltk.internal.debug.ui.interpreters.InterpretersBlock;

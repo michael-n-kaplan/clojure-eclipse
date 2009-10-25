@@ -2,8 +2,8 @@ package org.anachronos.clojure.ui.launching;
 
 import java.io.IOException;
 
+import org.anachronos.clojure.core.ClojureNature;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
-import org.anachronos.clojure.ui.ClojureNature;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.dltk.core.environment.IDeployment;
