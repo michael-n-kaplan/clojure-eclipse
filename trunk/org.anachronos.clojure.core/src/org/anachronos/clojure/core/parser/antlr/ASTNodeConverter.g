@@ -32,7 +32,7 @@ form[ModuleDeclaration moduleDeclaration]:
   
     v=def { moduleDeclaration.getVariablesList().add(v); }
   |
-    (d=defn | d=fn) { moduleDeclaration.getFunctionList().add(d); }; 
+    (d=defn | d=fn) { moduleDeclaration.getFunctionList().add(d); moduleDeclaration.addStatement(d); }; 
     // | var | let |
   
 //  require | refer | use | in_ns | import__ | ns |
