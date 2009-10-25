@@ -30,7 +30,7 @@ file returns [ModuleDeclaration moduleDeclaration]
 form[ModuleDeclaration moduleDeclaration]: 
 //  literal |
   
-    v=def { moduleDeclaration.getVariablesList().add(v); }
+    v=def { moduleDeclaration.getVariablesList().add(v); moduleDeclaration.addStatement(v); }
   |
     (d=defn | d=fn) { moduleDeclaration.getFunctionList().add(d); moduleDeclaration.addStatement(d); }; 
     // | var | let |
