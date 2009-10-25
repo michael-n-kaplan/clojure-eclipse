@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.console;
 
-import org.anachronos.clojure.ui.ClojureNature;
+import org.anachronos.clojure.core.ClojureNature;
 import org.eclipse.dltk.console.IScriptInterpreter;
 import org.eclipse.dltk.console.ScriptInterpreterManager;
 import org.eclipse.dltk.console.ui.ScriptConsole;

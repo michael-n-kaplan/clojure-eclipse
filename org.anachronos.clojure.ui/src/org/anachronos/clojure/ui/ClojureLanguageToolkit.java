@@ -1,5 +1,6 @@
 package org.anachronos.clojure.ui;
 
+import org.anachronos.clojure.core.ClojureNature;
 import org.eclipse.dltk.core.AbstractLanguageToolkit;
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 
