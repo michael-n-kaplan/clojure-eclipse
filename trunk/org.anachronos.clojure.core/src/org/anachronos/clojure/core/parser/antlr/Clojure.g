@@ -91,8 +91,8 @@ defn:
   -> ^(DEFN SYMBOL STRING? map? params $body);
    
 params:
-  '[' args+=SYMBOL* ']'
-  -> ^(PARAMS $args);
+  '[' SYMBOL* ']'
+  -> ^(PARAMS SYMBOL*);
    
 fn:
   '(' FN params body+=form+ ')'
