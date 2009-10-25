@@ -91,5 +91,19 @@
          </contentTypeBinding>
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.anachronos.clojure.ui.ClojurePerspective"
+            id="org.anachronos.clojure.ui.perspective"
+            name="Clojure Perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="org.anachronos.clojure.ui.editor.ClojureDocumentSetupParticipant">
+      </participant>
+   </extension>
 
 </plugin>
