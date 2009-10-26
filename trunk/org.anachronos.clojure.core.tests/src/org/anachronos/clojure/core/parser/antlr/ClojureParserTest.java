@@ -1,7 +1,10 @@
 package org.anachronos.clojure.core.parser.antlr;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -9,17 +12,16 @@ import org.antlr.runtime.Lexer;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ClojureParserTest {
 
     @Test
-    @Ignore("Needs error reporting!")
     public void defnWithAnonParams() throws Exception {
-	ClojureParser parser = buildParser("(defn test [] % %1 %2 %12))");
+	ClojureParser parser = buildParser("(defn test [] %)");
 	parser.file();
-	fail();
+	final List<RecognitionException> errors = parser.getErrors();
+	assertFalse(errors.isEmpty());
     }
 
     @Test
@@ -83,6 +85,8 @@ public class ClojureParserTest {
     private CommonTree buildAst(String script) throws RecognitionException {
 	final ClojureParser parser = buildParser(script);
 	final CommonTree ast = (CommonTree) parser.file().getTree();
+	assertTrue("Expected no errors during parse!", parser.getErrors()
+		.isEmpty());
 	return ast;
     }
 

@@ -68,6 +68,16 @@ import java.util.Set;
 
 @members {
   private boolean paramNamesAllowed = false;
+  private final List<RecognitionException> errors = 
+    new ArrayList<RecognitionException>();
+  
+  public void reportError(final RecognitionException error) {
+    errors.add(error);
+  }
+  
+  public List<RecognitionException> getErrors() {
+    return errors;
+  }
 }
 
 file: 
