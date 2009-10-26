@@ -28,6 +28,15 @@ public class ASTNodeConverterTest {
 	assertEquals("test", testVar.getName());
     }
 
+    @Test
+    public void defFunction() throws Exception {
+	final String script = "(def test (fn [] 1))";
+	final ModuleDeclaration file = convertScript(script);
+
+	final MethodDeclaration testVar = getFunction(file, 0);
+	assertEquals("test", testVar.getName());
+    }
+
     private FieldDeclaration getVariable(ModuleDeclaration file, int index) {
 	final FieldDeclaration[] variables = file.getVariables();
 	assertTrue("Expected correct number of variables!",
