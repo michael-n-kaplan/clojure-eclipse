@@ -29,6 +29,22 @@ public class ClojureParserTest {
 	}
     }
 
+    @Test
+    public void defnNestedDefnAndDefn() throws Exception {
+	final CommonTree tree = buildAst("(defn test []\n"
+		+ "(defn nest1 [] (+ 1 2))"
+		+ "(defn nest2 [] (+ 1 3)))");
+	assertEquals(4, tree.getChildCount());
+
+	final Tree defn1 = tree.getChild(2);
+	assertEquals(3, defn1.getChildCount());
+	assertEquals("nest1", defn1.getChild(0).getText());
+
+	final Tree defn2 = tree.getChild(3);
+	assertEquals(3, defn2.getChildCount());
+	assertEquals("nest2", defn2.getChild(0).getText());
+    }
+
     private CommonTree buildAst(String script) throws RecognitionException {
 	final Lexer lexer = new ClojureLexer(new ANTLRStringStream(script));
 	final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
