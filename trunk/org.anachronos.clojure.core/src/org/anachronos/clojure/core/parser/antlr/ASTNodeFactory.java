@@ -14,7 +14,7 @@ import org.eclipse.dltk.ast.statements.Block;
 import org.eclipse.dltk.ast.statements.Statement;
 
 public class ASTNodeFactory {
-    private static final String VAR_ARG_LABEL = "...";
+    private static final String VAR_ARG_LABEL = "&";
     private static final int ILLEGAL_INDEX = -1;
 
     public ModuleDeclaration createFile() {
@@ -69,7 +69,7 @@ public class ASTNodeFactory {
     }
 
     public Argument createVarArg(CommonTree name) {
-	return createArgument(name, name.getText() + VAR_ARG_LABEL);
+	return createArgument(name, VAR_ARG_LABEL + name.getText());
     }
 
     public FieldDeclaration createDef(final CommonTree def,
