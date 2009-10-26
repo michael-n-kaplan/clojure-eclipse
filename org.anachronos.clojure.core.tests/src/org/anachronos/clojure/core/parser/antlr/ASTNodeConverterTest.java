@@ -5,9 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.anachronos.clojure.core.parser.antlr.ASTNodeConverter;
-import org.anachronos.clojure.core.parser.antlr.ClojureLexer;
-import org.anachronos.clojure.core.parser.antlr.ClojureParser;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.Lexer;
@@ -40,6 +37,19 @@ public class ASTNodeConverterTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void simpleDefn() throws Exception {
+	final String script = "(defn test [] 1)";
+	final ModuleDeclaration file = convertScript(script);
+
+	final MethodDeclaration testFunction = getFunction(file, 0);
+	assertEquals("test", testFunction.getName());
+
+	final List arguments = testFunction.getArguments();
+	assertEquals(0, arguments.size());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void defn() throws Exception {
 	final String script = "(defn test \"doc\" [a] 1)";
 	final ModuleDeclaration file = convertScript(script);
@@ -57,14 +67,33 @@ public class ASTNodeConverterTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    public void defnNestedFn() throws Exception {
+	final String script = "(defn test [] (fn [a] 1))";
+	final ModuleDeclaration file = convertScript(script);
+
+	final MethodDeclaration testFunction = getFunction(file, 0);
+	assertEquals("test", testFunction.getName());
+
+	final MethodDeclaration anonFunction = getNestedFunction(testFunction,
+		0);
+	assertEquals("", anonFunction.getName());
+
+	final List arguments = anonFunction.getArguments();
+	assertEquals(1, arguments.size());
+	final Argument arg = (Argument) arguments.get(0);
+	assertEquals("a", arg.getName());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     public void fn() throws Exception {
 	final String script = "(fn [a] 1)";
 	final ModuleDeclaration file = convertScript(script);
 
-	final MethodDeclaration testFunction = getFunction(file, 0);
-	assertEquals("", testFunction.getName());
+	final MethodDeclaration anonFunction = getFunction(file, 0);
+	assertEquals("", anonFunction.getName());
 
-	final List arguments = testFunction.getArguments();
+	final List arguments = anonFunction.getArguments();
 	assertEquals(1, arguments.size());
 
 	final Argument arg = (Argument) arguments.get(0);
@@ -76,6 +105,17 @@ public class ASTNodeConverterTest {
 	assertTrue("Expected correct number of functions!",
 		index + 1 <= functions.length);
 	return functions[index];
+    }
+
+    @SuppressWarnings("unchecked")
+    private MethodDeclaration getNestedFunction(MethodDeclaration defn,
+	    int index) {
+	final List nestedFunctions = defn.getStatements();
+	assertTrue("Expected correct number of nested functions!",
+		index + 1 <= nestedFunctions.size());
+	final MethodDeclaration nestedFunction = (MethodDeclaration) nestedFunctions
+		.get(index);
+	return nestedFunction;
     }
 
     private ModuleDeclaration convertScript(String script)
