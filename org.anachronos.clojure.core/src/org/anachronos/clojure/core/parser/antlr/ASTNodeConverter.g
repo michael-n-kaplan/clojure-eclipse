@@ -17,6 +17,7 @@ import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.declarations.MethodDeclaration;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
+import org.eclipse.dltk.ast.statements.Statement;
 }
 
 @members {
@@ -30,56 +31,51 @@ file returns [ModuleDeclaration file]
       d=form { if (d != null) moduleDeclaration.addStatement(d); }
     )*;
   
-form returns [Declaration def]
-@init { def = null; }: 
+form returns [Statement stmt]: 
     literal |
-    ( 
-      d=def | d=defn | d=fn |
-      d=list
-    ) { def = d; }; 
+    ( s=def | s=defn | s=fn | 
+      s=list | s=map | s=set | s=vector
+    ) { stmt = s; }; 
     // | var | let |
   
 //  require | refer | use | in_ns | import__ | ns |
   
-//  list | map | set | vector |
-  
 //  reader_macro;
 
-def returns [Declaration def]:
+def returns [Statement stmt]:
   ^(d=DEF name=SYMBOL initial=form)
   { 
     if (initial instanceof MethodDeclaration) {
-      initial.setName(name.getText());
-      def = initial; 
+      MethodDeclaration fn = (MethodDeclaration) initial; 
+      fn.setName(name.getText());
+      stmt = fn; 
     } else
-      def = factory.createDef(d, name); 
+      stmt = factory.createDef(d, name); 
   };
   
-defn returns [Declaration def]
-@init { List<Declaration> nestedDefs = new ArrayList<Declaration>(); }:
+defn returns [Statement stmt]:
   ^(d=DEFN 
       name=SYMBOL doc=STRING? 
       args=params 
-      (nestedDef=form { if (nestedDef != null) nestedDefs.add(nestedDef); })*
+      statements=stmt_list
    ) 
   { 
     MethodDeclaration defn = factory.createDefn(d, name, doc); 
     defn.acceptArguments(args);
-    defn.acceptBody(factory.createBody(d, nestedDefs));
-    def = defn; 
+    defn.acceptBody(factory.createBody(d, statements));
+    stmt = defn;
   };
 
-fn returns [Declaration def]
-@init { List<Declaration> nestedDefs = new ArrayList<Declaration>(); }:
+fn returns [Statement stmt]:
   ^(f=FN 
       args=params 
-      (nestedDef=form { if (nestedDef != null) nestedDefs.add(nestedDef); })*
+      statements=stmt_list
    ) 
   { 
     MethodDeclaration fn = factory.createFn(f); 
     fn.acceptArguments(args); 
-    fn.acceptBody(factory.createBody(f, nestedDefs));
-    def = fn;
+    fn.acceptBody(factory.createBody(f, statements));
+    stmt = fn;
   };
 
 params returns [List<Argument> args]
@@ -92,8 +88,25 @@ params returns [List<Argument> args]
 var_arg[List<Argument> args]:
   ^(VAR_ARG name=SYMBOL) { args.add(factory.createVarArg(name)); };
   
-list returns [Declaration def]:
-  ^(LIST (d=form)*) { def = d; };
+list returns [Statement list]:
+  ^(l=LIST statements=stmt_list ) 
+  { list = factory.createBody(l, statements); };
+
+set returns [Statement set]:
+  ^(s=SET statements=stmt_list) 
+  { set = factory.createBody(s, statements); };
+
+map returns [Statement map]:
+  ^(m=MAP statements=stmt_list) 
+  { map = factory.createBody(m, statements); };
+
+vector returns [Statement vector]:
+  ^(v=VECTOR statements=stmt_list) 
+  { vector = factory.createBody(v, statements); };
+
+stmt_list returns [List<Statement> statements]
+@init { statements = new ArrayList<Statement>(); }:
+  (stmt=form { statements.add(stmt); })*;
   
 literal:
   NUMBER | SYMBOL;
