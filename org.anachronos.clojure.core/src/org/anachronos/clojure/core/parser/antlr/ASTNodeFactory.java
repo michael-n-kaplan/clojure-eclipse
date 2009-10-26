@@ -1,5 +1,6 @@
 package org.anachronos.clojure.core.parser.antlr;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.CommonToken;
@@ -37,7 +38,8 @@ public class ASTNodeFactory {
 	final int declStart = ((CommonToken) defn.getToken()).getStartIndex();
 	final int declEnd = ((CommonToken) ((CommonTree) defn.getChild(defn
 		.getChildCount() - 1)).getToken()).getStopIndex();
-	final MethodDeclaration methodDeclaration = new MethodDeclaration(name.getText(), name.getTokenStartIndex(),
+	final MethodDeclaration methodDeclaration = new MethodDeclaration(name
+		.getText(), name.getTokenStartIndex(),
 		name.getTokenStopIndex(), declStart, declEnd);
 	methodDeclaration.setComments(doc == null ? null : doc.getText()
 		.substring(1, doc.getText().length() - 1));
@@ -47,6 +49,18 @@ public class ASTNodeFactory {
     public Argument createArgument(final CommonTree name) {
 	final String argName = name.getText();
 	return createArgument(name, argName);
+    }
+
+    public List<Argument> createLambdaArguments(final int paramCount) {
+	final List<Argument> args = new ArrayList<Argument>();
+	for (int param = 0; param < paramCount; param++) {
+	    args.add(createArgument("%" + (param + 1)));
+	}
+	return args;
+    }
+
+    private Argument createArgument(final String name) {
+	return new Argument(new SimpleReference(0, 0, name), 0, 0, null, 0);
     }
 
     private Argument createArgument(final CommonTree name, final String argName) {

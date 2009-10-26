@@ -66,6 +66,10 @@ import java.util.HashSet;
 import java.util.Set;  
 }
 
+@members {
+  private boolean paramNamesAllowed = false;
+}
+
 file: 
   form*;
   
@@ -102,7 +106,9 @@ fn:
   '(' FN params form* ')'
   -> ^(FN params form*);
 
-lambda:
+lambda
+@init  { paramNamesAllowed = true;  }
+@after { paramNamesAllowed = false; }:
   LAMBDA form* ')' 
   -> ^(LAMBDA form*);
   
@@ -202,7 +208,7 @@ literal:
   BOOLEAN |
   KEYWORD |
   SYMBOL |
-  PARAM_NAME;   
+  {paramNamesAllowed}? PARAM_NAME;   
   
 STRING: 
   '"' ( ~'"' | ('\\' '"') )* '"';

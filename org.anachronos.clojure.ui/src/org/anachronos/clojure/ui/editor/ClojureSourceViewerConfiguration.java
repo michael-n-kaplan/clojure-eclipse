@@ -78,7 +78,7 @@ public class ClojureSourceViewerConfiguration extends
 	scanner.addTokenPrefKey(ClojureColorConstants.NUMBER_PREF_KEY, ClojureLexer.NUMBER);
 	scanner.addTokenPrefKey(ClojureColorConstants.STRING_PREF_KEY, ClojureLexer.STRING);
 	scanner.addTokenPrefKey(ClojureColorConstants.LIST_PREF_KEY,
-		ClojureLexer.LPAREN, ClojureLexer.RPAREN);
+		ClojureLexer.LAMBDA, ClojureLexer.LPAREN, ClojureLexer.RPAREN);
 	scanner.addTokenPrefKey(ClojureColorConstants.VECTOR_PREF_KEY,
 		ClojureLexer.LBRACKET, ClojureLexer.RBRACKET);
 	scanner.addTokenPrefKey(ClojureColorConstants.MAP_PREF_KEY,

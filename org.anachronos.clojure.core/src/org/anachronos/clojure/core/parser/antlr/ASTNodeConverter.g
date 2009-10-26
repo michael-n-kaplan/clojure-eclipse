@@ -78,13 +78,18 @@ fn returns [Statement stmt]:
     stmt = fn;
   };
 
-lambda returns [Statement stmt]:
+
+lambda returns [Statement stmt]
+scope {
+  int paramCount;
+}:
   ^(f=LAMBDA 
       statements=stmt_list
    ) 
   { 
     MethodDeclaration fn = factory.createFn(f); 
     fn.acceptBody(factory.createBody(f, statements));
+    fn.acceptArguments(factory.createLambdaArguments($lambda::paramCount));
     stmt = fn;
   };
 
@@ -119,5 +124,11 @@ stmt_list returns [List<Statement> statements]
   (stmt=form { if (stmt != null) statements.add(stmt); })*;
   
 literal:
-  NUMBER | SYMBOL;
+  NUMBER | SYMBOL | 
+  p=PARAM_NAME 
+  { 
+    String s = p.getText(); 
+    int pNum = s.length() != 1 ? Integer.valueOf(s.substring(1)) : 1;
+    $lambda::paramCount = Math.max($lambda::paramCount, pNum); 
+  };
 
