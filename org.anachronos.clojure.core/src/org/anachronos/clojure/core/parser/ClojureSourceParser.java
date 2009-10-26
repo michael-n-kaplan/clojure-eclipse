@@ -85,12 +85,13 @@ public class ClojureSourceParser extends AbstractSourceParser {
 	    final RecognitionException error = errorEntry.getKey();
 	    final int line = error.line;
 	    final int offset = lineModel.getLineOffset(line);
-	    final int start = offset + error.charPositionInLine;
+	    final int column = error.charPositionInLine;
+	    final int start = offset + column;
 	    final int end = start + error.token.getText().length();
 	    final String message = errorEntry.getValue();
 	    final DefaultProblem problem = new DefaultProblem(fileName,
-		    message, 0, new String[] {}, ProblemSeverities.Error,
-		    start, end, line);
+		    message, 0, null, ProblemSeverities.Error, start, end,
+		    line, column);
 	    reporter.reportProblem(problem);
 	}
     }
