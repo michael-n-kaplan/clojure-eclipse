@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
+import java.util.Set;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -20,7 +20,8 @@ public class ClojureParserTest {
     public void defnWithAnonParams() throws Exception {
 	ClojureParser parser = buildParser("(defn test [] %)");
 	parser.file();
-	final List<RecognitionException> errors = parser.getErrors();
+	final Set<RecognitionException> errors = parser.getErrorToMessage()
+		.keySet();
 	assertFalse(errors.isEmpty());
     }
 
@@ -85,8 +86,9 @@ public class ClojureParserTest {
     private CommonTree buildAst(String script) throws RecognitionException {
 	final ClojureParser parser = buildParser(script);
 	final CommonTree ast = (CommonTree) parser.file().getTree();
-	assertTrue("Expected no errors during parse!", parser.getErrors()
-		.isEmpty());
+	assertTrue("Expected no errors during parse!", parser
+		.getErrorToMessage()
+		.keySet().isEmpty());
 	return ast;
     }
 
