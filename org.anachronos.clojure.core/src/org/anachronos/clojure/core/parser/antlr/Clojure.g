@@ -87,16 +87,16 @@ def:
   -> ^(DEF $name $initialValue);
   
 defn:
-  '(' DEFN SYMBOL STRING? map? params body+=form+ ')' 
-  -> ^(DEFN SYMBOL STRING? map? params $body);
+  '(' DEFN SYMBOL STRING? map? params form* ')' 
+  -> ^(DEFN SYMBOL STRING? map? params form*);
    
 params:
   '[' SYMBOL* ']'
   -> ^(PARAMS SYMBOL*);
    
 fn:
-  '(' FN params body+=form+ ')'
-  -> ^(FN params $body);
+  '(' FN params form+ ')'
+  -> ^(FN params form+);
 
 lambda:
   LAMBDA body+=form+ ')' 
