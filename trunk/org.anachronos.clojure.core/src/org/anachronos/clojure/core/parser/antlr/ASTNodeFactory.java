@@ -13,6 +13,7 @@ import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Block;
 
 public class ASTNodeFactory {
+    private static final String VAR_ARG_LABEL = "...";
     private static final int ILLEGAL_INDEX = -1;
 
     public ModuleDeclaration createFile() {
@@ -44,8 +45,17 @@ public class ASTNodeFactory {
     }
 
     public Argument createArgument(final CommonTree name) {
-	return new Argument(new SimpleReference(0, 0, name.getText()), name
+	final String argName = name.getText();
+	return createArgument(name, argName);
+    }
+
+    private Argument createArgument(final CommonTree name, final String argName) {
+	return new Argument(new SimpleReference(0, 0, argName), name
 		.getTokenStartIndex(), name.getTokenStopIndex(), null, 0);
+    }
+
+    public Argument createVarArg(CommonTree name) {
+	return createArgument(name, name.getText() + VAR_ARG_LABEL);
     }
 
     public FieldDeclaration createDef(final CommonTree def,

@@ -86,8 +86,12 @@ params returns [List<Argument> args]
 @init{ args = new ArrayList<Argument>(); }:
   ^(PARAMS 
       (name=SYMBOL { args.add(factory.createArgument(name)); })* 
+      var_arg[args]?
    );
-   
+
+var_arg[List<Argument> args]:
+  ^(VAR_ARG name=SYMBOL) { args.add(factory.createVarArg(name)); };
+  
 list returns [Declaration def]:
   ^(LIST (d=form)*) { def = d; };
   
