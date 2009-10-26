@@ -91,9 +91,13 @@ defn:
   -> ^(DEFN SYMBOL STRING? map? params form*);
    
 params:
-  '[' SYMBOL* ']'
-  -> ^(PARAMS SYMBOL*);
+  '[' SYMBOL* var_arg? ']'
+  -> ^(PARAMS SYMBOL* var_arg?);
    
+var_arg:
+  '&' SYMBOL
+  -> ^(VAR_ARG SYMBOL);
+  
 fn:
   '(' FN params form* ')'
   -> ^(FN params form*);
@@ -164,7 +168,7 @@ map:
   -> ^(MAP (form form)*);
   
 vector:
-  '[' form* ('&' form)? ']' 
+  '[' form* ']' 
   -> ^(VECTOR form*);
 
 special_form:
