@@ -106,7 +106,7 @@ vector returns [Statement vector]:
 
 stmt_list returns [List<Statement> statements]
 @init { statements = new ArrayList<Statement>(); }:
-  (stmt=form { statements.add(stmt); })*;
+  (stmt=form { if (stmt != null) statements.add(stmt); })*;
   
 literal:
   NUMBER | SYMBOL;
