@@ -46,9 +46,13 @@ form returns [Declaration def]
 //  reader_macro;
 
 def returns [Declaration def]:
-  ^(d=DEF name=SYMBOL initial_value=form)
+  ^(d=DEF name=SYMBOL initial=form)
   { 
-    def = factory.createDef(d, name); 
+    if (initial instanceof MethodDeclaration) {
+      initial.setName(name.getText());
+      def = initial; 
+    } else
+      def = factory.createDef(d, name); 
   };
   
 defn returns [Declaration def]
