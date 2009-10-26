@@ -33,7 +33,7 @@ file returns [ModuleDeclaration file]
   
 form returns [Statement stmt]: 
     literal |
-    ( s=def | s=defn | s=fn | 
+    ( s=def | s=defn | s=fn | s=lambda | 
       s=list | s=map | s=set | s=vector
     ) { stmt = s; }; 
     // | var | let |
@@ -74,6 +74,16 @@ fn returns [Statement stmt]:
   { 
     MethodDeclaration fn = factory.createFn(f); 
     fn.acceptArguments(args); 
+    fn.acceptBody(factory.createBody(f, statements));
+    stmt = fn;
+  };
+
+lambda returns [Statement stmt]:
+  ^(f=LAMBDA 
+      statements=stmt_list
+   ) 
+  { 
+    MethodDeclaration fn = factory.createFn(f); 
     fn.acceptBody(factory.createBody(f, statements));
     stmt = fn;
   };

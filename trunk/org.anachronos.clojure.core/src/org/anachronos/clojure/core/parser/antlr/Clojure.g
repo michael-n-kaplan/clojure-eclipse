@@ -103,8 +103,8 @@ fn:
   -> ^(FN params form*);
 
 lambda:
-  LAMBDA body+=form+ ')' 
-  -> ^(LAMBDA $body);
+  LAMBDA form* ')' 
+  -> ^(LAMBDA form*);
   
 let:
   '(' LET bindings=vector body+=form* ')'
