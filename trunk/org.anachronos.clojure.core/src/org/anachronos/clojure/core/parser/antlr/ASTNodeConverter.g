@@ -34,7 +34,10 @@ file returns [ModuleDeclaration file]
 body returns [Declaration def]
 @init { def = null; }: 
     literal |
-    (d=def | d=defn | d=fn) { def = d; }; 
+    ( 
+      d=def | d=defn | d=fn |
+      d=list
+    ) { def = d; }; 
     // | var | let |
   
 //  require | refer | use | in_ns | import__ | ns |
@@ -51,9 +54,11 @@ def returns [Declaration def]:
   
 defn returns [Declaration def]
 @init { List<Declaration> nestedDefs = new ArrayList<Declaration>(); }:
-  ^(d=DEFN name=SYMBOL doc=STRING? 
+  ^(
+    d=DEFN name=SYMBOL doc=STRING? 
     args=params 
-    (nestedDef=body { if (nestedDef != null) nestedDefs.add(nestedDef); })+) 
+    (nestedDef=body { if (nestedDef != null) nestedDefs.add(nestedDef); })*
+   ) 
   { 
     MethodDeclaration defn = factory.createDefn(d, name, doc); 
     defn.acceptArguments(args);
@@ -75,6 +80,9 @@ params returns [List<Argument> args]
       (name=SYMBOL { args.add(factory.createArgument(name)); })* 
    );
    
+list returns [Declaration def]:
+  ^(LIST (d=body)*) { def = d; };
+  
 literal:
-  NUMBER;
+  NUMBER | SYMBOL;
 
