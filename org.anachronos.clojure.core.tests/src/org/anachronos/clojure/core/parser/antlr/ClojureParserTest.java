@@ -13,6 +13,23 @@ import org.junit.Test;
 public class ClojureParserTest {
 
     @Test
+    public void defnWithVarArgs() throws Exception {
+	CommonTree tree = buildAst("(defn test [x & ys] 1)");
+
+	assertEquals(3, tree.getChildCount());
+
+	final Tree params = tree.getChild(1);
+	assertEquals(ClojureLexer.PARAMS, params.getType());
+	assertEquals(2, params.getChildCount());
+	assertEquals("x", params.getChild(0).getText());
+
+	final Tree varArg = params.getChild(1);
+	assertEquals(ClojureLexer.VAR_ARG, varArg.getType());
+	assertEquals(1, varArg.getChildCount());
+	assertEquals("ys", varArg.getChild(0).getText());
+    }
+
+    @Test
     public void defnWithParams() throws Exception {
 	final Tree tree = buildAst("(defn test [a b c] 1)");
 	assertEquals("defn", tree.getText());
