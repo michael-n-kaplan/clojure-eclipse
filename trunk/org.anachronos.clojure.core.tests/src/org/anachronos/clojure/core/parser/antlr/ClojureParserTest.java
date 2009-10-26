@@ -1,6 +1,7 @@
 package org.anachronos.clojure.core.parser.antlr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -8,9 +9,26 @@ import org.antlr.runtime.Lexer;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ClojureParserTest {
+
+    @Test
+    @Ignore("Needs error reporting!")
+    public void defnWithAnonParams() throws Exception {
+	ClojureParser parser = buildParser("(defn test [] % %1 %2 %12))");
+	parser.file();
+	fail();
+    }
+
+    @Test
+    public void lambdaWithParams() throws Exception {
+	CommonTree tree = buildAst("#(% %2 %3 %44)");
+
+	assertEquals(ClojureLexer.LAMBDA, tree.getType());
+	assertEquals(4, tree.getChildCount());
+    }
 
     @Test
     public void defnWithVarArgs() throws Exception {
@@ -63,10 +81,15 @@ public class ClojureParserTest {
     }
 
     private CommonTree buildAst(String script) throws RecognitionException {
+	final ClojureParser parser = buildParser(script);
+	final CommonTree ast = (CommonTree) parser.file().getTree();
+	return ast;
+    }
+
+    private ClojureParser buildParser(String script) {
 	final Lexer lexer = new ClojureLexer(new ANTLRStringStream(script));
 	final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 	final ClojureParser parser = new ClojureParser(tokenStream);
-	final CommonTree ast = (CommonTree) parser.file().getTree();
-	return ast;
+	return parser;
     }
 }

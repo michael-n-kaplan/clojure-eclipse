@@ -29,6 +29,28 @@ public class ASTNodeConverterTest {
     }
 
     @Test
+    public void defLambdaWithParams() throws Exception {
+	final String script = "(def test #(str % %2 %3))";
+	final ModuleDeclaration file = convertScript(script);
+
+	final MethodDeclaration testFunction = getFunction(file, 0);
+	assertEquals("test", testFunction.getName());
+	List arguments = testFunction.getArguments();
+	assertEquals(3, arguments.size());
+    }
+
+    @Test
+    public void defNestedLambdasWithParams() throws Exception {
+	final String script = "(def test #(str % %2 %3 #(% %5)))";
+	final ModuleDeclaration file = convertScript(script);
+
+	final MethodDeclaration testFunction = getFunction(file, 0);
+	assertEquals("test", testFunction.getName());
+	List arguments = testFunction.getArguments();
+	assertEquals(3, arguments.size());
+    }
+
+    @Test
     public void defFunction() throws Exception {
 	final String script = "(def test (fn [] 1))";
 	final ModuleDeclaration file = convertScript(script);
