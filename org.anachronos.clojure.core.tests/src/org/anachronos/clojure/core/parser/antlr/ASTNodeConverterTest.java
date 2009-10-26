@@ -29,6 +29,7 @@ public class ASTNodeConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void defLambdaWithParams() throws Exception {
 	final String script = "(def test #(str % %2 %3))";
 	final ModuleDeclaration file = convertScript(script);
@@ -40,6 +41,7 @@ public class ASTNodeConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void defNestedLambdasWithParams() throws Exception {
 	final String script = "(def test #(str % %2 %3 #(% %5)))";
 	final ModuleDeclaration file = convertScript(script);
