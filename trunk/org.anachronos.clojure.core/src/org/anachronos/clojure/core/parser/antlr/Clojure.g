@@ -57,6 +57,9 @@ tokens {
 
 @header {
 package org.anachronos.clojure.core.parser.antlr;
+
+import java.util.Map;
+import java.util.HashMap;
 }
   
 @lexer::header {
@@ -68,15 +71,22 @@ import java.util.Set;
 
 @members {
   private boolean paramNamesAllowed = false;
-  private final List<RecognitionException> errors = 
-    new ArrayList<RecognitionException>();
+  private final Map<RecognitionException, String> errorToMessage = 
+    new HashMap<RecognitionException, String>();
   
-  public void reportError(final RecognitionException error) {
-    errors.add(error);
+  public void displayRecognitionError(final String[] tokenNames,
+     final RecognitionException e) {
+     
+     final String msg = getErrorHeader(e) + " " + getErrorMessage(e, tokenNames);
+     errorToMessage.put(e, msg);
   }
   
-  public List<RecognitionException> getErrors() {
-    return errors;
+  public boolean hasErrors() {
+    return !errorToMessage.isEmpty();
+  }
+  
+  public Map<RecognitionException, String> getErrorToMessage() {
+    return errorToMessage;
   }
 }
 
