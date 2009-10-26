@@ -5,12 +5,12 @@ import java.util.List;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.dltk.ast.declarations.Argument;
-import org.eclipse.dltk.ast.declarations.Declaration;
 import org.eclipse.dltk.ast.declarations.FieldDeclaration;
 import org.eclipse.dltk.ast.declarations.MethodDeclaration;
 import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 import org.eclipse.dltk.ast.references.SimpleReference;
 import org.eclipse.dltk.ast.statements.Block;
+import org.eclipse.dltk.ast.statements.Statement;
 
 public class ASTNodeFactory {
     private static final String VAR_ARG_LABEL = "...";
@@ -27,9 +27,9 @@ public class ASTNodeFactory {
     }
 
     public Block createBody(final CommonTree body,
-	    final List<Declaration> nestedDefs) {
+	    final List<Statement> statements) {
 	return new Block(body.getTokenStartIndex(), body.getTokenStopIndex(),
-		nestedDefs);
+		statements);
     }
 
     public MethodDeclaration createDefn(final CommonTree defn,
