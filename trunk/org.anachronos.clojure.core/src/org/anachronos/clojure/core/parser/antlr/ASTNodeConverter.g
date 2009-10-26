@@ -27,11 +27,10 @@ import org.eclipse.dltk.ast.declarations.ModuleDeclaration;
 file returns [ModuleDeclaration file] 
 @init { file = moduleDeclaration; }:  
     (
-      literal |
-      (d=def | d=defn | d=fn) { moduleDeclaration.addStatement(d); }
+      d=form { if (d != null) moduleDeclaration.addStatement(d); }
     )*;
   
-body returns [Declaration def]
+form returns [Declaration def]
 @init { def = null; }: 
     literal |
     ( 
@@ -47,17 +46,17 @@ body returns [Declaration def]
 //  reader_macro;
 
 def returns [Declaration def]:
-  ^(d=DEF name=SYMBOL initial_value=body)
+  ^(d=DEF name=SYMBOL initial_value=form)
   { 
     def = factory.createDef(d, name); 
   };
   
 defn returns [Declaration def]
 @init { List<Declaration> nestedDefs = new ArrayList<Declaration>(); }:
-  ^(
-    d=DEFN name=SYMBOL doc=STRING? 
-    args=params 
-    (nestedDef=body { if (nestedDef != null) nestedDefs.add(nestedDef); })*
+  ^(d=DEFN 
+      name=SYMBOL doc=STRING? 
+      args=params 
+      (nestedDef=form { if (nestedDef != null) nestedDefs.add(nestedDef); })*
    ) 
   { 
     MethodDeclaration defn = factory.createDefn(d, name, doc); 
@@ -66,11 +65,16 @@ defn returns [Declaration def]
     def = defn; 
   };
 
-fn returns [Declaration def]:
-  ^(f=FN args=params body+) 
+fn returns [Declaration def]
+@init { List<Declaration> nestedDefs = new ArrayList<Declaration>(); }:
+  ^(f=FN 
+      args=params 
+      (nestedDef=form { if (nestedDef != null) nestedDefs.add(nestedDef); })*
+   ) 
   { 
     MethodDeclaration fn = factory.createFn(f); 
     fn.acceptArguments(args); 
+    fn.acceptBody(factory.createBody(f, nestedDefs));
     def = fn;
   };
 
@@ -81,7 +85,7 @@ params returns [List<Argument> args]
    );
    
 list returns [Declaration def]:
-  ^(LIST (d=body)*) { def = d; };
+  ^(LIST (d=form)*) { def = d; };
   
 literal:
   NUMBER | SYMBOL;
