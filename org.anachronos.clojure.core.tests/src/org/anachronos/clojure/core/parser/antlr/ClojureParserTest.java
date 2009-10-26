@@ -30,7 +30,7 @@ public class ClojureParserTest {
     }
 
     @Test
-    public void defnNestedDefnAndDefn() throws Exception {
+    public void defnNestedDefns() throws Exception {
 	final CommonTree tree = buildAst("(defn test []\n"
 		+ "(defn nest1 [] (+ 1 2))"
 		+ "(defn nest2 [] (+ 1 3)))");

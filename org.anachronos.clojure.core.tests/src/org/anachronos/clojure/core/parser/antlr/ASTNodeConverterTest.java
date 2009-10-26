@@ -91,7 +91,7 @@ public class ASTNodeConverterTest {
     }
 
     @Test
-    public void defnNestedDefnAndDefn() throws Exception {
+    public void defnNestedDefns() throws Exception {
 	final String script = "(defn test []\n" + "(defn nest1 [] (+ 1 2))"
 		+ "(defn nest2 [] (+ 1 3)))";
 	final ModuleDeclaration file = convertScript(script);
@@ -106,6 +106,24 @@ public class ASTNodeConverterTest {
 	final MethodDeclaration nest2Function = getNestedFunction(testFunction,
 		1);
 	assertEquals("nest2", nest2Function.getName());
+    }
+
+    @Test
+    public void defnNestedFns() throws Exception {
+	final String script = "(defn test []\n" + "(fn [] (+ 1 2))"
+		+ "(fn [] (+ 1 3)))";
+	final ModuleDeclaration file = convertScript(script);
+
+	final MethodDeclaration testFunction = getFunction(file, 0);
+	assertEquals("test", testFunction.getName());
+
+	final MethodDeclaration nest1Function = getNestedFunction(testFunction,
+		0);
+	assertEquals("", nest1Function.getName());
+
+	final MethodDeclaration nest2Function = getNestedFunction(testFunction,
+		1);
+	assertEquals("", nest2Function.getName());
     }
 
     @Test

@@ -95,8 +95,8 @@ params:
   -> ^(PARAMS SYMBOL*);
    
 fn:
-  '(' FN params form+ ')'
-  -> ^(FN params form+);
+  '(' FN params form* ')'
+  -> ^(FN params form*);
 
 lambda:
   LAMBDA body+=form+ ')' 

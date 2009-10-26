@@ -2,6 +2,7 @@ package org.anachronos.clojure.core.parser.antlr;
 
 import java.util.List;
 
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.dltk.ast.declarations.Argument;
 import org.eclipse.dltk.ast.declarations.Declaration;
@@ -32,8 +33,9 @@ public class ASTNodeFactory {
 
     public MethodDeclaration createDefn(final CommonTree defn,
 	    final CommonTree name, final CommonTree doc) {
-	final int declStart = defn.getTokenStartIndex();
-	final int declEnd = defn.getTokenStopIndex();
+	final int declStart = ((CommonToken) defn.getToken()).getStartIndex();
+	final int declEnd = ((CommonToken) ((CommonTree) defn.getChild(defn
+		.getChildCount() - 1)).getToken()).getStopIndex();
 	final MethodDeclaration methodDeclaration = new MethodDeclaration(name.getText(), name.getTokenStartIndex(),
 		name.getTokenStopIndex(), declStart, declEnd);
 	methodDeclaration.setComments(doc == null ? null : doc.getText()
