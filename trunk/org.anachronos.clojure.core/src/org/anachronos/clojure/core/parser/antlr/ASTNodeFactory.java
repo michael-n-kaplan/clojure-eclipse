@@ -78,4 +78,5 @@ public class ASTNodeFactory {
 		name.getTokenStopIndex(), def.getTokenStartIndex(), def
 			.getTokenStopIndex());
     }
+
 }
