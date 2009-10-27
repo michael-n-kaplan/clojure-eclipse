@@ -41,6 +41,14 @@ public class ClojureParserTest {
     }
 
     @Test
+    public void defnWithVarArg() throws Exception {
+	ClojureParser parser = buildParser("(defn test [a & b] 1)");
+	parser.file();
+	assertTrue(parser.getGlobalScope().hasValidArity("test", 1));
+	assertTrue(parser.getGlobalScope().hasValidArity("test", 3));
+    }
+
+    @Test
     public void defnWithAnonParams() throws Exception {
 	ClojureParser parser = buildParser("(defn test [] %)");
 	parser.file();
