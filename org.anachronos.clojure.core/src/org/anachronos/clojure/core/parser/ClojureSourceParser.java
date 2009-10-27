@@ -1,7 +1,7 @@
 package org.anachronos.clojure.core.parser;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -23,7 +23,7 @@ import org.eclipse.dltk.compiler.problem.ProblemSeverities;
 public class ClojureSourceParser extends AbstractSourceParser {
     private final class LineModel {
 	private final String content;
-	private final Map<Integer, Integer> lineNumToOffset = new HashMap<Integer, Integer>();
+	private final List<Integer> lineNumOffsets = new ArrayList<Integer>();
 
 	public LineModel(String content) {
 	    this.content = content;
@@ -31,18 +31,15 @@ public class ClojureSourceParser extends AbstractSourceParser {
 	}
 
 	private void initLineOffsets() {
-	    final String[] srcLines = content.split("\n");
-	    int lineNum = 1;
-	    int offset = 0;
-	    for (String line : srcLines) {
-		lineNumToOffset.put(lineNum, offset);
-		offset += line.length() + 1;
-		lineNum++;
+	    final String[] lines = content.split("\n");
+	    for (int lineNum = 0, offset = 0; lineNum < lines.length; lineNum++) {
+		lineNumOffsets.add(offset);
+		offset += lines[lineNum].length() + 1;
 	    }
 	}
 
 	public int getLineOffset(int line) {
-	    return lineNumToOffset.get(line);
+	    return lineNumOffsets.get(line);
 	}
     }
 
@@ -83,7 +80,7 @@ public class ClojureSourceParser extends AbstractSourceParser {
 	final LineModel lineModel = new LineModel(content);
 	for (final Entry<RecognitionException, String> errorEntry : errorEntries) {
 	    final RecognitionException error = errorEntry.getKey();
-	    final int line = error.line;
+	    final int line = error.line > 0 ? error.line - 1 : 0;
 	    final int offset = lineModel.getLineOffset(line);
 	    final int column = error.charPositionInLine;
 	    final int start = offset + column;
