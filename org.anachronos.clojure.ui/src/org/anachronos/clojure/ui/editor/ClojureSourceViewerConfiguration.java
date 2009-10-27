@@ -3,7 +3,7 @@ package org.anachronos.clojure.ui.editor;
 import org.anachronos.clojure.core.parser.antlr.ClojureLexer;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.completion.ClojureContentAssistPreference;
-import org.anachronos.clojure.ui.preferences.ClojureColorConstants;
+import org.anachronos.clojure.ui.preferences.ClojureColorPrefConstants;
 import org.anachronos.clojure.ui.syntaxcoloring.AntlrTokenScanner;
 import org.eclipse.dltk.ui.text.IColorManager;
 import org.eclipse.dltk.ui.text.ScriptSourceViewerConfiguration;
@@ -15,6 +15,7 @@ import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -40,6 +41,12 @@ public class ClojureSourceViewerConfiguration extends
     @Override
     public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer) {
 	return new String[] { IDocument.DEFAULT_CONTENT_TYPE };
+    }
+
+    @Override
+    protected boolean isShowInVerticalRuler(Annotation annotation) {
+	// TODO hack to see error messages in vertical ruler
+	return true;
     }
 
     @Override
@@ -72,20 +79,20 @@ public class ClojureSourceViewerConfiguration extends
 		createLexer(), getColorManager(), ClojureUIPlugin.getDefault()
 			.getPreferenceStore());
 
-	scanner.addTokenPrefKey(ClojureColorConstants.CHARACTER_COLOR_PREF_KEY, ClojureLexer.CHARACTER);
-	scanner.addTokenPrefKey(ClojureColorConstants.COMMENT_PREF_KEY, ClojureLexer.COMMENT);
-	scanner.addTokenPrefKey(ClojureColorConstants.KEYWORD_PREF_KEY, ClojureLexer.KEYWORD);
-	scanner.addTokenPrefKey(ClojureColorConstants.NUMBER_PREF_KEY, ClojureLexer.NUMBER);
-	scanner.addTokenPrefKey(ClojureColorConstants.STRING_PREF_KEY, ClojureLexer.STRING);
-	scanner.addTokenPrefKey(ClojureColorConstants.LIST_PREF_KEY,
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.CHARACTER_COLOR_PREF_KEY, ClojureLexer.CHARACTER);
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.COMMENT_PREF_KEY, ClojureLexer.COMMENT);
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.KEYWORD_PREF_KEY, ClojureLexer.KEYWORD);
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.NUMBER_PREF_KEY, ClojureLexer.NUMBER);
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.STRING_PREF_KEY, ClojureLexer.STRING);
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.LIST_PREF_KEY,
 		ClojureLexer.LAMBDA, ClojureLexer.LPAREN, ClojureLexer.RPAREN);
-	scanner.addTokenPrefKey(ClojureColorConstants.VECTOR_PREF_KEY,
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.VECTOR_PREF_KEY,
 		ClojureLexer.LBRACKET, ClojureLexer.RBRACKET);
-	scanner.addTokenPrefKey(ClojureColorConstants.MAP_PREF_KEY,
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.MAP_PREF_KEY,
 		ClojureLexer.SET, ClojureLexer.LCURLY, ClojureLexer.RCURLY);
-	scanner.addTokenPrefKey(ClojureColorConstants.SYMBOL_PREF_KEY, ClojureLexer.SYMBOL);
+	scanner.addTokenPrefKey(ClojureColorPrefConstants.SYMBOL_PREF_KEY, ClojureLexer.SYMBOL);
 	scanner.addTokenPrefKey(
-		ClojureColorConstants.PREDEFINED_SYMBOL_PREF_KEY,
+		ClojureColorPrefConstants.PREDEFINED_SYMBOL_PREF_KEY,
 		ClojureLexer.DEF, ClojureLexer.DEFN, 
 		ClojureLexer.FN,  
 		ClojureLexer.IMPORT, ClojureLexer.IN_NS, ClojureLexer.LET,

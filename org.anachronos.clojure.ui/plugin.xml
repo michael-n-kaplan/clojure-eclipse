@@ -105,5 +105,11 @@
             class="org.anachronos.clojure.ui.editor.ClojureDocumentSetupParticipant">
       </participant>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.anachronos.clojure.ui.preferences.ClojureUIPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>
