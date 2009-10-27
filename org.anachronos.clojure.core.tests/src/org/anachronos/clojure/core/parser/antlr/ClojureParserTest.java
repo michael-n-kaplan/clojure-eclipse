@@ -17,6 +17,30 @@ import org.junit.Test;
 public class ClojureParserTest {
 
     @Test
+    public void callValidArity() throws Exception {
+	ClojureParser parser = buildParser("(test 1)");
+	parser.getGlobalScope().addFunctionDef("test", 1, true);
+	CommonTree tree = (CommonTree) parser.file().getTree();
+	assertEquals(ClojureLexer.CALL, tree.getType());
+    }
+
+    @Test
+    public void callUnboundValidArity() throws Exception {
+	ClojureParser parser = buildParser("(test 1 2)");
+	parser.getGlobalScope().addFunctionDef("test", 1, false);
+	CommonTree tree = (CommonTree) parser.file().getTree();
+	assertEquals(ClojureLexer.CALL, tree.getType());
+    }
+
+    @Test
+    public void callInvalidArity() throws Exception {
+	ClojureParser parser = buildParser("(test 1 2)");
+	parser.getGlobalScope().addFunctionDef("test", 1, true);
+	parser.file();
+	assertTrue(parser.hasErrors());
+    }
+
+    @Test
     public void defnWithAnonParams() throws Exception {
 	ClojureParser parser = buildParser("(defn test [] %)");
 	parser.file();
@@ -70,8 +94,7 @@ public class ClojureParserTest {
     @Test
     public void defnNestedDefns() throws Exception {
 	final CommonTree tree = buildAst("(defn test []\n"
-		+ "(defn nest1 [] (+ 1 2))"
-		+ "(defn nest2 [] (+ 1 3)))");
+		+ "(defn nest1 [] (1 2))" + "(defn nest2 [] (1 3)))");
 	assertEquals(4, tree.getChildCount());
 
 	final Tree defn1 = tree.getChild(2);
@@ -86,9 +109,7 @@ public class ClojureParserTest {
     private CommonTree buildAst(String script) throws RecognitionException {
 	final ClojureParser parser = buildParser(script);
 	final CommonTree ast = (CommonTree) parser.file().getTree();
-	assertTrue("Expected no errors during parse!", parser
-		.getErrorToMessage()
-		.keySet().isEmpty());
+	assertFalse("Expected no errors during parse!", parser.hasErrors());
 	return ast;
     }
 

@@ -34,7 +34,7 @@ file returns [ModuleDeclaration file]
 form returns [Statement stmt]: 
     literal |
     ( s=def | s=defn | s=fn | s=lambda | 
-      s=list | s=map | s=set | s=vector
+      s=call | s=list | s=map | s=set | s=vector
     ) { stmt = s; }; 
     // | var | let |
   
@@ -43,7 +43,7 @@ form returns [Statement stmt]:
 //  reader_macro;
 
 def returns [Statement stmt]:
-  ^(d=DEF name=SYMBOL initial=form)
+  ^(d=DEF name=SYMBOL initial=form?)
   { 
     if (initial instanceof MethodDeclaration) {
       MethodDeclaration fn = (MethodDeclaration) initial; 
@@ -102,6 +102,9 @@ params returns [List<Argument> args]
 
 var_arg[List<Argument> args]:
   ^(VAR_ARG name=SYMBOL) { args.add(factory.createVarArg(name)); };
+  
+call returns [Statement list]:
+  ^(c=CALL form*);
   
 list returns [Statement list]:
   ^(l=LIST statements=stmt_list ) 

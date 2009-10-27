@@ -6,6 +6,8 @@ options {
 }
 
 tokens {
+  CALL;
+  
   DEREF = '@';
   DEF = 'def';
   DEFN = 'defn';
@@ -71,6 +73,13 @@ import java.util.Set;
 
 @members {
   private boolean paramNamesAllowed = false;
+  
+  private Scope globalScope = new Scope();
+  
+  public Scope getGlobalScope() {
+    return globalScope;
+  }
+  
   private final Map<RecognitionException, String> errorToMessage = 
     new HashMap<RecognitionException, String>();
   
@@ -100,22 +109,25 @@ form:
   
   require | refer | use | in_ns | import__ | ns |
   
-  list | map | set | vector |
+  call | list | map | set | vector |
   
   reader_macro;
   
 // Definitions
 
 def:
-  '(' DEF name=SYMBOL initialValue=form? ')'
-  -> ^(DEF $name $initialValue);
+  '(' DEF name=SYMBOL form? ')' 
+  { globalScope.addVariableDef($name.text); }
+  -> ^(DEF $name form?);
   
 defn:
-  '(' DEFN SYMBOL STRING? map? params form* ')' 
+  '(' DEFN name=SYMBOL STRING? map? p=params form* ')'
+  { globalScope.addFunctionDef($name.text, $p.paramCount, $p.varArg); } 
   -> ^(DEFN SYMBOL STRING? map? params form*);
    
-params:
-  '[' SYMBOL* var_arg? ']'
+params returns [int paramCount, boolean varArg]:
+  '[' (SYMBOL { $paramCount++; })* v=var_arg? ']'
+  { $varArg = v != null; }
   -> ^(PARAMS SYMBOL* var_arg?);
    
 var_arg:
@@ -178,8 +190,14 @@ namespace_reference:
 quoted_namespace_symbol:
   QUOTE namespace=SYMBOL
   -> ^($namespace);
-  
+ 
 // Data types
+
+call:
+  { globalScope.isFunction(input.LT(2).getText()) }? 
+  '(' f=SYMBOL args += form* ')'
+  { globalScope.hasValidArity($f.text, $args.size()) }?
+  -> ^(CALL form*);   
   
 list:
   '(' form* ')' 
@@ -227,7 +245,7 @@ literal:
   NIL |
   BOOLEAN |
   KEYWORD |
-  SYMBOL |
+  s=SYMBOL { globalScope.isDefined($s.text) }? |
   {paramNamesAllowed}? PARAM_NAME;   
   
 STRING: 
