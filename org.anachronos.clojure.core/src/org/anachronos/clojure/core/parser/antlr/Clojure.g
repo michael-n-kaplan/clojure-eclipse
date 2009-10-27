@@ -122,7 +122,7 @@ def:
   
 defn:
   '(' DEFN name=SYMBOL STRING? map? p=params form* ')'
-  { globalScope.addFunctionDef($name.text, $p.paramCount, $p.varArg); } 
+  { globalScope.addFunctionDef($name.text, $p.paramCount, !$p.varArg); } 
   -> ^(DEFN SYMBOL STRING? map? params form*);
    
 params returns [int paramCount, boolean varArg]:
@@ -195,8 +195,7 @@ quoted_namespace_symbol:
 
 call:
   { globalScope.isFunction(input.LT(2).getText()) }? 
-  '(' f=SYMBOL args += form* ')'
-  { globalScope.hasValidArity($f.text, $args.size()) }?
+  '(' f=SYMBOL args += form*  { globalScope.hasValidArity($f.text, $args.size()) }? ')'
   -> ^(CALL form*);   
   
 list:
