@@ -3,6 +3,7 @@ package org.anachronos.clojure.ui.syntaxcoloring;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.anachronos.clojure.ui.preferences.ClojureUIPreferenceInitializer;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Lexer;
@@ -258,34 +259,18 @@ public class AntlrTokenScanner implements ITokenScanner {
 	if (colorKey != null)
 	    color = colorManager.getColor(colorKey);
 
-	int style = preferenceStore.getBoolean(getBoldKey(colorKey)) ? SWT.BOLD
+	int style = preferenceStore.getBoolean(ClojureUIPreferenceInitializer.getBoldKey(colorKey)) ? SWT.BOLD
 		: SWT.NORMAL;
-	if (preferenceStore.getBoolean(getItalicKey(colorKey)))
+	if (preferenceStore.getBoolean(ClojureUIPreferenceInitializer.getItalicKey(colorKey)))
 	    style |= SWT.ITALIC;
 
-	if (preferenceStore.getBoolean(getStrikethroughKey(colorKey)))
+	if (preferenceStore.getBoolean(ClojureUIPreferenceInitializer.getStrikethroughKey(colorKey)))
 	    style |= TextAttribute.STRIKETHROUGH;
 
-	if (preferenceStore.getBoolean(getUnderlineKey(colorKey)))
+	if (preferenceStore.getBoolean(ClojureUIPreferenceInitializer.getUnderlineKey(colorKey)))
 	    style |= TextAttribute.UNDERLINE;
 
 	return new TextAttribute(color, null, style);
-    }
-
-    private String getBoldKey(String colorKey) {
-	return colorKey + PreferenceConstants.EDITOR_BOLD_SUFFIX;
-    }
-
-    private String getItalicKey(String colorKey) {
-	return colorKey + PreferenceConstants.EDITOR_ITALIC_SUFFIX;
-    }
-
-    private String getStrikethroughKey(String colorKey) {
-	return colorKey + PreferenceConstants.EDITOR_STRIKETHROUGH_SUFFIX;
-    }
-
-    private String getUnderlineKey(String colorKey) {
-	return colorKey + PreferenceConstants.EDITOR_UNDERLINE_SUFFIX;
     }
 
     public void initialize() {

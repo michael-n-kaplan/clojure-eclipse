@@ -31,4 +31,9 @@ public class ClojureLanguageToolkit extends AbstractLanguageToolkit {
     public String getNatureId() {
 	return ClojureNature.CLOJURE_NATURE;
     }
+
+    @Override
+    public String getPreferenceQualifier() {
+	return ClojureUIPlugin.PLUGIN_ID;
+    }
 }

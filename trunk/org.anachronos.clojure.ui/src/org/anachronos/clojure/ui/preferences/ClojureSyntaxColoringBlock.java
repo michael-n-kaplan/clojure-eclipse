@@ -45,46 +45,46 @@ public class ClojureSyntaxColoringBlock extends
 	return new String[][] {
 		new String[] {
 			"Character",
-			ClojureColorConstants.CHARACTER_COLOR_PREF_KEY,
+			ClojureColorPrefConstants.CHARACTER_COLOR_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"Comment",
-			ClojureColorConstants.COMMENT_PREF_KEY,
+			ClojureColorPrefConstants.COMMENT_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_comments },
 
 		new String[] {
 			"Number",
-			ClojureColorConstants.NUMBER_PREF_KEY,
+			ClojureColorPrefConstants.NUMBER_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"String",
-			ClojureColorConstants.STRING_PREF_KEY,
+			ClojureColorPrefConstants.STRING_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 
 		new String[] {
 			"List",
-			ClojureColorConstants.LIST_PREF_KEY,
+			ClojureColorPrefConstants.LIST_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"Map",
-			ClojureColorConstants.MAP_PREF_KEY,
+			ClojureColorPrefConstants.MAP_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"Vector",
-			ClojureColorConstants.VECTOR_PREF_KEY,
+			ClojureColorPrefConstants.VECTOR_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 
 		new String[] {
 			"Keyword",
-			ClojureColorConstants.KEYWORD_PREF_KEY,
+			ClojureColorPrefConstants.KEYWORD_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"Symbol",
-			ClojureColorConstants.SYMBOL_PREF_KEY,
+			ClojureColorPrefConstants.SYMBOL_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK },
 		new String[] {
 			"Predefined Symbol",
-			ClojureColorConstants.PREDEFINED_SYMBOL_PREF_KEY,
+			ClojureColorPrefConstants.PREDEFINED_SYMBOL_PREF_KEY,
 			PreferencesMessages.DLTKEditorPreferencePage_coloring_category_DLTK } };
     }
 
