@@ -7,6 +7,7 @@ import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.dltk.core.environment.IDeployment;
+import org.eclipse.dltk.core.environment.IFileHandle;
 import org.eclipse.dltk.internal.launching.AbstractInterpreterInstallType;
 import org.eclipse.dltk.launching.IInterpreterInstall;
 
@@ -46,5 +47,12 @@ public class ClojureInterpreterInstallType extends
     @Override
     public String getNatureId() {
 	return ClojureNature.ID;
+    }
+
+    @Override
+    protected String[] buildCommandLine(IFileHandle installLocation,
+	    IFileHandle pathFile) {
+	return new String[] { installLocation.getCanonicalPath(),
+		pathFile.getCanonicalPath() };
     }
 }
