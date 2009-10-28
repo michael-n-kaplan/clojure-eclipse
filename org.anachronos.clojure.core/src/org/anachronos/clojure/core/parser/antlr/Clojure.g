@@ -76,6 +76,8 @@ import java.util.Set;
   
   private Scope globalScope = new Scope();
   
+  private Scope scope;
+  
   public Scope getGlobalScope() {
     return globalScope;
   }
@@ -99,7 +101,8 @@ import java.util.Set;
   }
 }
 
-file: 
+file
+@init { scope = globalScope; }: 
   form*;
   
 form: 
@@ -120,13 +123,21 @@ def:
   { globalScope.addVariableDef($name.text); }
   -> ^(DEF $name form?);
   
-defn:
-  '(' DEFN name=SYMBOL STRING? map? p=params form* ')'
+defn
+@init  { scope = scope.newScope(); }
+@after { scope = scope.endScope(); }:
+  '(' DEFN name=SYMBOL STRING? map? 
+    p=params { scope.addFunctionDef($name.text, $p.paramCount, !$p.varArg); } // hack to allow recursive calls
+    form* 
+  ')'
   { globalScope.addFunctionDef($name.text, $p.paramCount, !$p.varArg); } 
   -> ^(DEFN SYMBOL STRING? map? params form*);
    
 params returns [int paramCount, boolean varArg]:
-  '[' (SYMBOL { $paramCount++; })* v=var_arg? ']'
+  '[' 
+    (n=SYMBOL { scope.addVariableDef($n.text); $paramCount++; })* 
+    v=var_arg? 
+  ']'
   { $varArg = v != null; }
   -> ^(PARAMS SYMBOL* var_arg?);
    
@@ -193,11 +204,13 @@ quoted_namespace_symbol:
  
 // Data types
 
-call:
-  { globalScope.isFunction(input.LT(2).getText()) }? 
+call
+@init { $args = new ArrayList(); }:
+  { scope.isFunction(input.LT(2).getText()) }? 
   '(' f=SYMBOL 
-    (args += form { !globalScope.exceedsArityUpperBound($f.text, $args.size()) }?)*  
-  { globalScope.isDefinedArity($f.text, $args.size()) }? ')'
+    (
+      { !scope.exceedsArityUpperBound($f.text, $args.size()) }? args += form)*  
+  { scope.isDefinedArity($f.text, $args.size()) }? ')'
   -> ^(CALL form*);   
   
 list:
@@ -246,7 +259,7 @@ literal:
   NIL |
   BOOLEAN |
   KEYWORD |
-  s=SYMBOL { globalScope.isDefined($s.text) }? |
+  s=SYMBOL { scope.isDefined($s.text) }? |
   {paramNamesAllowed}? PARAM_NAME;   
   
 STRING: 
