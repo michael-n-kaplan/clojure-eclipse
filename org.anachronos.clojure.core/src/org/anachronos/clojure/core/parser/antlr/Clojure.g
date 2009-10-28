@@ -195,7 +195,9 @@ quoted_namespace_symbol:
 
 call:
   { globalScope.isFunction(input.LT(2).getText()) }? 
-  '(' f=SYMBOL args += form*  { globalScope.hasValidArity($f.text, $args.size()) }? ')'
+  '(' f=SYMBOL 
+    (args += form { !globalScope.exceedsArityUpperBound($f.text, $args.size()) }?)*  
+  { globalScope.isDefinedArity($f.text, $args.size()) }? ')'
   -> ^(CALL form*);   
   
 list:
