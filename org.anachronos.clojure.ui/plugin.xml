@@ -20,14 +20,14 @@
    <extension
          point="org.eclipse.dltk.launching.interpreterInstallTypes">
       <interpreterInstallType
-            class="org.anachronos.clojure.ui.launching.ClojureInterpreterInstallType"
+            class="org.anachronos.clojure.ui.launch.ClojureInterpreterInstallType"
             id="org.anachronos.clojure.ui.interpreterInstallType">
       </interpreterInstallType>
    </extension>
    <extension
          point="org.eclipse.dltk.console.scriptInterpreter">
       <scriptInterpreter
-            class="org.anachronos.clojure.ui.launching.ClojureScriptInterpreter"
+            class="org.anachronos.clojure.ui.launch.ClojureScriptInterpreter"
             natureID="org.anachronos.clojure.core.nature">
       </scriptInterpreter>
    </extension>
@@ -72,13 +72,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ui.console.consoleFactories">
-      <consoleFactory
-            class="org.anachronos.clojure.ui.console.ClojureConsoleFactory"
-            label="Clojure Console">
-      </consoleFactory>
-   </extension>
-   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="org.anachronos.clojure.ui.editor.ClojureEditor"
@@ -111,5 +104,34 @@
             class="org.anachronos.clojure.ui.preferences.ClojureUIPreferenceInitializer">
       </initializer>
    </extension>
-
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.anachronos.clojure.ui.launch.ClojureLaunchConfigurationDelegate"
+            id="org.anachronos.clojure.ui.launchConfigurationType"
+            modes="run"
+            name="Clojure"
+            public="true">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.anachronos.clojure.ui.launchConfigurationType"
+            icon="icons/clojure.png"
+            id="org.anachronos.clojure.ui.launchConfigurationTypeImage1">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.anachronos.clojure.ui.launch.ClojureLaunchConfigurationTabGroup"
+            id="org.anachronos.clojure.ui.launchConfigurationTabGroup"
+            type="org.anachronos.clojure.ui.launchConfigurationType">
+         <launchMode
+               description="Run Clojure script"
+               mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+   </extension>
 </plugin>
