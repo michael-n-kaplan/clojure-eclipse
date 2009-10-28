@@ -21,6 +21,6 @@ public class ClojureInterpretersBlock extends InterpretersBlock {
 
     @Override
     protected String getCurrentNature() {
-	return ClojureNature.CLOJURE_NATURE;
+	return ClojureNature.ID;
     }
 }

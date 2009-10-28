@@ -29,7 +29,7 @@ public class ClojureLanguageToolkit extends AbstractLanguageToolkit {
 
     @Override
     public String getNatureId() {
-	return ClojureNature.CLOJURE_NATURE;
+	return ClojureNature.ID;
     }
 
     @Override
