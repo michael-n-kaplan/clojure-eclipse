@@ -7,6 +7,6 @@ public class ClojureSourceElementParser extends AbstractSourceElementParser {
 
     @Override
     protected String getNatureId() {
-	return ClojureNature.CLOJURE_NATURE;
+	return ClojureNature.ID;
     }
 }
