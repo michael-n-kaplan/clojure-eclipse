@@ -41,6 +41,20 @@ public class ClojureParserTest {
     }
 
     @Test
+    public void defnBodyUsesParam() throws Exception {
+	ClojureParser parser = buildParser("(defn test [a] a)");
+	parser.file();
+	assertFalse(parser.hasErrors());
+    }
+
+    @Test
+    public void defnRecursive() throws Exception {
+	ClojureParser parser = buildParser("(defn r [a] " + "(r a))");
+	parser.file();
+	assertFalse(parser.hasErrors());
+    }
+
+    @Test
     public void defnWithVarArg() throws Exception {
 	ClojureParser parser = buildParser("(defn test [a & b] 1)");
 	parser.file();
