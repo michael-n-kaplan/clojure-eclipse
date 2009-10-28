@@ -54,8 +54,16 @@ public class Scope {
 	return functionNameToArity.containsKey(name);
     }
 
-    public boolean hasValidArity(final String name, final int arity) {
-	return functionNameToArity.get(name).isValid(arity);
+    public boolean isDefinedArity(final String name, final int arity) {
+	return getArity(name).isValid(arity);
+    }
+
+    private Arity getArity(final String name) {
+	return functionNameToArity.get(name);
+    }
+
+    public boolean exceedsArityUpperBound(final String name, final int arity) {
+	return getArity(name).exceedsUpperbound(arity);
     }
 
     /**

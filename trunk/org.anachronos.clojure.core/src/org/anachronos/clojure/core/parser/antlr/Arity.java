@@ -10,22 +10,18 @@ package org.anachronos.clojure.core.parser.antlr;
  */
 public class Arity {
     private final int lowerBound;
-    private final boolean isBound;
+    private final int upperBound;;
 
     public Arity(final int lowerBound, final boolean isBound) {
 	this.lowerBound = lowerBound;
-	this.isBound = isBound;
+	this.upperBound = isBound ? lowerBound : Integer.MAX_VALUE;
     }
 
-    public int getLowerBound() {
-	return lowerBound;
-    }
-
-    public boolean isBound() {
-	return isBound;
+    public boolean exceedsUpperbound(final int arity) {
+	return arity > upperBound;
     }
 
     public boolean isValid(final int arity) {
-	return arity == lowerBound || !isBound && arity >= lowerBound;
+	return arity >= lowerBound && arity <= upperBound;
     }
 }
