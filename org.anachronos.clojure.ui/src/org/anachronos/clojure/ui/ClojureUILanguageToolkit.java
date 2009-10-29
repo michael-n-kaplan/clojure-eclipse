@@ -1,5 +1,6 @@
 package org.anachronos.clojure.ui;
 
+import org.anachronos.clojure.core.ClojureLanguageToolkit;
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 import org.eclipse.dltk.ui.AbstractDLTKUILanguageToolkit;
 import org.eclipse.jface.preference.IPreferenceStore;

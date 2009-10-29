@@ -12,7 +12,7 @@ public class ClojureLaunchConfigurationTabGroup extends
     public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 	ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
 		new ClojureMainLaunchConfigurationTab(mode),
-		new ClojureInterpreterTab(null), new EnvironmentTab(), };
+		new ClojureInterpreterTab(null), new EnvironmentTab() };
 	setTabs(tabs);
     }
 }

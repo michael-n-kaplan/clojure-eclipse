@@ -2,14 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.dltk.core.language">
-      <language
-            class="org.anachronos.clojure.ui.ClojureLanguageToolkit"
-            nature="org.anachronos.clojure.core.nature"
-            priority="0">
-      </language>
-   </extension>
-   <extension
          point="org.eclipse.dltk.ui.language">
       <language
             class="org.anachronos.clojure.ui.ClojureUILanguageToolkit"
@@ -80,7 +72,7 @@
             id="org.anachronos.clojure.ui.editor"
             name="Clojure Editor">
          <contentTypeBinding
-               contentTypeId="org.anachronos.clojure.ui.content-type">
+               contentTypeId="org.anachronos.clojure.core.content-type">
          </contentTypeBinding>
       </editor>
    </extension>

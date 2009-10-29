@@ -1,11 +1,10 @@
-package org.anachronos.clojure.ui;
+package org.anachronos.clojure.core;
 
-import org.anachronos.clojure.core.ClojureNature;
 import org.eclipse.dltk.core.AbstractLanguageToolkit;
 import org.eclipse.dltk.core.IDLTKLanguageToolkit;
 
 public class ClojureLanguageToolkit extends AbstractLanguageToolkit {
-    public static final String CLOJURE_CONTENT_TYPE = ClojureUIPlugin.PLUGIN_ID
+    public static final String CLOJURE_CONTENT_TYPE = ClojureCorePlugin.PLUGIN_ID
 	    + ".content-type";
 
     private static IDLTKLanguageToolkit toolkit;
@@ -34,6 +33,11 @@ public class ClojureLanguageToolkit extends AbstractLanguageToolkit {
 
     @Override
     public String getPreferenceQualifier() {
-	return ClojureUIPlugin.PLUGIN_ID;
+	return ClojureCorePlugin.PLUGIN_ID;
+    }
+
+    @Override
+    public boolean languageSupportZIPBuildpath() {
+	return true;
     }
 }

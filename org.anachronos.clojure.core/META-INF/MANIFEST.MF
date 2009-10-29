@@ -13,3 +13,4 @@ Require-Bundle: org.antlr.runtime;bundle-version="3.0.0",
 Export-Package: org.anachronos.clojure.core,
  org.anachronos.clojure.core.parser,
  org.anachronos.clojure.core.parser.antlr
+Bundle-Activator: org.anachronos.clojure.core.ClojureCorePlugin
