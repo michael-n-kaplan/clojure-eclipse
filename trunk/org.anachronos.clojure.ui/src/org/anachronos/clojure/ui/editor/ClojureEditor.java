@@ -1,6 +1,6 @@
 package org.anachronos.clojure.ui.editor;
 
-import org.anachronos.clojure.ui.ClojureLanguageToolkit;
+import org.anachronos.clojure.core.ClojureLanguageToolkit;
 import org.anachronos.clojure.ui.ClojureUILanguageToolkit;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.preferences.ClojurePreferenceConstants;

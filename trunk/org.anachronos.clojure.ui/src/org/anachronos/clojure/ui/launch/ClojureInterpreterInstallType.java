@@ -24,6 +24,7 @@ public class ClojureInterpreterInstallType extends
 	return new ClojureInterpreterInstall(this, id);
     }
 
+
     @Override
     protected ILog getLog() {
 	return ClojureUIPlugin.getDefault().getLog();
