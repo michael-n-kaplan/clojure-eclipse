@@ -134,4 +134,19 @@
          </launchMode>
       </launchConfigurationTabGroup>
    </extension>
+   <extension
+         point="org.eclipse.dltk.console.ui.scriptConsole">
+      <scriptConsole
+            class="org.anachronos.clojure.ui.console.ClojureScriptConsoleFactory"
+            natureID="org.anachronos.clojure.core.nature">
+      </scriptConsole>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consoleFactories">
+      <consoleFactory
+            class="org.anachronos.clojure.ui.console.ClojureScriptConsoleFactory"
+            icon="icons/clojure.png"
+            label="Clojure Console">
+      </consoleFactory>
+   </extension>
 </plugin>
