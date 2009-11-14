@@ -128,6 +128,36 @@ public class ClojureParserTest {
 	assertEquals("nest2", defn2.getChild(0).getText());
     }
 
+    @Test
+    public void nsWithImport() throws Exception {
+	final CommonTree tree = buildAst("(ns repl-client\n"
+		+ "(:import (java.net Socket SocketException))"
+		+ "(:import (clojure.lang LineNumberingPushbackReader)))");
+	assertEquals(ClojureLexer.NS, tree.getType());
+	assertEquals(3, tree.getChildCount());
+
+	final Tree pkg = tree.getChild(0);
+	assertEquals("repl-client", pkg.getText());
+	checkImportTree(tree.getChild(1), "java.net", "Socket",
+		"SocketException");
+	checkImportTree(tree.getChild(2), "clojure.lang",
+		"LineNumberingPushbackReader");
+    }
+
+    private void checkImportTree(final Tree importTree,
+	    final String expectedPkg, final String... expectedClasses) {
+	assertEquals(ClojureLexer.IMPORT, importTree.getType());
+
+	assertEquals(1, importTree.getChildCount());
+	final Tree javaPkg = importTree.getChild(0);
+	assertEquals(expectedPkg, javaPkg.getText());
+
+	assertEquals(expectedClasses.length, javaPkg.getChildCount());
+	for (int i = 0; i < expectedClasses.length; i++) {
+	    assertEquals(expectedClasses[i], javaPkg.getChild(i).getText());
+	}
+    }
+
     private CommonTree buildAst(String script) throws RecognitionException {
 	final ClojureParser parser = buildParser(script);
 	final CommonTree ast = (CommonTree) parser.file().getTree();

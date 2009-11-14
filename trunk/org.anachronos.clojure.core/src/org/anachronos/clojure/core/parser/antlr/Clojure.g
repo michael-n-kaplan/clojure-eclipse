@@ -186,17 +186,22 @@ in_ns:
   -> ^(IN_NS $namespace);
   
 import__:
-  '(' IMPORT '(' pkg=SYMBOL classes+=SYMBOL ')' ')'
-  -> ^(IMPORT $pkg $classes);
+  '(' IMPORT pkg_import__+ ')'
+  -> ^(IMPORT pkg_import__+);
   
 ns:
   '(' NS name=SYMBOL namespace_references+=namespace_reference+ ')'
-  -> ^(NS $name $namespace_references);
+  -> ^(NS $name $namespace_references+);
   
 namespace_reference:
   '(' ':use' packages+=SYMBOL+ ')' 
   |
-  '(' ':import' '(' pkg=SYMBOL cls+=SYMBOL+ ')';
+  '(' ':import' pkg_import__+ ')'
+  -> ^(IMPORT pkg_import__+);
+  
+pkg_import__:
+  '(' pkg=SYMBOL classes += SYMBOL+ ')'
+  -> ^($pkg $classes+);
   
 quoted_namespace_symbol:
   QUOTE namespace=SYMBOL

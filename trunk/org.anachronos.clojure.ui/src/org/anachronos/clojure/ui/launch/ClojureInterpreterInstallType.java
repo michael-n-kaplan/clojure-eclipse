@@ -16,7 +16,8 @@ public class ClojureInterpreterInstallType extends
 
     @Override
     protected IPath createPathFile(IDeployment deployment) throws IOException {
-	return deployment.getAbsolutePath();
+	return deployment.add(ClojureUIPlugin.getDefault().getBundle(),
+		"scripts/classpath.clj");
     }
 
     @Override

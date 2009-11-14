@@ -141,4 +141,12 @@
             label="Clojure Console">
       </consoleFactory>
    </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.anachronos.clojure.ui.editor-context"
+            name="Clojure Editor Context"
+            parentId="org.eclipse.dltk.ui.scriptEditorScope">
+      </context>
+   </extension>
 </plugin>
