@@ -1,14 +1,18 @@
 package org.anachronos.clojure.ui.editor;
 
 import org.anachronos.clojure.core.parser.antlr.ClojureLexer;
+import org.anachronos.clojure.ui.ClojureTextTools;
 import org.anachronos.clojure.ui.ClojureUIPlugin;
 import org.anachronos.clojure.ui.completion.ClojureContentAssistPreference;
+import org.anachronos.clojure.ui.internal.text.ClojureAutoEditStrategy;
+import org.anachronos.clojure.ui.internal.text.IClojurePartitions;
 import org.anachronos.clojure.ui.preferences.ClojureColorPrefConstants;
 import org.anachronos.clojure.ui.syntaxcoloring.AntlrTokenScanner;
 import org.eclipse.dltk.ui.text.IColorManager;
 import org.eclipse.dltk.ui.text.ScriptSourceViewerConfiguration;
 import org.eclipse.dltk.ui.text.completion.ContentAssistPreference;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
@@ -40,7 +44,13 @@ public class ClojureSourceViewerConfiguration extends
 
     @Override
     public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer) {
-	return new String[] { IDocument.DEFAULT_CONTENT_TYPE };
+	return ClojureTextTools.LEGAL_CONTENT_TYPES;
+    }
+
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(
+	    ISourceViewer sourceViewer, String contentType) {
+	return new IAutoEditStrategy[] { new ClojureAutoEditStrategy() };
     }
 
     @Override
@@ -58,6 +68,16 @@ public class ClojureSourceViewerConfiguration extends
 	final DefaultDamagerRepairer dr = new DefaultDamagerRepairer(scanner);
 	reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 	reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+
+	final DefaultDamagerRepairer stringDr = new DefaultDamagerRepairer(
+		scanner);
+	reconciler.setDamager(stringDr, IClojurePartitions.STRING);
+	reconciler.setRepairer(stringDr, IClojurePartitions.STRING);
+
+	final DefaultDamagerRepairer commentDr = new DefaultDamagerRepairer(
+		scanner);
+	reconciler.setDamager(commentDr, IClojurePartitions.COMMENT);
+	reconciler.setRepairer(commentDr, IClojurePartitions.COMMENT);
 
 	return reconciler;
     }

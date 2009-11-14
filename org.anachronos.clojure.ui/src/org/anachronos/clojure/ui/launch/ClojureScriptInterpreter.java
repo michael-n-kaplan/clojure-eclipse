@@ -37,8 +37,7 @@ public class ClojureScriptInterpreter implements IScriptInterpreter,
 
     @Override
     public boolean isValid() {
-	return true;
-	// return protocol != null;
+	return protocol != null;
     }
 
     @Override
