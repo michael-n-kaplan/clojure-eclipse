@@ -1,0 +1,16 @@
+«IMPORT org::maschinenstuermer::clojure::ui::wizard»
+
+«DEFINE main FOR ClojureProjectInfo»
+«EXPAND model FOR this»
+«ENDDEFINE»
+
+«DEFINE model FOR ClojureProjectInfo»
+«FILE "src/main.clj"-»
+; just a small example
+
+; (def hello-world 
+;	(fn [n] (str "Hello, " n "!"))
+	
+; (hello-world "Max")
+«ENDFILE»
+«ENDDEFINE»

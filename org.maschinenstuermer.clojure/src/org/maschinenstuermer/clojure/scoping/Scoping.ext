@@ -1,0 +1,32 @@
+import emf;
+import clojure;
+	
+Set[SymbolDef] scope(EObject e):
+	globalDefs(e).addAll(lexicalDefs(e));
+
+boolean isLocalDef(EObject e):
+	NameBinding.isInstance(e);
+	
+boolean isGlobalDef(EObject e):
+	SymbolDef.isInstance(e) && !isLocalDef(e);
+	 	
+Set[SymbolDef] globalDefs(EObject e):
+	e.eRootContainer.eAllContents.select(s|isGlobalDef(s));
+	
+Set[SymbolDef] lexicalDefs(Lambda l):
+	l.params.binding.eAllContents.typeSelect(NameBinding)
+		.addAll(lexicalDefs(l.eContainer));
+
+Set[SymbolDef] lexicalDefs(VarBinding v):
+	lexicalDefs(v.eContainer.eContainer);
+
+Set[SymbolDef] lexicalDefs(LexicalScope l):
+	l.bindings.binding.eAllContents.typeSelect(NameBinding)
+		.addAll(lexicalDefs(l.eContainer));
+	
+Set[SymbolDef] lexicalDefs(EObject e):
+	e.eContainer == null ? 
+		{} : lexicalDefs(e.eContainer);	
+	 	
+
+			 

@@ -1,0 +1,15 @@
+import emf;
+import clojure;
+
+Loop loop(EObject e):
+	if e == null then 
+		null
+	else
+		if 	Loop.isInstance(e) then 
+			((Loop) e)
+		else 
+			e.eContainer;
+			
+Loop loop(Recur r):
+	loop(r.eContainer);
+	
