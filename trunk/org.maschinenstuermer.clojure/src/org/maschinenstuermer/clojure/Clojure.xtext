@@ -1,0 +1,209 @@
+grammar org.maschinenstuermer.clojure.Clojure 
+hidden (WSS,SL_COMMENT)
+
+generate clojure "http://www.maschinenstuermer.org/clojure/Clojure"
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+File:
+	forms+=Form*;
+	
+Form:
+	Literal| 
+	SpecialForm| 
+	Seq;
+		
+Literal:
+	string=STRING|
+	int=INT| 
+	keyword=KEYWORD|
+	symbol=[SymbolDef|NAME];
+
+	
+SpecialForm:
+	Deref|
+	Do|
+	If|
+	LexicalScope|
+	Meta|
+	MonitorEnter|
+	MonitorExit|
+	Quote|
+	Recur|
+	Regex|
+	SymbolDef|
+	SyntaxQuote|
+	Try|
+	Unquote|
+	UnquoteSplicing|
+	Var;
+
+SymbolDef:
+	Def|
+	Fn|
+	NameBinding;
+	
+// Special forms
+
+Def:
+	'(' 'def' name=NAME init=Form? ')';
+
+Deref:
+	'(' 'deref' form=Form ')'|
+	'@' form=Form;
+	
+Do:
+	{ Do }
+	'(' 'do' exprs+=Form* ')';
+	
+Fn:
+	{ Fn }
+	('(' 'fn' name=NAME? body=Body ')');
+	
+If:
+	'(' 'if' test=Form then=Form else=Form? ')';
+	
+LexicalScope:
+	Let|
+	Loop;
+	
+Let:
+	{ Let }
+	'(' 'let' '['bindings+=VarBinding*']' exprs+=Form* ')';
+
+Loop:
+	{ Loop }
+	'(' 'loop' '['bindings+=VarBinding*']' exprs+=Form* ')';
+	
+VarBinding:
+	binding=Binding init=Form;
+	
+Meta:
+	'(' 'meta' form=Form ')'|
+	'^' form=Form;
+
+MonitorEnter:
+	'(' 'monitor-enter' form=Form ')';
+		
+MonitorExit:
+	'(' 'monitor-exit' form=Form ')';
+		
+Recur:
+	{ Recur }
+	'(' 'recur' exprs+=Form* ')';
+	
+Quote:
+	'(' 'quote' form=Form ')';
+		
+Regex:
+	'#' regex=STRING;
+	
+SyntaxQuote:
+	'\'' form=Form;
+	
+Try:
+	{ Try }
+	'(' 'try' exprs+=Form* (catchClauses+=CatchClause)* finallyClause=FinallyClause? ')';
+	
+CatchClause:
+	'(' 'catch' className=NAME name=NAME exprs+=Form* ')';
+	
+FinallyClause:
+	{ FinallyClause }
+	'(' 'finally' exprs+=Form* ')';
+	
+Unquote:
+	'~' form=Form;
+	
+UnquoteSplicing:
+	'~@' form=Form;
+	
+Var:
+	('(' 'var' symbol=[SymbolDef|NAME] ')') |
+	('#\'' symbol=[SymbolDef|NAME]);
+
+// Bindings
+	
+Binding:
+	SimpleBinding |
+	VectorBinding |
+	MapBinding;
+
+NameBinding:
+	name=NAME;
+		
+SimpleBinding:
+	bindings+=NameBinding;
+	
+VectorBinding:
+	{ VectorBinding }
+	'[' bindings+=Binding* ']';
+	
+MapBinding:
+	{ MapBinding }
+	'{' bindings+=KeyBinding* '}';
+
+KeyBinding:
+	binding+=Binding key += KEYWORD; 
+
+// fn 
+	
+Body:
+	lambdas+=Lambda | 
+	('(' lambdas+=Lambda ')')+;
+	
+Lambda:
+	{ Lambda }
+	'[' params+=Param* (varArgs?='&' params+=Param)? ']' exprs+=Form*;
+		
+Param:
+	binding=Binding;
+
+// Sequences
+	
+Seq:
+	List|
+	Vector|
+	Map|
+	Set;
+	
+List:
+	{ List }
+	'(' elements+=Form* ')';
+
+Vector:
+	{ Vector }
+	'[' elements+=Form* ']';
+		
+Map:
+	{ Map }
+	'{' (keys+=Form elements+=Form)* '}';
+	
+Set:
+	{ Set }
+	'#{' elements+=Form* '}';
+
+// Terminals
+	
+terminal KEYWORD:
+	':' NAME;
+	
+terminal NAME: 
+	(SYMBOL_START)(SYMBOL_START|'0'..'9')*;
+	
+terminal SYMBOL_START:
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'/'|'!'|'?'|'.';
+	
+terminal INT 
+returns ecore::EInt: 
+	('0'..'9')+;
+	
+terminal STRING	: 
+	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'"'|"'"|'\\') | !('\\'|'"') )* '"';
+	
+terminal WSS: 
+	(' '|'\t'|'\r'|'\n')+;
+	
+terminal SL_COMMENT: 
+	';' !('\n'|'\r')* ('\r'? '\n')?;
+	

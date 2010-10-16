@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<templates>
+<template 
+	name="def" description="def" enabled="true"
+	id="org.maschinenstuermer.clojure.Clojure.File"
+	context="org.maschinenstuermer.clojure.Clojure.File" >(def ${name} ${cursor})</template>
+<template 
+	name="fn" description="fn" enabled="true"
+	id="org.maschinenstuermer.clojure.Clojure.File"
+	context="org.maschinenstuermer.clojure.Clojure.File" >(fn ${name} [${param}] ${cursor})</template>
+<template 
+	name="let" description="let" enabled="true"
+	id="org.maschinenstuermer.clojure.Clojure.Form"
+	context="org.maschinenstuermer.clojure.Clojure.File" >(let [${binding} ${form}] [${param}] ${cursor})</template>  
+	  
+</templates>

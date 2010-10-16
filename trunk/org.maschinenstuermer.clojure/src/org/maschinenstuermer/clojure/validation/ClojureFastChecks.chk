@@ -1,0 +1,31 @@
+/*
+ * This check file is used to specify inexpensive constraints for the
+ * derived metamodels. They will be executed by the editor when the
+ * user opens a file and whenever the user changes its content.
+ * At generation time they will be executed as well.
+ *  
+ * Example:
+ *
+ * import myDsl;
+ *
+ * context Class WARNING "Name should start with a capital" :
+ *    name.toFirstUpper() == name;
+ */
+
+import clojure;
+
+extension org::maschinenstuermer::clojure::scoping::Scoping;
+extension org::maschinenstuermer::clojure::validation::ClojureExtensions;
+
+context Lambda ERROR "Can't have 2 overloads with same arity":
+	((Body) eContainer).lambdas.select(l|l.params.size == params.size).size == 1;
+	
+context Literal#symbol if symbol != null 
+	ERROR "Undefined symbol '" + symbol.name + "'":
+	scope(this).exists(p|p.name == this.symbol.name); 
+
+context Recur ERROR "recur without loop!":
+	loop(this) != null;
+		
+context Recur if loop(this) != null ERROR "Mismatched argument count to recur!":
+	loop(this).bindings.size == this.exprs.size;  
