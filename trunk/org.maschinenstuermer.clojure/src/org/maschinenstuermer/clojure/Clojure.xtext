@@ -52,7 +52,7 @@ Literal:
 	string=STRING|
 	int=INT| 
 	keyword=KEYWORD|
-	symbol=[SymbolDef|ID];
+	symbol=[types::JvmType|ID];
 
 Boolean:
 	value=("true"|"false");
@@ -62,7 +62,8 @@ SpecialForm:
 	Do|
 	Dot|
 	If|
-	LexicalScope|
+	Let|
+	Loop|
 	Meta|
 	MonitorEnter|
 	MonitorExit|
@@ -98,7 +99,7 @@ Do:
 	'(' 'do' exprs+=Form* ')';
 	
 Dot:
-	'(' '.' class=[types::JvmType|Name] call=MethodCall ')';
+	'(' '.' class=Form call=MethodCall ')';
 
 MethodCall:
 	method=Name args+=Form* |
@@ -112,20 +113,18 @@ If:
 	'(' 'if' test=Form then=Form else=Form? ')';
 	
 LexicalScope:
+	Lambda|
 	Let|
 	Loop;
 	
 Let:
 	{ Let }
-	'(' 'let' '['bindings+=VarBinding*']' exprs+=Form* ')';
+	'(' 'let' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 	
 Loop:
 	{ Loop }
-	'(' 'loop' '['bindings+=VarBinding*']' exprs+=Form* ')';
+	'(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 	
-VarBinding:
-	binding=Binding init=Form;
-
 Ns:
 	'(' 'ns' meta=Meta? name=ID ')';
 	
@@ -183,6 +182,7 @@ Var:
 // Bindings
 	
 Binding:
+	VarArgBinding |
 	SimpleBinding |
 	VectorBinding |
 	MapBinding;
@@ -190,6 +190,9 @@ Binding:
 NameBinding:
 	name=ID;
 		
+VarArgBinding:
+	'&' bindings+=Binding;
+	
 SimpleBinding:
 	ReaderMeta? bindings+=NameBinding;
 	
@@ -212,10 +215,7 @@ Body:
 	
 Lambda:
 	{ Lambda }
-	'[' params+=Param* (varArgs?='&' params+=Param)? ']' exprs+=Form*;
-		
-Param:
-	binding=Binding;
+	'[' bindings+=Binding* ']' exprs+=Form*;
 
 // Sequences
 	
@@ -242,7 +242,7 @@ Set:
 	'#{' elements+=Form* '}';
 
 // data type rules
-
+	
 Name:
 	ID|
 	'catch'|
@@ -263,11 +263,11 @@ terminal KEYWORD:
 	':' ID;
 	
 terminal ID: 
-	(SYMBOL_START (SYMBOL_START|'0'..'9'|'.')*)|
-	('&' SYMBOL_START (SYMBOL_START|'0'..'9'|'.')*);
+	(SYMBOL_START (SYMBOL_START|'0'..'9')*)|
+	('&' SYMBOL_START (SYMBOL_START|'0'..'9')*);
 		
 terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'/';
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'/'|'.';
 		
 terminal INT 
 returns ecore::EInt: 
