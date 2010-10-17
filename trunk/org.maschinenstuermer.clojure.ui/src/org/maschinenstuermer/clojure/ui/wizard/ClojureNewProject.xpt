@@ -6,11 +6,10 @@
 
 «DEFINE model FOR ClojureProjectInfo»
 «FILE "src/main.clj"-»
-; just a small example
-
-; (def hello-world 
-;	(fn [n] (str "Hello, " n "!"))
+(def ^{:doc "Just a simple hello world example function."} 
+	hello-world 
+    (fn [n] (print "Hello, " n "!\n")))
 	
-; (hello-world "Max")
+(hello-world "Max")
 «ENDFILE»
 «ENDDEFINE»

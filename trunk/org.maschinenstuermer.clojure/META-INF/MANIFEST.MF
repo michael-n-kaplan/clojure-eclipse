@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.xtext,
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
  org.antlr.runtime,
- org.eclipse.xtend
+ org.eclipse.xtend,
+ org.eclipse.xtext.common.types
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.maschinenstuermer.clojure,

@@ -3,7 +3,7 @@ import clojure;
 	
 Set[SymbolDef] scope(EObject e):
 	globalDefs(e).addAll(lexicalDefs(e));
-
+	
 boolean isLocalDef(EObject e):
 	NameBinding.isInstance(e);
 	
