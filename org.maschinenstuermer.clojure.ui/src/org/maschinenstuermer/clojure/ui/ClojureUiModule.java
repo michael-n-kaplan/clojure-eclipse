@@ -5,7 +5,9 @@ package org.maschinenstuermer.clojure.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.ui.editor.contentassist.AbstractJavaBasedContentProposalProvider.ReferenceProposalCreator;
+import org.eclipse.xtext.ui.wizard.IProjectCreator;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojureReferenceProposalCreator;
+import org.maschinenstuermer.clojure.ui.wizard.CustomClojureProjectCreator;
 
 /**
  * Use this class to register components to be used within the IDE.
@@ -15,7 +17,12 @@ public class ClojureUiModule extends org.maschinenstuermer.clojure.ui.AbstractCl
 		super(plugin);
 	}
 	
-	public Class<? extends ReferenceProposalCreator> bindReferenceProposalCreator() {
+	public Class<? extends ReferenceProposalCreator> bindAbstractJavaBasedContentProposalProvider$ReferenceProposalCreator() {
 		return ClojureReferenceProposalCreator.class;
+	}
+	
+	@Override
+	public Class<? extends IProjectCreator> bindIProjectCreator() {
+		return CustomClojureProjectCreator.class;
 	}
 }

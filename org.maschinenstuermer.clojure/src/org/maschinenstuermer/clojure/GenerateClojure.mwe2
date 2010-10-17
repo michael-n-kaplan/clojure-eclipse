@@ -36,9 +36,9 @@ Workflow {
 
 			// generates Java API for the generated EPackages 
 			fragment = ecore.EcoreGeneratorFragment {
-			// referencedGenModels = "uri to genmodel, uri to next genmodel"
+  				referencedGenModels="classpath:/model/JavaVMTypes.genmodel"
 			}
-
+			
 			// the serialization component
 			fragment = parseTreeConstructor.ParseTreeConstructorFragment {}
 
@@ -71,6 +71,8 @@ Workflow {
 			fragment = exporting.QualifiedNamesFragment {}
 			fragment = builder.BuilderIntegrationFragment {}
 
+			fragment = types.TypesGeneratorFragment {}
+			
 			// formatter API 
 			fragment = formatting.FormatterFragment {}
 

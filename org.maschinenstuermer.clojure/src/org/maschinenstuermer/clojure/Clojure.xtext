@@ -4,6 +4,7 @@ hidden (WSS,SL_COMMENT)
 generate clojure "http://www.maschinenstuermer.org/clojure/Clojure"
 
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+import "http://www.eclipse.org/xtext/common/JavaVMTypes" as types
 
 File:
 	forms+=Form*;
@@ -13,21 +14,60 @@ Form:
 	SpecialForm| 
 	Seq;
 		
-Literal:
+QuotedForm:
+	QuotedLiteral|
+	QuotedSeq;
+
+QuotedSeq:
+	QuotedList|
+	QuotedVector|
+	QuotedMap|
+	QuotedSet;
+	
+QuotedList:
+	{ List }
+	'(' elements+=QuotedForm* ')';
+
+QuotedVector:
+	{ Vector }
+	'[' elements+=QuotedForm* ']';
+		
+QuotedMap:
+	{ Map }
+	'{' (keys+=QuotedForm elements+=QuotedForm)* '}';
+	
+QuotedSet:
+	{ Set }
+	'#{' elements+=QuotedForm* '}';
+
+QuotedLiteral:
 	string=STRING|
 	int=INT| 
 	keyword=KEYWORD|
-	symbol=[SymbolDef|NAME];
+	symbol=(Name|'&');
+	
+Literal:
+	nil?='nil'|
+	bool=Boolean|
+	string=STRING|
+	int=INT| 
+	keyword=KEYWORD|
+	symbol=[SymbolDef|ID];
 
+Boolean:
+	value=("true"|"false");
 	
 SpecialForm:
 	Deref|
 	Do|
+	Dot|
 	If|
 	LexicalScope|
 	Meta|
 	MonitorEnter|
 	MonitorExit|
+	New|
+	Ns|
 	Quote|
 	Recur|
 	Regex|
@@ -43,11 +83,12 @@ SymbolDef:
 	Fn|
 	NameBinding;
 	
+	 
 // Special forms
 
 Def:
-	'(' 'def' name=NAME init=Form? ')';
-
+	'(' 'def' meta=ReaderMeta? name=Name init=Form? ')';
+	
 Deref:
 	'(' 'deref' form=Form ')'|
 	'@' form=Form;
@@ -56,9 +97,16 @@ Do:
 	{ Do }
 	'(' 'do' exprs+=Form* ')';
 	
+Dot:
+	'(' '.' class=[types::JvmType|Name] call=MethodCall ')';
+
+MethodCall:
+	method=Name args+=Form* |
+	'(' method=Name args+=Form* ')';
+	
 Fn:
 	{ Fn }
-	('(' 'fn' name=NAME? body=Body ')');
+	('(' ('fn'|'fn*') meta=ReaderMeta? name=Name? body=Body ')');
 	
 If:
 	'(' 'if' test=Form then=Form else=Form? ')';
@@ -70,16 +118,22 @@ LexicalScope:
 Let:
 	{ Let }
 	'(' 'let' '['bindings+=VarBinding*']' exprs+=Form* ')';
-
+	
 Loop:
 	{ Loop }
 	'(' 'loop' '['bindings+=VarBinding*']' exprs+=Form* ')';
 	
 VarBinding:
 	binding=Binding init=Form;
+
+Ns:
+	'(' 'ns' meta=Meta? name=ID ')';
 	
 Meta:
 	'(' 'meta' form=Form ')'|
+	ReaderMeta;
+	
+ReaderMeta:
 	'^' form=Form;
 
 MonitorEnter:
@@ -88,25 +142,29 @@ MonitorEnter:
 MonitorExit:
 	'(' 'monitor-exit' form=Form ')';
 		
+New:
+	'(' 'new' class=Name ')';
+	
 Recur:
 	{ Recur }
 	'(' 'recur' exprs+=Form* ')';
 	
 Quote:
-	'(' 'quote' form=Form ')';
+	'(' 'quote' form=QuotedForm ')'|
+	'\'' form=QuotedForm;
 		
 Regex:
 	'#' regex=STRING;
 	
 SyntaxQuote:
-	'\'' form=Form;
+	'`' form=QuotedForm;
 	
 Try:
 	{ Try }
 	'(' 'try' exprs+=Form* (catchClauses+=CatchClause)* finallyClause=FinallyClause? ')';
 	
 CatchClause:
-	'(' 'catch' className=NAME name=NAME exprs+=Form* ')';
+	'(' 'catch' className=Name name=Name exprs+=Form* ')';
 	
 FinallyClause:
 	{ FinallyClause }
@@ -119,8 +177,8 @@ UnquoteSplicing:
 	'~@' form=Form;
 	
 Var:
-	('(' 'var' symbol=[SymbolDef|NAME] ')') |
-	('#\'' symbol=[SymbolDef|NAME]);
+	('(' 'var' symbol=[SymbolDef|Name] ')') |
+	('#\'' symbol=[SymbolDef|Name]);
 
 // Bindings
 	
@@ -130,10 +188,10 @@ Binding:
 	MapBinding;
 
 NameBinding:
-	name=NAME;
+	name=ID;
 		
 SimpleBinding:
-	bindings+=NameBinding;
+	ReaderMeta? bindings+=NameBinding;
 	
 VectorBinding:
 	{ VectorBinding }
@@ -183,17 +241,34 @@ Set:
 	{ Set }
 	'#{' elements+=Form* '}';
 
+// data type rules
+
+Name:
+	ID|
+	'catch'|
+	'def'|'deref'|'do'|
+	'fn'|'finally'|
+	'if'|
+	'let'|'loop'|
+	'meta'|'monitor-enter'|'monitor-exit'|
+	'new'|
+	'quote'|
+	'try'|
+	'recur'|
+	'var';
+	
 // Terminals
 	
 terminal KEYWORD:
-	':' NAME;
+	':' ID;
 	
-terminal NAME: 
-	(SYMBOL_START)(SYMBOL_START|'0'..'9')*;
-	
+terminal ID: 
+	(SYMBOL_START (SYMBOL_START|'0'..'9'|'.')*)|
+	('&' SYMBOL_START (SYMBOL_START|'0'..'9'|'.')*);
+		
 terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'/'|'!'|'?'|'.';
-	
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'/';
+		
 terminal INT 
 returns ecore::EInt: 
 	('0'..'9')+;

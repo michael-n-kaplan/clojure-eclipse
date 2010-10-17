@@ -1,15 +1,12 @@
 import emf;
 import clojure;
 
-Loop loop(EObject e):
+LexicalScope lexicalScope(EObject e):
 	if e == null then 
 		null
 	else
-		if 	Loop.isInstance(e) then 
-			((Loop) e)
+		if 	LexicalScope.isInstance(e) then 
+			((LexicalScope) e)
 		else 
-			e.eContainer;
-			
-Loop loop(Recur r):
-	loop(r.eContainer);
+			lexicalScope(e.eContainer);
 	
