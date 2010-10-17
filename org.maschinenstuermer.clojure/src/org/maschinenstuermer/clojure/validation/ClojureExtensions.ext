@@ -1,12 +1,14 @@
 import emf;
 import clojure;
 
-LexicalScope lexicalScope(EObject e):
+LexicalScope recurPoint(EObject e):
 	if e == null then 
 		null
 	else
-		if 	LexicalScope.isInstance(e) then 
+		if isRecurPoint(e) then 
 			((LexicalScope) e)
 		else 
-			lexicalScope(e.eContainer);
+			recurPoint(e.eContainer);
 	
+boolean isRecurPoint(EObject e):
+	Lambda.isInstance(e) || Loop.isInstance(e);

@@ -1,0 +1,17 @@
+import types;
+ 
+process(xtext::GeneratedMetamodel this) :
+	process(ePackage)
+;
+ 
+process(ecore::EPackage this):
+	eClassifiers.typeSelect(ecore::EClass).process();
+ 
+process(ecore::EClass this):
+	switch (name) {
+		case "SymbolDef": addSuperType(this, "JvmType")
+		default:	null
+	};
+	
+addSuperType(ecore::EClass this, String class):
+	this.eSuperTypes.add(org::eclipse::xtext::common::types::TypesPackage::eINSTANCE.getEClassifier(class));

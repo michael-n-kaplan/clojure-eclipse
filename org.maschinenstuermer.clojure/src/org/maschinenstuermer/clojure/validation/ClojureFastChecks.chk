@@ -19,10 +19,10 @@ extension org::maschinenstuermer::clojure::validation::ClojureExtensions;
 
 
 context Lambda ERROR "Can't have 2 overloads with same arity":
-	((Body) eContainer).lambdas.select(l|l.params.size == params.size).size == 1;
+	((Body) eContainer).lambdas.select(l|l.bindings.size == bindings.size).size == 1;
 	
 context Recur ERROR "recur without lexical scope!":
-	lexicalScope(this) != null;
+	recurPoint(this) != null;
 		
-context Recur if lexicalScope(this) != null ERROR "Mismatched argument count to recur!":
-	lexicalScope(this).bindings.size == this.exprs.size;	
+context Recur if recurPoint(this) != null ERROR "Mismatched argument count to recur!":
+	recurPoint(this).bindings.size == this.exprs.size;	
