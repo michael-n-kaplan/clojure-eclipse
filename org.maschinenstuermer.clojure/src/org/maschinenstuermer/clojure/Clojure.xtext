@@ -52,7 +52,7 @@ Literal:
 	string=STRING|
 	int=INT| 
 	keyword=KEYWORD|
-	symbol=[types::JvmType|ID];
+	symbol=[types::JvmType|QualifiedName];
 
 Boolean:
 	value=("true"|"false");
@@ -74,6 +74,7 @@ SpecialForm:
 	Regex|
 	SymbolDef|
 	SyntaxQuote|
+	Throw|
 	Try|
 	Unquote|
 	UnquoteSplicing|
@@ -81,15 +82,21 @@ SpecialForm:
 
 SymbolDef:
 	Def|
-	Fn|
-	NameBinding;
-	
+	Defn|
+	Defmacro|
+	Fn;
 	 
 // Special forms
 
 Def:
 	'(' 'def' meta=ReaderMeta? name=Name init=Form? ')';
 	
+Defn:
+	'(' 'defn' name=Name doc=STRING? meta=Map? body=Body ')';
+
+Defmacro:
+	'(' 'defmacro' name=Name doc=STRING? meta=Map? body=Body ')';
+	 
 Deref:
 	'(' 'deref' form=Form ')'|
 	'@' form=Form;
@@ -126,7 +133,7 @@ Loop:
 	'(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 	
 Ns:
-	'(' 'ns' meta=Meta? name=ID ')';
+	'(' 'ns' meta=Meta? name=QualifiedName ')';
 	
 Meta:
 	'(' 'meta' form=Form ')'|
@@ -142,7 +149,7 @@ MonitorExit:
 	'(' 'monitor-exit' form=Form ')';
 		
 New:
-	'(' 'new' class=Name ')';
+	'(' 'new' class=QualifiedName args+=Form*')';
 	
 Recur:
 	{ Recur }
@@ -157,6 +164,9 @@ Regex:
 	
 SyntaxQuote:
 	'`' form=QuotedForm;
+	
+Throw:
+	'(' 'throw' expr=Form ')';
 	
 Try:
 	{ Try }
@@ -182,17 +192,13 @@ Var:
 // Bindings
 	
 Binding:
-	VarArgBinding |
 	SimpleBinding |
 	VectorBinding |
 	MapBinding;
 
 NameBinding:
-	name=ID;
-		
-VarArgBinding:
-	'&' bindings+=Binding;
-	
+	varArg?='&'? name=Name;
+			
 SimpleBinding:
 	ReaderMeta? bindings+=NameBinding;
 	
@@ -243,17 +249,20 @@ Set:
 
 // data type rules
 	
+QualifiedName:
+	ID ('.' ID)* ('/' Name)?;
+	
 Name:
 	ID|
 	'catch'|
-	'def'|'deref'|'do'|
+	'def'|'defn'|'defmacro'|'deref'|'do'|
 	'fn'|'finally'|
 	'if'|
 	'let'|'loop'|
 	'meta'|'monitor-enter'|'monitor-exit'|
-	'new'|
+	'ns'|'new'|
 	'quote'|
-	'try'|
+	'throw'|'try'|
 	'recur'|
 	'var';
 	
@@ -264,10 +273,11 @@ terminal KEYWORD:
 	
 terminal ID: 
 	(SYMBOL_START (SYMBOL_START|'0'..'9')*)|
-	('&' SYMBOL_START (SYMBOL_START|'0'..'9')*);
+	('&' SYMBOL_START (SYMBOL_START|'0'..'9')*)|
+	'/';
 		
 terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'/'|'.';
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?';
 		
 terminal INT 
 returns ecore::EInt: 

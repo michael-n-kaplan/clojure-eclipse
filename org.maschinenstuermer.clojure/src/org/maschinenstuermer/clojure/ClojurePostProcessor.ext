@@ -9,23 +9,31 @@ process(ecore::EPackage this):
  
 process(ecore::EClass this):
 	switch (name) {
-		case "SymbolDef": addSuperType(this, "JvmType")
+		case "NameBinding" : processNameBinding(this) 
+		case "Lambda": removeStructuralFeature(this, "bindings")
 		case "LexicalScope": addChildReference(this, "bindings", ePackage.getEClassifier("Binding"))
-		case "Loop": removeReference(this, "bindings")
-		case "Let": removeReference(this, "bindings")
-		case "Lambda": removeReference(this, "bindings")
+		case "Let": removeStructuralFeature(this, "bindings")
+		case "Loop": removeStructuralFeature(this, "bindings")
+		case "SymbolDef": addSuperType(this, org::eclipse::xtext::common::types::TypesPackage::eINSTANCE.getEClassifier("JvmType"))
 		default:	null
 	};
 	
-addSuperType(ecore::EClass this, String class):
-	this.eSuperTypes.add(org::eclipse::xtext::common::types::TypesPackage::eINSTANCE.getEClassifier(class));
+processNameBinding(ecore::EClass this):
+	addSuperType(this, ePackage.getEClassifier("SymbolDef"))->
+	removeStructuralFeature(this, "name");
+	
+addSuperType(ecore::EClass this, ecore::EClassifier c):
+	this.eSuperTypes.add(c)->
+	this;
 
 addChildReference(ecore::EClass this, String name, ecore::EClassifier type):
 	if this.getEStructuralFeature(name) == null then
-		this.eStructuralFeatures.add(newChildReference(name, type));
+		this.eStructuralFeatures.add(newChildReference(name, type))->
+		this;
 	
-removeReference(ecore::EClass this, String ref):
-	this.eStructuralFeatures.remove(this.getEStructuralFeature(name));
+removeStructuralFeature(ecore::EClass this, String ref):
+	this.eStructuralFeatures.remove(this.getEStructuralFeature(ref))->
+	this;
 	
 newChildReference(String name, ecore::EClassifier type):
 	let r = new ecore::EReference :
