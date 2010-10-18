@@ -10,8 +10,28 @@ process(ecore::EPackage this):
 process(ecore::EClass this):
 	switch (name) {
 		case "SymbolDef": addSuperType(this, "JvmType")
+		case "LexicalScope": addChildReference(this, "bindings", ePackage.getEClassifier("Binding"))
+		case "Loop": removeReference(this, "bindings")
+		case "Let": removeReference(this, "bindings")
+		case "Lambda": removeReference(this, "bindings")
 		default:	null
 	};
 	
 addSuperType(ecore::EClass this, String class):
 	this.eSuperTypes.add(org::eclipse::xtext::common::types::TypesPackage::eINSTANCE.getEClassifier(class));
+
+addChildReference(ecore::EClass this, String name, ecore::EClassifier type):
+	if this.getEStructuralFeature(name) == null then
+		this.eStructuralFeatures.add(newChildReference(name, type));
+	
+removeReference(ecore::EClass this, String ref):
+	this.eStructuralFeatures.remove(this.getEStructuralFeature(name));
+	
+newChildReference(String name, ecore::EClassifier type):
+	let r = new ecore::EReference :
+		r.setName(name)->
+		r.setEType(type)->
+		r.setContainment(true)->
+		r.setUpperBound(-1)->
+		r.setLowerBound(0)->
+		r;
