@@ -3,13 +3,22 @@ import clojure;
 	
 Set[SymbolDef] scope(EObject e):
 	globalDefs(e).addAll(lexicalDefs(e));
-	
+
 boolean isLocalDef(EObject e):
-	NameBinding.isInstance(e);
+	false;
+		
+boolean isLocalDef(NameBinding n):
+	true;
+
+boolean isLocalDef(Fn f):
+	true;
 	
 boolean isGlobalDef(EObject e):
-	SymbolDef.isInstance(e) && !isLocalDef(e);
-	 	
+	false; 
+	 
+boolean isGlobalDef(SymbolDef s):
+	!isLocalDef(e);
+	
 Set[SymbolDef] globalDefs(EObject e):
 	e.eRootContainer.eAllContents.select(s|isGlobalDef(s));
 	
