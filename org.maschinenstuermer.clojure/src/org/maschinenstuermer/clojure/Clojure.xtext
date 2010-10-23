@@ -8,11 +8,15 @@ import "http://www.eclipse.org/xtext/common/JavaVMTypes" as types
 
 File:
 	forms+=Form*;
-	
-Form:
-	Literal| 
-	SpecialForm| 
+
+SimpleForm:
+	SimpleLiteral|
+	SpecialForm|
 	Seq;
+		
+Form:
+	SimpleForm|
+	Literal;
 		
 QuotedForm:
 	QuotedLiteral|
@@ -41,23 +45,24 @@ QuotedSet:
 	'#{' elements+=QuotedForm* '}';
 
 QuotedLiteral:
-	string=STRING|
-	int=INT| 
-	keyword=KEYWORD|
-	symbol=(Name|'&');
+	SimpleLiteral|
+	symbol=(QualifiedName|'&');
+	
+SimpleLiteral:
+	value='nil'|
+	value=STRING|
+	value=NUMBER|
+	value=KEYWORD|
+	value=Boolean;
 	
 Literal:
-	nil?='nil'|
-	bool=Boolean|
-	string=STRING|
-	int=INT| 
-	keyword=KEYWORD|
 	symbol=[types::JvmType|QualifiedName];
 
 Boolean:
-	value=("true"|"false");
+	"true"|"false";
 	
 SpecialForm:
+	Call|
 	Deref|
 	Do|
 	Dot|
@@ -92,10 +97,10 @@ Def:
 	'(' 'def' meta=ReaderMeta? name=Name init=Form? ')';
 	
 Defn:
-	'(' 'defn' name=Name doc=STRING? meta=Map? body=Body ')';
+	'(' 'defn' meta=ReaderMeta? name=Name doc=STRING? attributes=Map? body=Body ')';
 
 Defmacro:
-	'(' 'defmacro' name=Name doc=STRING? meta=Map? body=Body ')';
+	'(' 'defmacro' meta=ReaderMeta? name=Name doc=STRING? attributes=Map? body=Body ')';
 	 
 Deref:
 	'(' 'deref' form=Form ')'|
@@ -106,11 +111,7 @@ Do:
 	'(' 'do' exprs+=Form* ')';
 	
 Dot:
-	'(' '.' class=Form call=MethodCall ')';
-
-MethodCall:
-	method=Name args+=Form* |
-	'(' method=Name args+=Form* ')';
+	'(' '.' args+=Form+ ')';
 	
 Fn:
 	{ Fn }
@@ -163,7 +164,7 @@ Regex:
 	'#' regex=STRING;
 	
 SyntaxQuote:
-	'`' form=QuotedForm;
+	'`' form=Form;
 	
 Throw:
 	'(' 'throw' expr=Form ')';
@@ -197,10 +198,10 @@ Binding:
 	MapBinding;
 
 NameBinding:
-	varArg?='&'? name=Name;
+	meta=ReaderMeta? varArg?='&'? name=Name;
 			
 SimpleBinding:
-	ReaderMeta? bindings+=NameBinding;
+	bindings+=NameBinding;
 	
 VectorBinding:
 	{ VectorBinding }
@@ -231,9 +232,12 @@ Seq:
 	Map|
 	Set;
 	
+Call:
+	'(' fn=[types::JvmType|JavaQualifiedName] args+=Form* ')';
+	
 List:
 	{ List }
-	'(' elements+=Form* ')';
+	'(' (elements+=SimpleForm elements+=Form*)? ')';
 
 Vector:
 	{ Vector }
@@ -249,14 +253,18 @@ Set:
 
 // data type rules
 	
-QualifiedName:
+JavaQualifiedName:
 	ID ('.' ID)* ('/' Name)?;
 	
+QualifiedName:
+	Name ('.' Name)* ('/' Name)?;
+	
+
 Name:
 	ID|
 	'catch'|
 	'def'|'defn'|'defmacro'|'deref'|'do'|
-	'fn'|'finally'|
+	'fn'|'fn*'|'finally'|
 	'if'|
 	'let'|'loop'|
 	'meta'|'monitor-enter'|'monitor-exit'|
@@ -273,14 +281,12 @@ terminal KEYWORD:
 	
 terminal ID: 
 	(SYMBOL_START (SYMBOL_START|'0'..'9')*)|
-	('&' SYMBOL_START (SYMBOL_START|'0'..'9')*)|
-	'/';
+	('&' SYMBOL_START (SYMBOL_START|'0'..'9')*);
 		
 terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?';
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'/';
 		
-terminal INT 
-returns ecore::EInt: 
+terminal NUMBER: 
 	('0'..'9')+;
 	
 terminal STRING	: 

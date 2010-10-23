@@ -17,20 +17,13 @@ boolean isGlobalDef(EObject e):
 	false; 
 	 
 boolean isGlobalDef(SymbolDef s):
-	!isLocalDef(e);
+	!isLocalDef(s);
 	
 Set[SymbolDef] globalDefs(EObject e):
 	e.eRootContainer.eAllContents.select(s|isGlobalDef(s));
 	
-Set[SymbolDef] lexicalDefs(Lambda l):
-	l.params.binding.eAllContents.typeSelect(NameBinding)
-		.addAll(lexicalDefs(l.eContainer));
-
-Set[SymbolDef] lexicalDefs(VarBinding v):
-	lexicalDefs(v.eContainer.eContainer);
-
 Set[SymbolDef] lexicalDefs(LexicalScope l):
-	l.bindings.binding.eAllContents.typeSelect(NameBinding)
+	l.bindings.eAllContents.typeSelect(NameBinding)
 		.addAll(lexicalDefs(l.eContainer));
 	
 Set[SymbolDef] lexicalDefs(EObject e):

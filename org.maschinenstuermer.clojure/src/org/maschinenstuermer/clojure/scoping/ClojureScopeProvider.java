@@ -34,5 +34,5 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 		final Iterable<EObject> result = (Iterable<EObject>) 
 			xtendFacade.call("scope", context);
 		return scopeFor(result);
-	}
+	}	
 }
