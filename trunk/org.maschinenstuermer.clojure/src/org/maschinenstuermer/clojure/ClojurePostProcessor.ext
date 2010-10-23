@@ -20,7 +20,8 @@ process(ecore::EClass this):
 	
 processNameBinding(ecore::EClass this):
 	addSuperType(this, ePackage.getEClassifier("SymbolDef"))->
-	removeStructuralFeature(this, "name");
+	removeStructuralFeature(this, "name")->
+	removeStructuralFeature(this, "meta");
 	
 addSuperType(ecore::EClass this, ecore::EClassifier c):
 	this.eSuperTypes.add(c)->
