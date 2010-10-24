@@ -12,6 +12,7 @@ File:
 SimpleForm:
 	SimpleLiteral|
 	SpecialForm|
+	ReaderMacro|
 	Seq;
 		
 Form:
@@ -20,6 +21,8 @@ Form:
 		
 QuotedForm:
 	QuotedLiteral|
+	ReaderMacro|
+	QuotedDot|
 	QuotedSeq;
 
 QuotedSeq:
@@ -53,6 +56,7 @@ SimpleLiteral:
 	value=STRING|
 	value=NUMBER|
 	value=KEYWORD|
+	value=CHAR|
 	value=Boolean;
 	
 Literal:
@@ -61,9 +65,23 @@ Literal:
 Boolean:
 	"true"|"false";
 	
+ReaderMacro:
+	Deref|
+	ReaderLambda|
+	ReaderMeta|
+	ReaderQuote|
+	ReaderVar|
+	Regex|
+	SyntaxQuote|
+	Unquote|
+	UnquoteSplicing;
+	
+ReaderLambda:
+	{ ReaderLambda }
+	'#(' exprs+=Form* ')';
+	
 SpecialForm:
 	Call|
-	Deref|
 	Do|
 	Dot|
 	If|
@@ -76,13 +94,9 @@ SpecialForm:
 	Ns|
 	Quote|
 	Recur|
-	Regex|
 	SymbolDef|
-	SyntaxQuote|
 	Throw|
 	Try|
-	Unquote|
-	UnquoteSplicing|
 	Var;
 
 SymbolDef:
@@ -103,12 +117,14 @@ Defmacro:
 	'(' 'defmacro' meta=ReaderMeta? name=Name doc=STRING? attributes=Map? body=Body ')';
 	 
 Deref:
-	'(' 'deref' form=Form ')'|
 	'@' form=Form;
 	
 Do:
 	{ Do }
 	'(' 'do' exprs+=Form* ')';
+
+QuotedDot:
+	'(' '.' args+=QuotedForm+ ')';
 	
 Dot:
 	'(' '.' args+=Form+ ')';
@@ -134,11 +150,10 @@ Loop:
 	'(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 	
 Ns:
-	'(' 'ns' meta=Meta? name=QualifiedName ')';
+	'(' 'ns' meta=ReaderMeta? name=QualifiedName ')';
 	
 Meta:
-	'(' 'meta' form=Form ')'|
-	ReaderMeta;
+	'(' 'meta' form=Form ')';
 	
 ReaderMeta:
 	'^' form=Form;
@@ -150,21 +165,23 @@ MonitorExit:
 	'(' 'monitor-exit' form=Form ')';
 		
 New:
-	'(' 'new' class=QualifiedName args+=Form*')';
+	'(' 'new' class=[types::JvmType|JavaQualifiedName] args+=Form*')';
 	
 Recur:
 	{ Recur }
 	'(' 'recur' exprs+=Form* ')';
 	
-Quote:
-	'(' 'quote' form=QuotedForm ')'|
+ReaderQuote:
 	'\'' form=QuotedForm;
+	
+Quote:
+	'(' 'quote' form=QuotedForm ')';
 		
 Regex:
 	'#' regex=STRING;
 	
 SyntaxQuote:
-	'`' form=Form;
+	'`' form=QuotedForm;
 	
 Throw:
 	'(' 'throw' expr=Form ')';
@@ -186,9 +203,11 @@ Unquote:
 UnquoteSplicing:
 	'~@' form=Form;
 	
-Var:
-	('(' 'var' symbol=[SymbolDef|Name] ')') |
+ReaderVar:
 	('#\'' symbol=[SymbolDef|Name]);
+	
+Var:
+	('(' 'var' symbol=[SymbolDef|Name] ')');
 
 // Bindings
 	
@@ -198,7 +217,7 @@ Binding:
 	MapBinding;
 
 NameBinding:
-	meta=ReaderMeta? varArg?='&'? name=Name;
+	meta=ReaderMeta? (varArg?='&'|keyWord=KEYWORD)? name=Name;
 			
 SimpleBinding:
 	bindings+=NameBinding;
@@ -233,7 +252,7 @@ Seq:
 	Set;
 	
 Call:
-	'(' fn=[types::JvmType|JavaQualifiedName] args+=Form* ')';
+	'(' fn=[types::JvmType|JavaQualifiedName] isNew?='.'? args+=Form* ')';
 	
 List:
 	{ List }
@@ -254,16 +273,15 @@ Set:
 // data type rules
 	
 JavaQualifiedName:
-	ID ('.' ID)* ('/' Name)?;
+	SYMBOL;
 	
 QualifiedName:
-	Name ('.' Name)* ('/' Name)?;
+	Name;
 	
-
 Name:
-	ID|
+	SYMBOL|
 	'catch'|
-	'def'|'defn'|'defmacro'|'deref'|'do'|
+	'def'|'defn'|'defmacro'|'do'|
 	'fn'|'fn*'|'finally'|
 	'if'|
 	'let'|'loop'|
@@ -277,24 +295,30 @@ Name:
 // Terminals
 	
 terminal KEYWORD:
-	':' ID;
+	':' SYMBOL;
 	
-terminal ID: 
-	(SYMBOL_START (SYMBOL_START|'0'..'9')*)|
-	('&' SYMBOL_START (SYMBOL_START|'0'..'9')*);
+terminal SYMBOL: 
+	'&'? SYMBOL_START (SYMBOL_START|DIGIT|'.'|'&')* |
+	'..';
 		
 terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'/';
-		
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'/'|'%';
+
 terminal NUMBER: 
-	('0'..'9')+;
+	DIGIT+(('.' DIGIT*)|('r' DIGIT+))?'M'?;
+	
+terminal DIGIT:
+	('0'..'9');
 	
 terminal STRING	: 
 	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'"'|"'"|'\\') | !('\\'|'"') )* '"';
+	
+terminal CHAR:
+	'\\' !(' '|'\t'|'\r'|'\n')+;
 	
 terminal WSS: 
 	(' '|'\t'|'\r'|'\n')+;
 	
 terminal SL_COMMENT: 
 	';' !('\n'|'\r')* ('\r'? '\n')?;
-	
+		
