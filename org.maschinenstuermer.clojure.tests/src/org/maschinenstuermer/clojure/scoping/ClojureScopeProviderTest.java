@@ -1,46 +1,45 @@
 package org.maschinenstuermer.clojure.scoping;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.junit.AbstractXtextTests;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
-import org.junit.Before;
-import org.junit.Test;
+import org.maschinenstuermer.clojure.ClojureStandaloneSetup;
 import org.maschinenstuermer.clojure.clojure.Body;
 import org.maschinenstuermer.clojure.clojure.ClojureFactory;
 import org.maschinenstuermer.clojure.clojure.ClojurePackage;
+import org.maschinenstuermer.clojure.clojure.Def;
+import org.maschinenstuermer.clojure.clojure.File;
 import org.maschinenstuermer.clojure.clojure.Fn;
 import org.maschinenstuermer.clojure.clojure.Lambda;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SimpleBinding;
+import org.maschinenstuermer.clojure.clojure.SymbolDef;
 
-public class ClojureScopeProviderTest {
+public class ClojureScopeProviderTest extends AbstractXtextTests {
 	private ClojureScopeProvider scopeProvider;
+	
+	private File file;
 	private Fn fn;
 	private Body body;
 	
-	@Before
-	public void setup() {
-		scopeProvider = new ClojureScopeProvider();
+	public void setUp() throws Exception {
+		super.setUp();
+		with(ClojureStandaloneSetup.class);
+		scopeProvider = get(ClojureScopeProvider.class);
+		file = ClojureFactory.eINSTANCE.createFile();
 	}
 	
-	@Test
-	public void fnWithOneLambda() {
+	public void testFnWithOneLambda() {
 		initFnWithBody();
 		final Lambda lambda = addLambdaToBody();
 		final SimpleBinding simpleBinding = addSimpleBinding(lambda);
 		final NameBinding nameBinding = addNameBinding(simpleBinding, "param1");
-		IScope scope = scopeProvider.getScope(lambda, ClojurePackage.eINSTANCE.getLiteral_Symbol());
-		final IEObjectDescription contentByName = scope.getContentByName("param1");
 		
-		assertNotNull(contentByName);
-		assertSame(nameBinding, contentByName.getEObjectOrProxy());
+		thenContextContains(lambda, nameBinding);
 	}
 
-	@Test
-	public void fnWithTwoLambda() {
+	public void testFnWithTwoLambda() {
 		initFnWithBody();
 		final Lambda lambda1 = addLambdaToBody();
 		final SimpleBinding simpleBinding1 = addSimpleBinding(lambda1);
@@ -51,26 +50,44 @@ public class ClojureScopeProviderTest {
 		final NameBinding nameBinding2 = addNameBinding(simpleBinding2, "param2");
 		final NameBinding nameBinding3 = addNameBinding(simpleBinding2, "param3");
 
-		IScope scope = scopeProvider.getScope(lambda1, ClojurePackage.eINSTANCE.getLiteral_Symbol());
-		IEObjectDescription contentByName = scope.getContentByName("param1");
-		
-		assertNotNull(contentByName);
-		assertSame(nameBinding1, contentByName.getEObjectOrProxy());
-		
-		scope = scopeProvider.getScope(lambda2, ClojurePackage.eINSTANCE.getLiteral_Symbol());
-		
-		contentByName = scope.getContentByName("param1");
-		assertNull(contentByName);
-	
-		contentByName = scope.getContentByName("param2");
-		assertNotNull(contentByName);
-		assertSame(nameBinding2, contentByName.getEObjectOrProxy());
-		
-		contentByName = scope.getContentByName("param3");
-		assertNotNull(contentByName);
-		assertSame(nameBinding3, contentByName.getEObjectOrProxy());
+		thenContextNotContains(lambda2, nameBinding1);
+		thenContextContains(lambda1, nameBinding1);		
+		thenContextContains(lambda2, nameBinding2);
+		thenContextContains(lambda2, nameBinding3);
 	}
 
+	public void testDef() {
+		final Def def1 = addDef("def1");
+		initFnWithBody();		
+		thenContextContains(fn, def1);
+		
+		final Def def2 = addDef("def2");		
+		thenContextContains(def1, def1);
+		thenContextContains(def1, def2);
+		thenContextContains(fn, def1);
+		thenContextContains(fn, def2);
+	}
+
+	private void thenContextNotContains(final EObject context, final SymbolDef symbolDef) {
+		final IScope scope = scopeProvider.getScope(context, ClojurePackage.eINSTANCE.getLiteral_Symbol());
+		final IEObjectDescription contentByName = scope.getContentByName(symbolDef.getName());
+		assertNull(contentByName);
+	}
+
+	private void thenContextContains(final EObject context, final SymbolDef symbolDef) {
+		final IScope scope = scopeProvider.getScope(context, ClojurePackage.eINSTANCE.getLiteral_Symbol());
+		final IEObjectDescription contentByName = scope.getContentByName(symbolDef.getName());
+		assertNotNull(contentByName);
+		assertSame(symbolDef, contentByName.getEObjectOrProxy());
+	}
+	
+	private Def addDef(final String name) {
+		final Def def = ClojureFactory.eINSTANCE.createDef();
+		file.getForms().add(def);
+		def.setName(name);
+		return def;
+	}
+	
 	private SimpleBinding addSimpleBinding(final Lambda lambda) {
 		final SimpleBinding simpleBinding = ClojureFactory.eINSTANCE.createSimpleBinding();
 		lambda.getBindings().add(simpleBinding);
@@ -78,7 +95,7 @@ public class ClojureScopeProviderTest {
 	}
 
 	private NameBinding addNameBinding(final SimpleBinding simpleBinding,
-			String name) {
+			final String name) {
 		NameBinding nameBinding = ClojureFactory.eINSTANCE.createNameBinding();
 		nameBinding.setName(name);
 		simpleBinding.getBindings().add(nameBinding);
@@ -93,6 +110,7 @@ public class ClojureScopeProviderTest {
 
 	private void initFnWithBody() {
 		fn = ClojureFactory.eINSTANCE.createFn();
+		file.getForms().add(fn);
 		body = ClojureFactory.eINSTANCE.createBody();
 		fn.setBody(body);
 	}
