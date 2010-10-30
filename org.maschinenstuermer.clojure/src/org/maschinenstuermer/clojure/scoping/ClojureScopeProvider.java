@@ -5,12 +5,32 @@ package org.maschinenstuermer.clojure.scoping;
 
 import static org.eclipse.xtext.scoping.Scopes.scopeFor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.xtend.XtendFacade;
-import org.eclipse.xtend.typesystem.emf.EmfRegistryMetaModel;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
+import org.eclipse.xtext.util.IResourceScopeCache;
+import org.eclipse.xtext.util.Tuples;
+import org.maschinenstuermer.clojure.clojure.Binding;
+import org.maschinenstuermer.clojure.clojure.Fn;
+import org.maschinenstuermer.clojure.clojure.KeyBinding;
+import org.maschinenstuermer.clojure.clojure.LexicalScope;
+import org.maschinenstuermer.clojure.clojure.NameBinding;
+import org.maschinenstuermer.clojure.clojure.SimpleBinding;
+import org.maschinenstuermer.clojure.clojure.SymbolDef;
+import org.maschinenstuermer.clojure.clojure.VectorBinding;
+import org.maschinenstuermer.clojure.clojure.util.ClojureSwitch;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * This class contains custom scoping description.
@@ -20,19 +40,116 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
  *
  */
 public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
-	private final XtendFacade xtendFacade;
 
-	public ClojureScopeProvider() {
-		super();
-		xtendFacade = XtendFacade.create("org::maschinenstuermer::clojure::scoping::Scoping");
-		xtendFacade.registerMetaModel(new EmfRegistryMetaModel());
+	@Inject
+	private IResourceScopeCache scopeCache;
+
+	public IScope scope_JvmType(final EObject context, 
+			final EReference reference) {
+		return scope(context);
 	}
 	
-	public IScope scope_SymbolDef(final EObject context, 
-			final EReference reference) {
-		@SuppressWarnings("unchecked")
-		final Iterable<EObject> result = (Iterable<EObject>) 
-			xtendFacade.call("scope", context);
-		return scopeFor(result);
-	}	
+	private IScope scope(final EObject context) {
+		assert context != null;
+		
+		final LexicalScope lexicalScope = getLexicalScope(context);
+		if (lexicalScope != null) {
+			return lexicalScope(context, lexicalScope);
+		} else {
+			return defScope(context);
+		}
+	}
+	
+	private IScope defScope(final EObject context) {
+		return scopeCache.get(Tuples.pair(Scope.DEF, null), context.eResource(), new Provider<IScope>() {
+			@Override
+			public IScope get() {
+				final List<EObject> defs = Lists.newArrayList(Iterators.filter(getAllContents(context), new IsDef()));
+				return scopeFor(defs);
+			}
+		});
+	}
+
+	private static class IsDef implements Predicate<EObject> {
+		@Override
+		public boolean apply(EObject input) {
+			return input instanceof SymbolDef 
+				&& !(input instanceof Fn) 
+				&& !(input instanceof NameBinding);
+		}		
+	}
+
+	private IScope lexicalScope(final EObject context,
+			final LexicalScope lexicalScope) {
+		assert lexicalScope != null;
+		
+		return scopeCache.get(Tuples.pair(Scope.LEXICAL, lexicalScope), context.eResource(), new Provider<IScope>() {
+			@Override
+			public IScope get() {
+				final List<NameBinding> namesInScope = NameBindings.all(lexicalScope);
+				final LexicalScope nextLexicalScope = getLexicalScope(lexicalScope.eContainer());
+				final IScope outerScope = nextLexicalScope == null ? 
+						defScope(context) :scope(nextLexicalScope);
+				return scopeFor(namesInScope, outerScope);
+			}
+		});
+	}
+	
+	private TreeIterator<EObject> getAllContents(final EObject context) {
+		if (context.eResource() != null) {			
+			return EcoreUtil.getAllContents(context, true);
+		} else {
+			return EcoreUtil.getRootContainer(context).eAllContents();
+		}
+	}
+	
+	private LexicalScope getLexicalScope(final EObject context) {
+		EObject currentContext = context;
+		while (!(currentContext instanceof LexicalScope) && currentContext != null) {
+			currentContext = currentContext.eContainer();
+		}
+		return (LexicalScope) currentContext;
+	}
+	
+	private static enum Scope {
+		DEF, LEXICAL
+	};
+	
+	private static class NameBindings extends ClojureSwitch<List<NameBinding>> {
+		private final List<NameBinding> nameBindings = 
+			new ArrayList<NameBinding>();
+		
+		public static List<NameBinding> all(final LexicalScope lexicalScope) {
+			return new NameBindings().doSwitch(lexicalScope);
+		}
+		
+		@Override
+		public List<NameBinding> caseLexicalScope(LexicalScope lexicalScope) {
+			for(Binding binding : lexicalScope.getBindings())
+				doSwitch(binding);
+			return nameBindings;
+		}
+		
+		@Override
+		public List<NameBinding> caseSimpleBinding(final SimpleBinding simpleBinding) {
+			nameBindings.addAll(simpleBinding.getBindings());
+			return nameBindings;
+		}
+		
+		@Override
+		public List<NameBinding> caseKeyBinding(final KeyBinding keyBinding) {
+			for (final Binding binding : keyBinding.getBinding()) 
+				doSwitch(binding);
+			
+			return nameBindings;
+		}
+		
+		@Override
+		public List<NameBinding> caseVectorBinding(final VectorBinding vectorBinding) {
+			for (final Binding binding : vectorBinding.getBindings()) 
+				doSwitch(binding);
+			
+			return nameBindings;
+		}
+	}
 }
