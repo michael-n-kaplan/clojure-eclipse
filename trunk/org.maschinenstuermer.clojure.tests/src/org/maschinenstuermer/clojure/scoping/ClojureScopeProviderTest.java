@@ -1,6 +1,9 @@
 package org.maschinenstuermer.clojure.scoping;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.xtext.junit.AbstractXtextTests;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
@@ -27,7 +30,10 @@ public class ClojureScopeProviderTest extends AbstractXtextTests {
 		super.setUp();
 		with(ClojureStandaloneSetup.class);
 		scopeProvider = get(ClojureScopeProvider.class);
+		Resource resource = getResourceFactory().createResource(URI.createFileURI("/var/temp/test.clj"));
+		new ResourceSetImpl().getResources().add(resource);
 		file = ClojureFactory.eINSTANCE.createFile();
+		resource.getContents().add(file);
 	}
 	
 	public void testFnWithOneLambda() {
