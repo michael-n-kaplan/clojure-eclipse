@@ -3,9 +3,16 @@
  */
 package org.maschinenstuermer.clojure;
 
+import org.maschinenstuermer.clojure.scoping.ClojureImportedNamespaceAwareLocalScopeProvider;
+
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 public class ClojureRuntimeModule extends org.maschinenstuermer.clojure.AbstractClojureRuntimeModule {
-
+	
+	public void configureIScopeProviderDelegate(com.google.inject.Binder binder) {
+		binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class).
+			annotatedWith(com.google.inject.name.Names.named("org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider.delegate")).
+			to(ClojureImportedNamespaceAwareLocalScopeProvider.class);
+	}
 }

@@ -11,6 +11,8 @@ import java.util.List;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
@@ -46,26 +48,33 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 
 	public IScope scope_JvmType(final EObject context, 
 			final EReference reference) {
-		return scope(context);
+		return scope(context, reference);
 	}
 	
-	private IScope scope(final EObject context) {
+	private IScope scope(final EObject context, 
+			final EReference reference) {
 		assert context != null;
 		
+		final Resource eResource = context.eResource();
+		final Object readOnly = eResource.getResourceSet().getURIConverter().getAttributes(eResource.getURI(), null).get(URIConverter.ATTRIBUTE_READ_ONLY);
+		final boolean isReadOnly = Boolean.TRUE.equals(readOnly);
+		
 		final LexicalScope lexicalScope = getLexicalScope(context);
-		if (lexicalScope != null) {
-			return lexicalScope(context, lexicalScope);
+		if (!isReadOnly && lexicalScope != null) {
+			return lexicalScope(context, lexicalScope, reference);
 		} else {
-			return defScope(context);
+			return defScope(context, reference);
 		}
 	}
 	
-	private IScope defScope(final EObject context) {
+	private IScope defScope(final EObject context, final EReference reference) {
 		return scopeCache.get(Tuples.pair(Scope.DEF, null), context.eResource(), new Provider<IScope>() {
 			@Override
 			public IScope get() {
 				final List<EObject> defs = Lists.newArrayList(Iterators.filter(getAllContents(context), new IsDef()));
-				return scopeFor(defs);
+				final IScope outerScope = delegateGetScope(context, reference);
+				return outerScope == null ? 
+						scopeFor(defs) : scopeFor(defs, outerScope);
 			}
 		});
 	}
@@ -80,7 +89,7 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	private IScope lexicalScope(final EObject context,
-			final LexicalScope lexicalScope) {
+			final LexicalScope lexicalScope, final EReference reference) {
 		assert lexicalScope != null;
 		
 		return scopeCache.get(Tuples.pair(Scope.LEXICAL, lexicalScope), context.eResource(), new Provider<IScope>() {
@@ -89,18 +98,14 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 				final List<NameBinding> namesInScope = NameBindings.all(lexicalScope);
 				final LexicalScope nextLexicalScope = getLexicalScope(lexicalScope.eContainer());
 				final IScope outerScope = nextLexicalScope == null ? 
-						defScope(context) :scope(nextLexicalScope);
+						defScope(context, reference) :scope(nextLexicalScope, reference);
 				return scopeFor(namesInScope, outerScope);
 			}
 		});
 	}
 	
 	private TreeIterator<EObject> getAllContents(final EObject context) {
-		if (context.eResource() != null) {			
-			return EcoreUtil.getAllContents(context, true);
-		} else {
-			return EcoreUtil.getRootContainer(context).eAllContents();
-		}
+		return EcoreUtil.getRootContainer(context).eAllContents();
 	}
 	
 	private LexicalScope getLexicalScope(final EObject context) {
