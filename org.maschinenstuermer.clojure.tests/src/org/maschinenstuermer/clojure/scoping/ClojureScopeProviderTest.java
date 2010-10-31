@@ -89,7 +89,7 @@ public class ClojureScopeProviderTest extends AbstractXtextTests {
 	
 	private Def addDef(final String name) {
 		final Def def = ClojureFactory.eINSTANCE.createDef();
-		file.getForms().add(def);
+		file.getExprs().add(def);
 		def.setName(name);
 		return def;
 	}
@@ -116,7 +116,7 @@ public class ClojureScopeProviderTest extends AbstractXtextTests {
 
 	private void initFnWithBody() {
 		fn = ClojureFactory.eINSTANCE.createFn();
-		file.getForms().add(fn);
+		file.getExprs().add(fn);
 		body = ClojureFactory.eINSTANCE.createBody();
 		fn.setBody(body);
 	}
