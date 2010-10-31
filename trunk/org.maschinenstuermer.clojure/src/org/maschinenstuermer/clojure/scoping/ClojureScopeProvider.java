@@ -18,17 +18,15 @@ import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
+import org.maschinenstuermer.clojure.ClojureUtil;
 import org.maschinenstuermer.clojure.clojure.Binding;
-import org.maschinenstuermer.clojure.clojure.Fn;
 import org.maschinenstuermer.clojure.clojure.KeyBinding;
 import org.maschinenstuermer.clojure.clojure.LexicalScope;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SimpleBinding;
-import org.maschinenstuermer.clojure.clojure.SymbolDef;
 import org.maschinenstuermer.clojure.clojure.VectorBinding;
 import org.maschinenstuermer.clojure.clojure.util.ClojureSwitch;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -68,10 +66,10 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 	
 	private IScope defScope(final EObject context, final EReference reference) {
-		return scopeCache.get(Tuples.pair(Scope.DEF, null), context.eResource(), new Provider<IScope>() {
+		return scopeCache.get(Tuples.pair("def", null), context.eResource(), new Provider<IScope>() {
 			@Override
 			public IScope get() {
-				final List<EObject> defs = Lists.newArrayList(Iterators.filter(getAllContents(context), new IsDef()));
+				final List<EObject> defs = Lists.newArrayList(Iterators.filter(getAllContents(context), ClojureUtil.IS_DEF));
 				final IScope outerScope = delegateGetScope(context, reference);
 				return outerScope == null ? 
 						scopeFor(defs) : scopeFor(defs, outerScope);
@@ -79,20 +77,11 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 		});
 	}
 
-	private static class IsDef implements Predicate<EObject> {
-		@Override
-		public boolean apply(EObject input) {
-			return input instanceof SymbolDef 
-				&& !(input instanceof Fn) 
-				&& !(input instanceof NameBinding);
-		}		
-	}
-
 	private IScope lexicalScope(final EObject context,
 			final LexicalScope lexicalScope, final EReference reference) {
 		assert lexicalScope != null;
 		
-		return scopeCache.get(Tuples.pair(Scope.LEXICAL, lexicalScope), context.eResource(), new Provider<IScope>() {
+		return scopeCache.get(Tuples.pair("lexical", lexicalScope), context.eResource(), new Provider<IScope>() {
 			@Override
 			public IScope get() {
 				final List<NameBinding> namesInScope = NameBindings.all(lexicalScope);
@@ -115,10 +104,6 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 		}
 		return (LexicalScope) currentContext;
 	}
-	
-	private static enum Scope {
-		DEF, LEXICAL
-	};
 	
 	private static class NameBindings extends ClojureSwitch<List<NameBinding>> {
 		private final List<NameBinding> nameBindings = 

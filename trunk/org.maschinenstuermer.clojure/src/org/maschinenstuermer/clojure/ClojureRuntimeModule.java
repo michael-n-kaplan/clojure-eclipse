@@ -3,6 +3,10 @@
  */
 package org.maschinenstuermer.clojure;
 
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.scoping.IGlobalScopeProvider;
+import org.maschinenstuermer.clojure.naming.ClojureQualifiedNameProvider;
+import org.maschinenstuermer.clojure.scoping.ClojureGlobalScopeProvider;
 import org.maschinenstuermer.clojure.scoping.ClojureImportedNamespaceAwareLocalScopeProvider;
 
 /**
@@ -14,5 +18,15 @@ public class ClojureRuntimeModule extends org.maschinenstuermer.clojure.Abstract
 		binder.bind(org.eclipse.xtext.scoping.IScopeProvider.class).
 			annotatedWith(com.google.inject.name.Names.named("org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider.delegate")).
 			to(ClojureImportedNamespaceAwareLocalScopeProvider.class);
+	}
+	
+	@Override
+	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
+		return ClojureQualifiedNameProvider.class;
+	}
+	
+	@Override
+	public Class<? extends IGlobalScopeProvider> bindIGlobalScopeProvider() {
+		return ClojureGlobalScopeProvider.class;
 	}
 }

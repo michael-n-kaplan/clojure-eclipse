@@ -14,6 +14,7 @@ public class ClojureImportedNamespaceAwareLocalScopeProvider extends
 		final Set<ImportNormalizer> importNormalizers = super.internalGetImportNormalizers(context);
 		if (context instanceof File) {
 			importNormalizers.add(createImportNormalizer("java.lang.*"));
+			importNormalizers.add(createImportNormalizer("clojure.core.*"));
 		}
 		return importNormalizers;
 	}
