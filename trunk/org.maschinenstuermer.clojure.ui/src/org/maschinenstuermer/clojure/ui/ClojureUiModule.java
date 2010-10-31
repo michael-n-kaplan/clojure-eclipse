@@ -4,8 +4,10 @@
 package org.maschinenstuermer.clojure.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.xtext.ui.editor.contentassist.PrefixMatcher;
 import org.eclipse.xtext.ui.editor.contentassist.AbstractJavaBasedContentProposalProvider.ReferenceProposalCreator;
 import org.eclipse.xtext.ui.wizard.IProjectCreator;
+import org.maschinenstuermer.clojure.ui.contentassist.ClojurePrefixMatcher;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojureReferenceProposalCreator;
 import org.maschinenstuermer.clojure.ui.wizard.CustomClojureProjectCreator;
 
@@ -24,5 +26,10 @@ public class ClojureUiModule extends org.maschinenstuermer.clojure.ui.AbstractCl
 	@Override
 	public Class<? extends IProjectCreator> bindIProjectCreator() {
 		return CustomClojureProjectCreator.class;
+	}
+	
+	@Override
+	public Class<? extends PrefixMatcher> bindPrefixMatcher() {
+		return ClojurePrefixMatcher.class;
 	}
 }
