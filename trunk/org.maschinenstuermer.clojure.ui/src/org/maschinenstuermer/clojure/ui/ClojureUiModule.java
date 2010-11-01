@@ -4,6 +4,9 @@
 package org.maschinenstuermer.clojure.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.xtext.builder.clustering.CurrentDescriptions;
+import org.eclipse.xtext.resource.IResourceDescriptions;
+import org.eclipse.xtext.scoping.impl.AbstractGlobalScopeProvider;
 import org.eclipse.xtext.ui.editor.contentassist.PrefixMatcher;
 import org.eclipse.xtext.ui.editor.contentassist.AbstractJavaBasedContentProposalProvider.ReferenceProposalCreator;
 import org.eclipse.xtext.ui.wizard.IProjectCreator;
@@ -11,25 +14,35 @@ import org.maschinenstuermer.clojure.ui.contentassist.ClojurePrefixMatcher;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojureReferenceProposalCreator;
 import org.maschinenstuermer.clojure.ui.wizard.CustomClojureProjectCreator;
 
+import com.google.inject.Binder;
+import com.google.inject.name.Names;
+
 /**
  * Use this class to register components to be used within the IDE.
  */
 public class ClojureUiModule extends org.maschinenstuermer.clojure.ui.AbstractClojureUiModule {
-	public ClojureUiModule(AbstractUIPlugin plugin) {
+	public ClojureUiModule(final AbstractUIPlugin plugin) {
 		super(plugin);
 	}
-	
+
 	public Class<? extends ReferenceProposalCreator> bindAbstractJavaBasedContentProposalProvider$ReferenceProposalCreator() {
 		return ClojureReferenceProposalCreator.class;
 	}
-	
+
 	@Override
 	public Class<? extends IProjectCreator> bindIProjectCreator() {
 		return CustomClojureProjectCreator.class;
 	}
-	
+
 	@Override
 	public Class<? extends PrefixMatcher> bindPrefixMatcher() {
 		return ClojurePrefixMatcher.class;
+	}
+
+	@Override  
+	public void configureIResourceDescriptionsBuilderScope(final Binder binder) {  
+		binder.bind(IResourceDescriptions.class).annotatedWith(  
+				Names.named(AbstractGlobalScopeProvider.NAMED_BUILDER_SCOPE))  
+					.to(CurrentDescriptions.ResourceSetAware.class);  
 	}
 }

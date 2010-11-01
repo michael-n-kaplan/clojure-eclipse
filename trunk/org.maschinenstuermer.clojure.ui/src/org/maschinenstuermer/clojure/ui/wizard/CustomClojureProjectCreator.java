@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -50,6 +52,13 @@ public class CustomClojureProjectCreator extends AbstractProjectCreator {
 	protected List<String> getAllFolders() {
         return SRC_FOLDER_LIST;
     }
+	
+	@Override
+	protected IFile getModelFile(final IProject project) throws CoreException {
+		final IFolder srcFolder = project.getFolder(getModelFolderName());
+		final IFile file = srcFolder.getFile("main.clj");
+		return file;
+	}
 	
 	protected void enhanceProject(final IProject project, final IProgressMonitor monitor) throws CoreException {
 		OutputImpl output = new OutputImpl();

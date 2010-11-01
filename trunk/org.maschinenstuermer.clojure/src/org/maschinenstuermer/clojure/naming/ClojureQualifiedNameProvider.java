@@ -1,7 +1,7 @@
 package org.maschinenstuermer.clojure.naming;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.common.types.JvmDeclaredType;
+import org.eclipse.xtext.common.types.JvmMember;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
@@ -29,11 +29,10 @@ public class ClojureQualifiedNameProvider extends IQualifiedNameProvider.Abstrac
 					&& !UNDEFINED_NAME.equals(def.getName());
 				if (hasQualifiedName) {
 					return namespace(def) + "." + def.getName();
-				} else if (obj instanceof JvmDeclaredType) {
-					final JvmDeclaredType javaType = (JvmDeclaredType) obj;
-					return javaType.getFullyQualifiedName();
 				} else {
-					return null;
+					final JvmMember jvmMember = ClojureUtil.AS_JVM_MEMBER.apply(obj);
+					return jvmMember != null ?
+							jvmMember.getFullyQualifiedName() : null;
 				}
 			}
 		});
@@ -49,7 +48,7 @@ public class ClojureQualifiedNameProvider extends IQualifiedNameProvider.Abstrac
 	private Ns getNs(final EObject eObject) {
 		EObject currentNs = eObject;
 		while (!(currentNs instanceof Ns) && currentNs.eContainer() != null) 
-			currentNs = eObject.eContainer();
+			currentNs = currentNs.eContainer();
 		return currentNs instanceof Ns ? (Ns) currentNs : null;
 	}
 }

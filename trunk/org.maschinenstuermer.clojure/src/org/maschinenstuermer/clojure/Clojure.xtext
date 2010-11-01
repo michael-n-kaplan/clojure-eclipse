@@ -69,13 +69,16 @@ Boolean:
 ReaderMacro:
 	Deref|
 	ReaderLambda|
-	ReaderMeta|
+	ReaderMetaMacro|
 	ReaderQuote|
 	ReaderVar|
 	Regex|
 	SyntaxQuote|
 	Unquote|
 	UnquoteSplicing;
+	
+ReaderMetaMacro:
+	ReaderMeta form=Form;
 	
 ReaderLambda:
 	{ ReaderLambda }
@@ -102,6 +105,7 @@ SpecialForm:
 SymbolDef:
 	Def|
 	Defn|
+	DefnPriv|
 	Defmacro|
 	Fn;
 	 
@@ -112,6 +116,9 @@ Def:
 	
 Defn:
 	'(' 'defn' meta=ReaderMeta? name=Name doc=STRING? attributes=Map? body=Body ')';
+
+DefnPriv:
+	'(' 'defn-' meta=ReaderMeta? name=Name doc=STRING? attributes=Map? body=Body ')';
 
 Defmacro:
 	'(' 'defmacro' meta=ReaderMeta? name=Name doc=STRING? attributes=Map? body=Body ')';
@@ -154,10 +161,10 @@ Ns:
 	elements += Form*;
 	
 Meta:
-	'(' 'meta' form=Form ')';
+	'(' 'meta' data=Form ')';
 	
 ReaderMeta:
-	'^' form=Form;
+	'^' data=Form;
 
 MonitorEnter:
 	'(' 'monitor-enter' form=Form ')';
@@ -282,7 +289,7 @@ QualifiedName:
 Name:
 	SYMBOL|
 	'catch'|
-	'def'|'defn'|'defmacro'|'do'|
+	'def'|'defn'|'defn-'|'defmacro'|'do'|
 	'fn'|'fn*'|'finally'|
 	'if'|
 	'let'|'loop'|
