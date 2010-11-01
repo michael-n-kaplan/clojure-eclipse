@@ -8,6 +8,7 @@ import org.eclipse.xtext.common.types.xtext.AbstractTypeScopeProvider;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.DefaultGlobalScopeProvider;
+import org.maschinenstuermer.clojure.ClojureUtil;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
@@ -63,17 +64,30 @@ public class ClojureGlobalScopeProvider extends
 		}
 
 		@Override
-		public IEObjectDescription getContentByName(String name) {
-			final IEObjectDescription clojureContentByName = clojureScope.getContentByName(name);
-			return clojureContentByName != null ?
-					clojureContentByName : javaScope.getContentByName(name);
+		public IEObjectDescription getContentByName(final String name) {
+			final IEObjectDescription javaContentByName = isJavaIdentifier(name) ? 
+					javaScope.getContentByName(name) : null;
+			final IEObjectDescription contentByName = javaContentByName == null ? 
+				clojureScope.getContentByName(name) : javaContentByName;
+			return contentByName;
+		}
+
+		private boolean isJavaIdentifier(final String name) {
+			boolean isJavaName = name.length() > 0 
+				&& Character.isJavaIdentifierStart(name.charAt(0));
+			int i = 1;
+			while (isJavaName && i < name.length())
+				isJavaName = Character.isJavaIdentifierPart(name.charAt(i++));
+			return isJavaName;
 		}
 
 		@Override
-		public IEObjectDescription getContentByEObject(EObject object) {
-			final IEObjectDescription clojureContentByEObject = clojureScope.getContentByEObject(object);
-			return clojureContentByEObject != null ?
-					clojureContentByEObject : javaScope.getContentByEObject(object);
+		public IEObjectDescription getContentByEObject(final EObject object) {
+			final IEObjectDescription javaContentByEObject = ClojureUtil.IS_JVM_MEMBER.apply(object) ?
+					javaScope.getContentByEObject(object) : null;
+			final IEObjectDescription contentByEObject = javaContentByEObject == null ?
+					clojureScope.getContentByEObject(object) : javaContentByEObject;
+			return contentByEObject;
 		}
 
 		@Override

@@ -1,6 +1,8 @@
 package org.maschinenstuermer.clojure;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.common.types.JvmMember;
+import org.maschinenstuermer.clojure.clojure.DefnPriv;
 import org.maschinenstuermer.clojure.clojure.Fn;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SymbolDef;
@@ -25,7 +27,8 @@ public class ClojureUtil {
 		public boolean apply(EObject input) {
 			return input instanceof SymbolDef 
 				&& !(input instanceof Fn) 
-				&& !(input instanceof NameBinding);
+				&& !(input instanceof NameBinding)
+				&& !(input instanceof DefnPriv);
 		}		
 	};
 	
@@ -36,6 +39,26 @@ public class ClojureUtil {
 		@Override
 		public SymbolDef apply(final EObject from) {
 			return IS_DEF.apply(from) ? (SymbolDef) from : null;
+		}
+	};
+	
+	/**
+	 * Predicate is true iff. the given EObject is a JvmMember.
+	 */
+	public static final Predicate<EObject> IS_JVM_MEMBER = new Predicate<EObject>() {
+		@Override
+		public boolean apply(EObject input) {
+			return input instanceof JvmMember; 
+		}		
+	};
+	
+	/**
+	 * Returns argument as SymbolDef iff. argument is a JvmMember.
+	 */
+	public static final Function<EObject, JvmMember> AS_JVM_MEMBER = new Function<EObject, JvmMember>() {
+		@Override
+		public JvmMember apply(final EObject from) {
+			return IS_JVM_MEMBER.apply(from) ? (JvmMember) from : null;
 		}
 	};
 }
