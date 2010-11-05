@@ -29,7 +29,6 @@ public class ClojureGlobalScopeProvider extends
 		return clojureScope;
 	}
 	
-
 	protected EClass getEReferenceType(EObject context, EReference reference) {
 		return reference.getEReferenceType();
 	}
@@ -73,11 +72,20 @@ public class ClojureGlobalScopeProvider extends
 		}
 
 		private boolean isJavaIdentifier(final String name) {
-			boolean isJavaName = name.length() > 0 
-				&& Character.isJavaIdentifierStart(name.charAt(0));
-			int i = 1;
-			while (isJavaName && i < name.length())
-				isJavaName = Character.isJavaIdentifierPart(name.charAt(i++));
+			int i = 0;
+			boolean isJavaName = true; 
+			while (i < name.length()) {
+				isJavaName &= Character.isJavaIdentifierStart(name.charAt(i++));
+				while (isJavaName && i < name.length()) {
+					isJavaName = Character.isJavaIdentifierPart(name.charAt(i));
+					if (!isJavaName && name.charAt(i) == '.' && i < name.length() - 1) {
+						isJavaName = true;
+						i++;
+						break;
+					}
+					i++;
+				}
+			}
 			return isJavaName;
 		}
 

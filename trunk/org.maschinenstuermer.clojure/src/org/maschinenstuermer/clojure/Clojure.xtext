@@ -89,6 +89,7 @@ SpecialForm:
 	Do|
 	Dot|
 	If|
+	Import|
 	Let|
 	Loop|
 	Meta|
@@ -143,6 +144,12 @@ Fn:
 If:
 	'(' 'if' test=Form then=Form else=Form? ')';
 	
+Import:
+	'(' 'import' packages+=PackageImport+ ')';
+
+PackageImport:
+	'\'' '(' package=QualifiedName classes+=Name* ')';
+	
 LexicalScope:
 	Lambda|
 	Let|
@@ -157,7 +164,8 @@ Loop:
 	'(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 	
 Ns:
-	'(' 'ns' meta=ReaderMeta? name=QualifiedName ')'
+	('(' 'ns' meta=ReaderMeta? name=QualifiedName ')'|
+	 '(' 'in-ns' '\'' name=QualifiedName ')')
 	elements += Form*;
 	
 Meta:
@@ -291,7 +299,7 @@ Name:
 	'catch'|
 	'def'|'defn'|'defn-'|'defmacro'|'do'|
 	'fn'|'fn*'|'finally'|
-	'if'|
+	'if'|'in-ns'|'import'|
 	'let'|'loop'|
 	'meta'|'monitor-enter'|'monitor-exit'|
 	'ns'|'new'|

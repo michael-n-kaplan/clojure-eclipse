@@ -15,7 +15,9 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.scoping.IScope;
+import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
+import org.eclipse.xtext.scoping.impl.AbstractScopeProvider;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
 import org.maschinenstuermer.clojure.ClojureUtil;
@@ -31,6 +33,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
  * This class contains custom scoping description.
@@ -39,13 +42,25 @@ import com.google.inject.Provider;
  * on how and when to use it 
  *
  */
-public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
+public class ClojureScopeProvider extends AbstractScopeProvider {
 
 	@Inject
 	private IResourceScopeCache scopeCache;
+	
+	@Inject
+	@Named(AbstractDeclarativeScopeProvider.NAMED_DELEGATE)
+	private IScopeProvider delegate;
 
-	public IScope scope_JvmType(final EObject context, 
-			final EReference reference) {
+	public void setDelegate(final IScopeProvider delegate) {
+		this.delegate = delegate;
+	}
+
+	public IScopeProvider getDelegate() {
+		return delegate;
+	}
+
+	@Override
+	public IScope getScope(final EObject context, final EReference reference) {
 		return scope(context, reference);
 	}
 	
@@ -103,6 +118,10 @@ public class ClojureScopeProvider extends AbstractDeclarativeScopeProvider {
 			currentContext = currentContext.eContainer();
 		}
 		return (LexicalScope) currentContext;
+	}
+	
+	private IScope delegateGetScope(final EObject context, final EReference reference) {
+		return getDelegate().getScope(context, reference);
 	}
 	
 	private static class NameBindings extends ClojureSwitch<List<NameBinding>> {
