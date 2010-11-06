@@ -4,6 +4,7 @@
 package org.maschinenstuermer.clojure.scoping;
 
 import static org.eclipse.xtext.scoping.Scopes.scopeFor;
+import static org.maschinenstuermer.clojure.ClojureUtil.IS_JVM_FEATURE_CLAZZ;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,24 +12,31 @@ import java.util.List;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.xtext.common.types.JvmMember;
+import org.eclipse.xtext.common.types.xtext.AbstractTypeScopeProvider;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
 import org.eclipse.xtext.scoping.impl.AbstractScopeProvider;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
-import org.maschinenstuermer.clojure.ClojureUtil;
 import org.maschinenstuermer.clojure.clojure.Binding;
 import org.maschinenstuermer.clojure.clojure.KeyBinding;
 import org.maschinenstuermer.clojure.clojure.LexicalScope;
+import org.maschinenstuermer.clojure.clojure.Literal;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SimpleBinding;
 import org.maschinenstuermer.clojure.clojure.VectorBinding;
 import org.maschinenstuermer.clojure.clojure.util.ClojureSwitch;
 
+import static org.maschinenstuermer.clojure.ClojureUtil.*;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -51,6 +59,24 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 	@Named(AbstractDeclarativeScopeProvider.NAMED_DELEGATE)
 	private IScopeProvider delegate;
 
+	@Inject
+	private AbstractTypeScopeProvider typeScopeProvider;
+	private Predicate<JvmMember> filter = new Predicate<JvmMember>() {
+
+		@Override
+		public boolean apply(final JvmMember input) {
+			final EStructuralFeature staticAttribute = input.eClass().getEStructuralFeature("static");
+			return staticAttribute != null && input.eGet(staticAttribute).equals(true);
+		}
+	};
+	private Function<JvmMember, String> names = new Function<JvmMember, String>() {
+
+		@Override
+		public String apply(JvmMember from) {
+			return from.getSimpleName();
+		}
+	};
+
 	public void setDelegate(final IScopeProvider delegate) {
 		this.delegate = delegate;
 	}
@@ -72,11 +98,16 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 		final Object readOnly = eResource.getResourceSet().getURIConverter().getAttributes(eResource.getURI(), null).get(URIConverter.ATTRIBUTE_READ_ONLY);
 		final boolean isReadOnly = Boolean.TRUE.equals(readOnly);
 		
-		final LexicalScope lexicalScope = getLexicalScope(context);
-		if (!isReadOnly && lexicalScope != null) {
-			return lexicalScope(context, lexicalScope, reference);
-		} else {
-			return defScope(context, reference);
+		if (IS_JVM_FEATURE_CLAZZ.apply(reference.getEReferenceType())) {
+			final Literal literal = (Literal) context;
+			return typeScopeProvider.createMemberScope(literal.getType(), filter, names, IScope.NULLSCOPE);
+		} else { 
+			final LexicalScope lexicalScope = getLexicalScope(context);
+			if (!isReadOnly && lexicalScope != null) {
+				return lexicalScope(context, lexicalScope, reference);
+			} else {
+				return defScope(context, reference);
+			}
 		}
 	}
 	
@@ -84,7 +115,7 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 		return scopeCache.get(Tuples.pair("def", null), context.eResource(), new Provider<IScope>() {
 			@Override
 			public IScope get() {
-				final List<EObject> defs = Lists.newArrayList(Iterators.filter(getAllContents(context), ClojureUtil.IS_DEF));
+				final List<EObject> defs = Lists.newArrayList(Iterators.filter(getAllContents(context), IS_DEF));
 				final IScope outerScope = delegateGetScope(context, reference);
 				return outerScope == null ? 
 						scopeFor(defs) : scopeFor(defs, outerScope);

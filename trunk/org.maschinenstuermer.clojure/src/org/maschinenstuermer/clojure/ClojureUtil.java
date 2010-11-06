@@ -1,7 +1,9 @@
 package org.maschinenstuermer.clojure;
 
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.common.types.JvmMember;
+import org.eclipse.xtext.common.types.TypesPackage;
 import org.maschinenstuermer.clojure.clojure.DefnPriv;
 import org.maschinenstuermer.clojure.clojure.Fn;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
@@ -51,7 +53,17 @@ public class ClojureUtil {
 			return input instanceof JvmMember; 
 		}		
 	};
-	
+
+	/**
+	 * Predicate is true iff. the given EObject is a JvmMember.
+	 */
+	public static final Predicate<EClass> IS_JVM_FEATURE_CLAZZ = new Predicate<EClass>() {
+		@Override
+		public boolean apply(EClass input) {
+			return TypesPackage.eINSTANCE.getJvmFeature().isSuperTypeOf(input); 
+		}		
+	};
+
 	/**
 	 * Returns argument as SymbolDef iff. argument is a JvmMember.
 	 */

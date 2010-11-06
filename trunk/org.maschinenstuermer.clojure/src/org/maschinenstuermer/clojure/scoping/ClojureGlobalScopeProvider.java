@@ -1,5 +1,7 @@
 package org.maschinenstuermer.clojure.scoping;
 
+import static org.maschinenstuermer.clojure.ClojureUtil.IS_JVM_MEMBER;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
@@ -8,7 +10,6 @@ import org.eclipse.xtext.common.types.xtext.AbstractTypeScopeProvider;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.scoping.impl.DefaultGlobalScopeProvider;
-import org.maschinenstuermer.clojure.ClojureUtil;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
@@ -20,19 +21,16 @@ public class ClojureGlobalScopeProvider extends
 	private AbstractTypeScopeProvider typeScopeProvider;
 
 	@Override
-	public IScope getScope(EObject context, EReference reference) {
+	public IScope getScope(final EObject context, EReference reference) {
 		final IScope clojureScope = super.getScope(context, reference);
-		if (TypesPackage.Literals.JVM_TYPE.isSuperTypeOf(getEReferenceType(context, reference))) {
+		final EClass eReferenceType = reference.getEReferenceType();
+		if (TypesPackage.Literals.JVM_TYPE.isSuperTypeOf(eReferenceType)) {
 			final IScope javaScope = typeScopeProvider.getScope(context, reference);
 			return new CombinedScope(javaScope, clojureScope);
 		}
 		return clojureScope;
 	}
 	
-	protected EClass getEReferenceType(EObject context, EReference reference) {
-		return reference.getEReferenceType();
-	}
-
 	private static class CombinedScope implements IScope {
 		private final IScope clojureScope;
 		private final IScope javaScope;
@@ -91,7 +89,7 @@ public class ClojureGlobalScopeProvider extends
 
 		@Override
 		public IEObjectDescription getContentByEObject(final EObject object) {
-			final IEObjectDescription javaContentByEObject = ClojureUtil.IS_JVM_MEMBER.apply(object) ?
+			final IEObjectDescription javaContentByEObject = IS_JVM_MEMBER.apply(object) ?
 					javaScope.getContentByEObject(object) : null;
 			final IEObjectDescription contentByEObject = javaContentByEObject == null ?
 					clojureScope.getContentByEObject(object) : javaContentByEObject;
