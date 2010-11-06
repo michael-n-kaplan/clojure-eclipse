@@ -146,10 +146,10 @@ If:
 	'(' 'if' test=Form then=Form else=Form? ')';
 	
 Import:
-	'(' 'import' packages+=PackageImport+ ')';
+	'(' 'import' ('\'' packages+=PackageImport )+ ')';
 
 PackageImport:
-	'\'' '(' package=Symbol classes+=Symbol* ')';
+	'(' package=Symbol classes+=Symbol* ')';
 	
 LexicalScope:
 	Lambda|
@@ -165,9 +165,13 @@ Loop:
 	'(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 	
 Ns:
-	('(' 'ns' meta=ReaderMeta? name=Symbol ')'|
+	('(' 'ns' meta=ReaderMeta? name=Symbol attributes=Map? 
+		refs+=Reference* ')'|
 	 '(' 'in-ns' '\'' name=Symbol ')')
 	elements += Form*;
+
+Reference:
+	'(' ':import' packages+=PackageImport+ ')';
 	
 Meta:
 	'(' 'meta' data=Form ')';
