@@ -6,13 +6,21 @@
 
 «DEFINE model FOR ClojureProjectInfo»
 «FILE "src/main.clj"-»
-(ns ^{:doc "This is a small example program."}
-	test)
+(ns 
+  ^{:doc "This is a small example program."}
+  test
+  (:import (java.math BigDecimal)))
 
-(def ^{:doc "Just a simple hello world example function."} 
-	hello-world 
-    (fn [n] (pop "Hello, " n "!\n")))
+(def *sout* System/out)
+
+(def 
+  ^{:doc "Just a simple hello world example function."} 
+  hello-world 
+  (fn [] (do
+  			(*sout* "Hello, World!\n")
+  			(*sout* BigDecimal/ZERO)
+  		 )))
 	
-(hello-world "Max")
+(hello-world)
 «ENDFILE»
 «ENDDEFINE»
