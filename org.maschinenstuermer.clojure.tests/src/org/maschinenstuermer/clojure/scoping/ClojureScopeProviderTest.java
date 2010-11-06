@@ -75,13 +75,13 @@ public class ClojureScopeProviderTest extends AbstractXtextTests {
 	}
 
 	private void thenContextNotContains(final EObject context, final SymbolDef symbolDef) {
-		final IScope scope = scopeProvider.getScope(context, ClojurePackage.eINSTANCE.getLiteral_Symbol());
+		final IScope scope = scopeProvider.getScope(context, ClojurePackage.eINSTANCE.getLiteral_Type());
 		final IEObjectDescription contentByName = scope.getContentByName(symbolDef.getName());
 		assertNull(contentByName);
 	}
 
 	private void thenContextContains(final EObject context, final SymbolDef symbolDef) {
-		final IScope scope = scopeProvider.getScope(context, ClojurePackage.eINSTANCE.getLiteral_Symbol());
+		final IScope scope = scopeProvider.getScope(context, ClojurePackage.eINSTANCE.getLiteral_Type());
 		final IEObjectDescription contentByName = scope.getContentByName(symbolDef.getName());
 		assertNotNull(contentByName);
 		assertSame(symbolDef, contentByName.getEObjectOrProxy());
