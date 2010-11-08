@@ -7,7 +7,7 @@ import org.maschinenstuermer.clojure.clojure.Def;
 import org.maschinenstuermer.clojure.clojure.File;
 import org.maschinenstuermer.clojure.clojure.Form;
 import org.maschinenstuermer.clojure.clojure.Literal;
-import org.maschinenstuermer.clojure.clojure.Ns;
+import org.maschinenstuermer.clojure.clojure.Namespace;
 
 public class ClojureParserTest extends AbstractXtextTests {
 
@@ -18,11 +18,15 @@ public class ClojureParserTest extends AbstractXtextTests {
 	}
 	
 	public void testStaticMember() throws Exception {
-		final File file = (File) getModel("System/out");
+		final File file = (File) getModel("(in-ns 'test) System/out");
 		
 		assertNotNull(file);
-		final EList<Form> exprs = file.getExprs();
+		final EList<Namespace> namespaces = file.getNamespaces();
+		assertEquals(1, namespaces.size());
+		final Namespace namespace = namespaces.get(0);
+		final EList<Form> exprs = namespace.getExprs();
 		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Literal);
 		final Literal literal = (Literal) exprs.get(0);
 		
 		assertNotNull(literal.getType());
@@ -53,10 +57,10 @@ public class ClojureParserTest extends AbstractXtextTests {
 			getModel("(ns test (:import (java.math BigDecimal)))" 
 					+ "(def z BigDecimal/ZERO)");
 		
-		final EList<Ns> namespaces = file.getNamespaces();
+		final EList<Namespace> namespaces = file.getNamespaces();
 		assertEquals(1, namespaces.size());
-		final Ns ns = namespaces.get(0);
-		final EList<Form> elements = ns.getElements();
+		final Namespace ns = namespaces.get(0);
+		final EList<Form> elements = ns.getExprs();
 		assertEquals(1, elements.size());
 		assertTrue(elements.get(0) instanceof Def);
 		final Def defZ = (Def) elements.get(0);
