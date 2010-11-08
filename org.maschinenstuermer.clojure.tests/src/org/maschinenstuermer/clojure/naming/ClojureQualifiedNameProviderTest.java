@@ -30,7 +30,7 @@ public class ClojureQualifiedNameProviderTest extends AbstractXtextTests {
 	public void testWithNs() {
 		final Def printfDef = ClojureFactory.eINSTANCE.createDef();
 		printfDef.setName("printf");
-		ns.getElements().add(printfDef);
+		ns.getExprs().add(printfDef);
 		
 		final Fn fn = ClojureFactory.eINSTANCE.createFn();
 		final Body body = ClojureFactory.eINSTANCE.createBody();
