@@ -11,4 +11,3 @@
  *    invariantThatIsComplexToCheck();
  */
 
-extension org::maschinenstuermer::clojure::scoping::Scoping;

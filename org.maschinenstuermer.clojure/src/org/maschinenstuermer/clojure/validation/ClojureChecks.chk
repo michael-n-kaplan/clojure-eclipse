@@ -11,4 +11,4 @@
  *    name.toFirstUpper() == name;
  */
 
-extension org::maschinenstuermer::clojure::scoping::Scoping;
+
