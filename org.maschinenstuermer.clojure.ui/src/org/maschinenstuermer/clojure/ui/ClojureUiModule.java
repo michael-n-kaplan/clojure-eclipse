@@ -9,9 +9,15 @@ import org.eclipse.xtext.resource.IResourceDescriptions;
 import org.eclipse.xtext.scoping.impl.AbstractGlobalScopeProvider;
 import org.eclipse.xtext.ui.editor.contentassist.PrefixMatcher;
 import org.eclipse.xtext.ui.editor.contentassist.AbstractJavaBasedContentProposalProvider.ReferenceProposalCreator;
+import org.eclipse.xtext.ui.editor.syntaxcoloring.IHighlightingConfiguration;
+import org.eclipse.xtext.ui.editor.syntaxcoloring.ISemanticHighlightingCalculator;
+import org.eclipse.xtext.ui.editor.syntaxcoloring.antlr.AbstractAntlrTokenToAttributeIdMapper;
 import org.eclipse.xtext.ui.wizard.IProjectCreator;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojurePrefixMatcher;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojureReferenceProposalCreator;
+import org.maschinenstuermer.clojure.ui.syntaxcoloring.ClojureHighlightingConfiguration;
+import org.maschinenstuermer.clojure.ui.syntaxcoloring.ClojureSemanticHighlightingCalculator;
+import org.maschinenstuermer.clojure.ui.syntaxcoloring.ClojureTokenToAttributeIdMapper;
 import org.maschinenstuermer.clojure.ui.wizard.CustomClojureProjectCreator;
 
 import com.google.inject.Binder;
@@ -25,6 +31,18 @@ public class ClojureUiModule extends org.maschinenstuermer.clojure.ui.AbstractCl
 		super(plugin);
 	}
 
+	public Class<? extends IHighlightingConfiguration> bindIHighlightingConfiguration() {
+		return ClojureHighlightingConfiguration.class;
+	}
+	
+	public Class<? extends AbstractAntlrTokenToAttributeIdMapper> bindAbstractAntlrTokenToAttributeIdMapper() {
+		return ClojureTokenToAttributeIdMapper.class;
+	}
+	
+	public Class<? extends ISemanticHighlightingCalculator> bindISemanticHighlightingCalculator() {
+		return ClojureSemanticHighlightingCalculator.class;
+	}
+	
 	public Class<? extends ReferenceProposalCreator> bindAbstractJavaBasedContentProposalProvider$ReferenceProposalCreator() {
 		return ClojureReferenceProposalCreator.class;
 	}
