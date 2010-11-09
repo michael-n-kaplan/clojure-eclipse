@@ -4,7 +4,13 @@
 package org.maschinenstuermer.clojure.ui.labeling;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.jdt.internal.ui.JavaPlugin;
+import org.eclipse.jdt.internal.ui.JavaPluginImages;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
+import org.maschinenstuermer.clojure.ClojureUtil;
+import org.maschinenstuermer.clojure.clojure.Namespace;
+import org.maschinenstuermer.clojure.clojure.SymbolDef;
 
 import com.google.inject.Inject;
 
@@ -13,22 +19,22 @@ import com.google.inject.Inject;
  * 
  * see http://www.eclipse.org/Xtext/documentation/latest/xtext.html#labelProvider
  */
+@SuppressWarnings("restriction")
 public class ClojureLabelProvider extends DefaultEObjectLabelProvider {
 
 	@Inject
 	public ClojureLabelProvider(AdapterFactoryLabelProvider delegate) {
 		super(delegate);
 	}
-
-/*
-	//Labels and icons can be computed like this:
 	
-	String text(MyModel ele) {
-	  return "my "+ele.getName();
+	Image image(final Namespace namespace) {
+		return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_OBJS_PACKAGE);
 	}
-	 
-    String image(MyModel ele) {
-      return "MyModel.gif";
-    }
-*/
+	
+	Image image(final SymbolDef namespace) {
+		if (ClojureUtil.isFn(namespace))
+			return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_MISC_PUBLIC);
+		else
+			return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_FIELD_PUBLIC);
+	}
 }
