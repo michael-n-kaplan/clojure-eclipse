@@ -4,10 +4,14 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.common.types.JvmMember;
 import org.eclipse.xtext.common.types.TypesPackage;
+import org.maschinenstuermer.clojure.clojure.Def;
+import org.maschinenstuermer.clojure.clojure.Defn;
 import org.maschinenstuermer.clojure.clojure.DefnPriv;
 import org.maschinenstuermer.clojure.clojure.Fn;
+import org.maschinenstuermer.clojure.clojure.Form;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SymbolDef;
+import org.maschinenstuermer.clojure.clojure.util.ClojureSwitch;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -21,6 +25,33 @@ public class ClojureUtil {
 	private ClojureUtil() {
 	}
 
+	private static ClojureSwitch<Boolean> IS_FN_SWITCH = new ClojureSwitch<Boolean>() {
+		@Override
+		public Boolean defaultCase(EObject object) {
+			return false;
+		}
+		
+		public Boolean caseFn(Fn object) {
+			return true;
+		};
+		
+		@Override
+		public Boolean caseDefn(Defn object) {
+			return true;
+		}
+		
+		@Override
+		public Boolean caseDefnPriv(DefnPriv object) {
+			return true;
+		}
+		
+		@Override
+		public Boolean caseDef(Def object) {
+			final Form init = object.getInit();
+			return init == null ? false : doSwitch(init);
+		}
+	};
+	
 	/**
 	 * Predicate is true iff. the given EObject is defining a global def.
 	 */
@@ -34,6 +65,9 @@ public class ClojureUtil {
 		}		
 	};
 	
+	public static boolean isFn(final SymbolDef symbolDef) {
+		return IS_FN_SWITCH.doSwitch(symbolDef);
+	}
 	/**
 	 * Returns argument as SymbolDef iff. argument is a global def.
 	 */
