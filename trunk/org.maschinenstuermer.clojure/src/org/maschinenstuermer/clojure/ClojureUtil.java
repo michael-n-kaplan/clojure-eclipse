@@ -68,6 +68,7 @@ public class ClojureUtil {
 	public static boolean isFn(final SymbolDef symbolDef) {
 		return IS_FN_SWITCH.doSwitch(symbolDef);
 	}
+	
 	/**
 	 * Returns argument as SymbolDef iff. argument is a global def.
 	 */
