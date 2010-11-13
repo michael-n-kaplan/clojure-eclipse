@@ -49,8 +49,9 @@ QuotedSet:
 	'#{' elements+=QuotedForm* '}';
 
 QuotedLiteral:
-	SimpleLiteral|
-	symbol=(Symbol|'&');
+	{ QuotedLiteral }
+	( literal=SimpleLiteral|
+	  type=Symbol ('/' member = N?)?);
 	
 SimpleLiteral:
 	value='nil'|
@@ -86,7 +87,6 @@ ReaderLambda:
 	'#(' exprs+=Form* ')';
 	
 SpecialForm:
-	Call|
 	Do|
 	Dot|
 	If|
@@ -293,14 +293,19 @@ Lambda:
 // Sequences
 	
 Seq:
+	Call|
 	List|
 	Vector|
 	Map|
 	Set;
 	
 Call:
-	'(' fn=[types::JvmType|NAME] isNew?='.'? args+=Form* ')';
+	'(' target=CallTarget isNew?='.'? args+=Form* ')';
 	
+
+CallTarget:
+	type=[types::JvmType|N] ('/' member=[types::JvmFeature|NAME])?;
+
 List:
 	{ List }
 	'(' (elements+=SimpleForm elements+=Form*)? ')';
@@ -331,7 +336,12 @@ Symbol:
 	'quote'|
 	'throw'|'try'|
 	'recur'|
-	'var';
+	'var'|
+	'/';
+
+N:
+	'/'|
+	NAME;
 	
 // Terminals
 	
@@ -357,7 +367,7 @@ terminal CHAR:
 	'\\' !(' '|'\t'|'\r'|'\n')+;
 	
 terminal WSS: 
-	(' '|'\t'|'\r'|'\n')+;
+	(' '|'\t'|'\r'|'\n'|',')+;
 	
 terminal SL_COMMENT: 
 	';' !('\n'|'\r')* ('\r'? '\n')?;
