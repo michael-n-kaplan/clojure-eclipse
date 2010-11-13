@@ -6,6 +6,9 @@ package org.maschinenstuermer.clojure.ui.labeling;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaPluginImages;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 import org.maschinenstuermer.clojure.ClojureUtil;
@@ -31,10 +34,14 @@ public class ClojureLabelProvider extends DefaultEObjectLabelProvider {
 		return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_OBJS_PACKAGE);
 	}
 	
-	Image image(final SymbolDef namespace) {
-		if (ClojureUtil.isFn(namespace))
-			return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_MISC_PUBLIC);
-		else
-			return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_FIELD_PUBLIC);
+	ImageDescriptor image(final SymbolDef symbolDef) {
+		if (ClojureUtil.isFn(symbolDef)) {
+			final Image image = JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_MISC_PUBLIC);
+			return new DecorationOverlayIcon(image, JavaPluginImages.DESC_OVR_STATIC, IDecoration.BOTTOM_RIGHT);
+		}
+		else {
+			final Image image = JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_FIELD_PUBLIC);
+			return new DecorationOverlayIcon(image, JavaPluginImages.DESC_OVR_STATIC, IDecoration.BOTTOM_RIGHT);
+		}
 	}
 }
