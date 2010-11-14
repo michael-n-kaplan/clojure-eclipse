@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -13,9 +15,13 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.xpand2.XpandExecutionContextImpl;
 import org.eclipse.xpand2.XpandFacade;
@@ -26,6 +32,7 @@ import org.eclipse.xtext.ui.XtextProjectHelper;
 import org.eclipse.xtext.ui.util.JavaProjectFactory;
 import org.eclipse.xtext.ui.util.ProjectFactory;
 import org.eclipse.xtext.ui.wizard.AbstractProjectCreator;
+import org.maschinenstuermer.clojure.jdt.ClojureClasspathContainer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -79,6 +86,17 @@ public class CustomClojureProjectCreator extends AbstractProjectCreator {
 					"Error while copying example files!", 
 					e));
 		}
+		final IJavaProject javaProject = JavaCore.create(project);
+		final IPath containerPath = new Path(ClojureClasspathContainer.ID).
+			append("default");
+		IClasspathEntry classpathEntry = 
+			JavaCore.newContainerEntry(containerPath);
+		IClasspathEntry[] rawClasspathArray = javaProject.getRawClasspath();
+		final List<IClasspathEntry> rawClasspath = 
+			new ArrayList<IClasspathEntry>(Arrays.asList(rawClasspathArray));
+		rawClasspath.add(classpathEntry);
+		rawClasspathArray = rawClasspath.toArray(rawClasspathArray);
+		javaProject.setRawClasspath(rawClasspathArray, monitor);
 		project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 	}
 
