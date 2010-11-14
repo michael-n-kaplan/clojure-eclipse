@@ -18,7 +18,7 @@ public class ClojureSemanticHighlightingCalculator
 	private static class HighlightingSwitch extends ParsetreeSwitch<Boolean> 
 		implements ISemanticHighlightingCalculator {
 
-		private static Pattern OPEN_PARENS = Pattern.compile("[\\({\\[]");
+		private static Pattern OPEN_PARENS = Pattern.compile("#?[\\({\\[]");
 		private static Pattern CLOSE_PARENS = Pattern.compile("[\\)}\\]]");
 		
 		private Stack<Integer> parenIdIndexStack = new Stack<Integer>();
