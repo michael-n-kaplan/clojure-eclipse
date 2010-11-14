@@ -1,4 +1,4 @@
-package org.maschinenstuermer.clojure.jdt;
+package org.maschinenstuermer.clojure.install;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -11,12 +11,15 @@ public class ClojureClasspathContainer implements IClasspathContainer {
 	
 	private final IPath path;
 	private final IClasspathEntry[] classpathEntries;
+
+	private ClojureInstall clojureInstall;
 	
-	public ClojureClasspathContainer(final IPath path) {
+	public ClojureClasspathContainer(final IPath path, final ClojureInstall clojureInstall) {
 		this.path = path;
+		this.clojureInstall = clojureInstall;
 		classpathEntries =
 			new IClasspathEntry[] {
-				JavaCore.newLibraryEntry(new Path("/home/km/Desktop/Downloads/down/clojure-classes.jar"), null, null)
+				JavaCore.newLibraryEntry(new Path(clojureInstall.getLocation()), null, null)
 		};
 	}
 
@@ -26,8 +29,8 @@ public class ClojureClasspathContainer implements IClasspathContainer {
 	}
 
 	@Override
-	public String getDescription() {
-		return "Clojure Runtime";
+	public String getDescription() {		
+		return  String.format("Clojure Runtime [%s]", clojureInstall.getName());
 	}
 
 	@Override
