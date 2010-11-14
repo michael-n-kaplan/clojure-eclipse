@@ -32,7 +32,7 @@ import org.eclipse.xtext.ui.XtextProjectHelper;
 import org.eclipse.xtext.ui.util.JavaProjectFactory;
 import org.eclipse.xtext.ui.util.ProjectFactory;
 import org.eclipse.xtext.ui.wizard.AbstractProjectCreator;
-import org.maschinenstuermer.clojure.jdt.ClojureClasspathContainer;
+import org.maschinenstuermer.clojure.install.ClojureClasspathContainer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
