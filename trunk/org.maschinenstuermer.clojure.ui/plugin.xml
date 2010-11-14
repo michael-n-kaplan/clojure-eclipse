@@ -70,6 +70,15 @@
             name="Templates">
             <keywordReference id="org.maschinenstuermer.clojure.ui.keyword_Clojure"/>
         </page>
+        <page
+              category="org.maschinenstuermer.clojure.Clojure"
+              class="org.maschinenstuermer.clojure.ui.preference.ClojureInstallPreferencePage"
+              id="org.maschinenstuermer.clojure.Clojure.runtimeInstallations"
+              name="Runtime Installations">
+           <keywordReference
+                 id="org.maschinenstuermer.clojure.ui.keyword_Clojure">
+           </keywordReference>
+        </page>
     </extension>
     <extension
         point="org.eclipse.ui.keywords">
