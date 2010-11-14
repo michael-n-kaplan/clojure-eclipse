@@ -51,6 +51,7 @@ QuotedSet:
 QuotedLiteral:
 	{ QuotedLiteral }
 	( literal=SimpleLiteral|
+	  varArgs='&'|
 	  type=Symbol ('/' member = N?)?);
 	
 SimpleLiteral:
@@ -349,10 +350,10 @@ terminal KEYWORD:
 	':' NAME;
 	
 terminal NAME: 
-	'&'? SYMBOL_START (SYMBOL_START|DIGIT|'.'|'&'|'$')* |'..';
+	SYMBOL_START (SYMBOL_START|DIGIT|'.'|'$')* |'..';
 		
 terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'%';
+	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'%'|'&';
 
 terminal NUMBER: 
 	DIGIT+(('.' DIGIT*)|('r' DIGIT+))?'M'?;

@@ -9,6 +9,8 @@ import org.maschinenstuermer.clojure.clojure.File;
 import org.maschinenstuermer.clojure.clojure.Form;
 import org.maschinenstuermer.clojure.clojure.Literal;
 import org.maschinenstuermer.clojure.clojure.Namespace;
+import org.maschinenstuermer.clojure.clojure.QuotedLiteral;
+import org.maschinenstuermer.clojure.clojure.ReaderQuote;
 
 public class ClojureParserTest extends AbstractXtextTests {
 
@@ -46,6 +48,17 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertTrue(namespace.getExprs().get(0) instanceof Literal);
 		final Literal literal = (Literal) namespace.getExprs().get(0);
 		assertEquals("java.util.Map$Entry", literal.getType().getCanonicalName());
+	}
+	
+	public void testReaderQuotedVarArgs() throws Exception {
+		final File file = (File) getModel("'&");
+		
+		assertEquals(1, file.getExprs().size());
+		assertTrue(file.getExprs().get(0) instanceof ReaderQuote);
+		final ReaderQuote readerQuote = (ReaderQuote) file.getExprs().get(0);
+		assertTrue(readerQuote.getForm() instanceof QuotedLiteral);
+		final QuotedLiteral quotedLiteral = (QuotedLiteral) readerQuote.getForm();
+		assertEquals("&", quotedLiteral.getVarArgs());
 	}
 	
 	public void testImport() throws Exception {
