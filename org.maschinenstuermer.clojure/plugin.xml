@@ -10,6 +10,13 @@
        genModel = "org/maschinenstuermer/clojure/Clojure.genmodel" /> 
 	
   </extension>
+  <extension
+        point="org.eclipse.jdt.core.classpathContainerInitializer">
+     <classpathContainerInitializer
+           class="org.maschinenstuermer.clojure.jdt.ClojureClasspathContainerInitializer"
+           id="org.maschinenstuermer.clojure.jdt.CLOJURE_CONTAINER">
+     </classpathContainerInitializer>
+  </extension>
 
 
 
