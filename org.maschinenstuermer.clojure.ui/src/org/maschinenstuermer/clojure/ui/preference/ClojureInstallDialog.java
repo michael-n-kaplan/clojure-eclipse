@@ -19,12 +19,14 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.maschinenstuermer.clojure.install.ClojureInstall;
 
 import com.swtdesigner.ResourceManager;
 
 public class ClojureInstallDialog extends TitleAreaDialog implements ModifyListener {
 	private Text nameText;
 	private Text locationText;
+	private ClojureInstall clojureInstall;
 
 	/**
 	 * Create the dialog.
@@ -35,6 +37,16 @@ public class ClojureInstallDialog extends TitleAreaDialog implements ModifyListe
 		setShellStyle(SWT.RESIZE);
 	}
 
+	@Override
+	protected void okPressed() {
+		clojureInstall = new ClojureInstall(nameText.getText(), locationText.getText());
+		super.okPressed();
+	}
+	
+	public ClojureInstall getClojureInstall() {
+		return clojureInstall;
+	}
+	
 	/**
 	 * Create contents of the dialog.
 	 * @param parent

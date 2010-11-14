@@ -1,25 +1,34 @@
 package org.maschinenstuermer.clojure.ui.preference;
 
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-
-import com.swtdesigner.FieldLayoutPreferencePage;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.maschinenstuermer.clojure.install.ClojureInstall;
+import org.maschinenstuermer.clojure.install.ClojureInstalls;
+import org.osgi.service.prefs.BackingStoreException;
+
+import com.swtdesigner.FieldLayoutPreferencePage;
 
 public class ClojureInstallPreferencePage extends FieldLayoutPreferencePage 
 	implements IWorkbenchPreferencePage {
-	private Table table;
-
+	private final ClojureInstalls clojureInstalls = 
+		new ClojureInstalls();
+	
+	private CheckboxTableViewer tableViewer;
+	
 	/**
 	 * Create the preference page.
 	 */
@@ -47,24 +56,46 @@ public class ClojureInstallPreferencePage extends FieldLayoutPreferencePage
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 		
-		table = new Table(container, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3));
+		tableViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER | SWT.FULL_SELECTION);
+		tableViewer.setColumnProperties(new String[] {});
+		Table table = tableViewer.getTable();
 		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-		
-		TableColumn tblclmnName = new TableColumn(table, SWT.LEFT);
-		tblclmnName.setWidth(181);
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3));
+	
+		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnName = tableViewerColumn.getColumn();
+		tblclmnName.setWidth(100);
 		tblclmnName.setText("Name");
 		
-		TableColumn tblclmnLocation = new TableColumn(table, SWT.LEFT);
-		tblclmnLocation.setWidth(281);
+		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnLocation = tableViewerColumn_1.getColumn();
+		tblclmnLocation.setWidth(100);
 		tblclmnLocation.setText("Location");
+		final ClojureInstallLabelProvider labelProvider = new ClojureInstallLabelProvider();
+		tableViewer.setLabelProvider(labelProvider);
+		tableViewer.setContentProvider(new ClojureInstallContentProvider());
+		tableViewer.setInput(clojureInstalls);
+		tableViewer.setCheckStateProvider(labelProvider);
 		
 		Button btnAdd = new Button(container, SWT.NONE);
 		btnAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				new ClojureInstallDialog(getShell()).open();
+				final ClojureInstallDialog clojureInstallDialog = new ClojureInstallDialog(getShell());
+				if (clojureInstallDialog.open() == Window.OK) {
+					final ClojureInstall newClojureInstall = clojureInstallDialog.getClojureInstall();
+					clojureInstalls.add(newClojureInstall);
+					try {
+						clojureInstalls.storeToPreferences();
+					} catch (BackingStoreException e1) {
+						throw new RuntimeException(e1);
+					}
+					tableViewer.setInput(clojureInstalls);
+					final boolean hasDefaultInstall = clojureInstalls.getDefault() != null;
+					if (!hasDefaultInstall)
+						setErrorMessage("Select a default Clojure runtime!");
+					setValid(hasDefaultInstall);
+				}
 			}
 		});
 		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -79,10 +110,15 @@ public class ClojureInstallPreferencePage extends FieldLayoutPreferencePage
 		btnRemove.setText("Remove");
 		return container;
 	}
-
+	
 	/**
 	 * Initialize the preference page.
 	 */
 	public void init(final IWorkbench workbench) {
+		try {
+			clojureInstalls.initFromPreferences();
+		} catch (BackingStoreException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
