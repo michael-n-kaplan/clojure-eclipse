@@ -349,7 +349,7 @@ terminal KEYWORD:
 	':' NAME;
 	
 terminal NAME: 
-	'&'? SYMBOL_START (SYMBOL_START|DIGIT|'.'|'&')* |'..';
+	'&'? SYMBOL_START (SYMBOL_START|DIGIT|'.'|'&'|'$')* |'..';
 		
 terminal SYMBOL_START:
 	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'%';

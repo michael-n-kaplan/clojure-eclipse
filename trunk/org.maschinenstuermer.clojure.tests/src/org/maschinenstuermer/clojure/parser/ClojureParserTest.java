@@ -37,6 +37,17 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertEquals("java.lang.System.out", literal.getMember().getCanonicalName());
 	}
 
+	public void testInnerClass() throws Exception {
+		final File file = (File) getModel("(in-ns 'test) java.util.Map$Entry");
+		
+		assertEquals(1, file.getNamespaces().size());
+		final Namespace namespace = file.getNamespaces().get(0);
+		assertEquals(1, namespace.getExprs().size());
+		assertTrue(namespace.getExprs().get(0) instanceof Literal);
+		final Literal literal = (Literal) namespace.getExprs().get(0);
+		assertEquals("java.util.Map$Entry", literal.getType().getCanonicalName());
+	}
+	
 	public void testImport() throws Exception {
 		final File file= (File) 
 		getModel("(import '(java.math BigDecimal))" 
