@@ -3,8 +3,8 @@ package org.maschinenstuermer.clojure.install;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -37,9 +37,8 @@ public class ClojureInstalls {
 	}
 	
 	private Preferences getOrCreateClojureInstallsNode() {
-		final IPreferencesService preferencesService = Platform.getPreferencesService();
-		final Preferences node = preferencesService.getRootNode().
-			node(ClojureClasspathContainer.ID);
+		final IEclipsePreferences rootNode = new InstanceScope().getNode(ClojureClasspathContainer.PLUGIN_ID);
+		final Preferences node = rootNode.node(ClojureClasspathContainer.ID);
 		return node;
 	}
 
