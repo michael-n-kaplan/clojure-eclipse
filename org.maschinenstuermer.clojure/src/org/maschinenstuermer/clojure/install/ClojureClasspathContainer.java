@@ -39,7 +39,7 @@ public class ClojureClasspathContainer implements IClasspathContainer {
 
 	@Override
 	public int getKind() {
-		return K_SYSTEM;
+		return K_APPLICATION;
 	}
 
 	@Override
