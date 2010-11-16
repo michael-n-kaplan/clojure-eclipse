@@ -208,6 +208,32 @@
             class="org.eclipse.xtext.builder.clustering.ClusteringModule">
       </module>
    </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.maschinenstuermer.clojure.ClojureReplLaunchConfigurationType"
+            icon="icons/clojure-repl.png"
+            id="org.maschinenstuermer.clojure.ui.ClojureReplLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchGroups">
+      <launchGroup
+            bannerImage="icons/clojure-repl.png"
+            id="org.maschinenstuermer.clojure.ui.ClojureReplLaunchGroup"
+            image="icons/clojure-repl.png"
+            label="Clojure REPL"
+            mode="run">
+      </launchGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.maschinenstuermer.clojure.ui.repl.ClojureLaunchConfigurationTabGroup"
+            id="org.maschinenstuermer.clojure.ui.ClojureReplLaunchConfigurationTabGroup"
+            type="org.maschinenstuermer.clojure.ClojureReplLaunchConfigurationType">
+      </launchConfigurationTabGroup>
+   </extension>
    
 
 </plugin>

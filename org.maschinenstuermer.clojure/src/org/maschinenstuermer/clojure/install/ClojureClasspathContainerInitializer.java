@@ -37,7 +37,7 @@ public class ClojureClasspathContainerInitializer extends
 		try {
 			clojureInstalls.initFromPreferences();
 		} catch (BackingStoreException e) {
-			// TODO
+			throw new RuntimeException(e);
 		}
 		
 		final ClojureClasspathContainer clojureClasspathContainer = 

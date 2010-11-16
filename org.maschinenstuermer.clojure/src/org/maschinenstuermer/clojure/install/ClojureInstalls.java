@@ -37,8 +37,7 @@ public class ClojureInstalls {
 	}
 	
 	private Preferences getOrCreateClojureInstallsNode() {
-		final IEclipsePreferences rootNode = new InstanceScope().getNode(ClojureClasspathContainer.PLUGIN_ID);
-		final Preferences node = rootNode.node(ClojureClasspathContainer.ID);
+		final IEclipsePreferences node = new InstanceScope().getNode(ClojureClasspathContainer.PREF_ID);
 		return node;
 	}
 

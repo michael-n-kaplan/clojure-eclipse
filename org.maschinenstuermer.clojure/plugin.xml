@@ -14,8 +14,28 @@
         point="org.eclipse.jdt.core.classpathContainerInitializer">
      <classpathContainerInitializer
            class="org.maschinenstuermer.clojure.install.ClojureClasspathContainerInitializer"
-           id="org.maschinenstuermer.clojure.jdt.CLOJURE_CONTAINER">
+           id="org.maschinenstuermer.clojure.install.CLOJURE_CONTAINER">
      </classpathContainerInitializer>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.launchDelegates">
+     <launchDelegate
+           delegate="org.maschinenstuermer.clojure.repl.ClojureReplLaunchConfigurationDelegate"
+           id="org.maschinenstuermer.clojure.ClojureReplLaunchDelegate"
+           modes="run"
+           name="Clojure REPL"
+           type="org.eclipse.jdt.launching.localJavaApplication">
+     </launchDelegate>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.launchConfigurationTypes">
+     <launchConfigurationType
+           delegate="org.maschinenstuermer.clojure.repl.ClojureReplLaunchConfigurationDelegate"
+           id="org.maschinenstuermer.clojure.ClojureReplLaunchConfigurationType"
+           modes="run"
+           name="Clojure REPL"
+           public="true">
+     </launchConfigurationType>
   </extension>
 
 

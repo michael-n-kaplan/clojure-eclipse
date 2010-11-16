@@ -7,8 +7,11 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 
 public class ClojureClasspathContainer implements IClasspathContainer {
+	private final static String CONTAINER_ID = "install.CLOJURE_CONTAINER";
+	
 	public final static String PLUGIN_ID = "org.maschinenstuermer.clojure";
-	public final static String ID = "install.CLOJURE_CONTAINER";
+	public final static String PREF_ID = PLUGIN_ID + "/" + CONTAINER_ID;
+	public final static String ID = PLUGIN_ID + "." + CONTAINER_ID;
 	
 	private final IPath path;
 	private final IClasspathEntry[] classpathEntries;
