@@ -234,6 +234,12 @@
             type="org.maschinenstuermer.clojure.ClojureReplLaunchConfigurationType">
       </launchConfigurationTabGroup>
    </extension>
-   
-
+   <extension
+         point="org.eclipse.ui.console.consoleFactories">
+      <consoleFactory
+            class="org.maschinenstuermer.clojure.ui.console.ClojureReplConsoleFactory"
+            icon="icons/clojure-repl.png"
+            label="Clojure REPL">
+      </consoleFactory>
+   </extension>  
 </plugin>
