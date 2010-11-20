@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.maschinenstuermer.clojure.install.ClojureInstall;
+import org.maschinenstuermer.clojure.install.ClojureInstalls;
 
 import com.swtdesigner.ResourceManager;
 
@@ -39,7 +40,7 @@ public class ClojureInstallDialog extends TitleAreaDialog implements ModifyListe
 
 	@Override
 	protected void okPressed() {
-		clojureInstall = new ClojureInstall(nameText.getText(), locationText.getText());
+		clojureInstall = ClojureInstalls.createClojureInstall(nameText.getText(), locationText.getText());
 		super.okPressed();
 	}
 	

@@ -43,7 +43,8 @@ public class ConsoleTerminateAction extends Action implements IUpdate {
 
 	public void update() {
 		IProcess process = console.getProcess(); 
-		setEnabled(process.canTerminate());
+		if (process != null)
+			setEnabled(process.canTerminate());
 	}
 	
 	public void run() {

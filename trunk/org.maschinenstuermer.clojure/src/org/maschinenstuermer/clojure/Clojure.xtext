@@ -204,7 +204,7 @@ Meta:
 	'(' 'meta' data=Form ')';
 	
 ReaderMeta:
-	'^' data=Form;
+	'#'?'^' data=Form;
 
 MonitorEnter:
 	'(' 'monitor-enter' form=Form ')';

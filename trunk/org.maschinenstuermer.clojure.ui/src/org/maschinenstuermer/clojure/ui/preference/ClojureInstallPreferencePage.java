@@ -60,12 +60,17 @@ public class ClojureInstallPreferencePage extends FieldLayoutPreferencePage
 		tableViewer.setColumnProperties(new String[] {});
 		Table table = tableViewer.getTable();
 		table.setHeaderVisible(true);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3));
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
 	
 		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn tblclmnName = tableViewerColumn.getColumn();
-		tblclmnName.setWidth(100);
+		tblclmnName.setWidth(80);
 		tblclmnName.setText("Name");
+		
+		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnVersion = tableViewerColumn_2.getColumn();
+		tblclmnVersion.setWidth(80);
+		tblclmnVersion.setText("Version");
 		
 		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn tblclmnLocation = tableViewerColumn_1.getColumn();
@@ -76,6 +81,7 @@ public class ClojureInstallPreferencePage extends FieldLayoutPreferencePage
 		tableViewer.setContentProvider(new ClojureInstallContentProvider());
 		tableViewer.setInput(clojureInstalls);
 		tableViewer.setCheckStateProvider(labelProvider);
+		new Label(container, SWT.NONE);
 		
 		Button btnAdd = new Button(container, SWT.NONE);
 		btnAdd.addSelectionListener(new SelectionAdapter() {
@@ -100,10 +106,12 @@ public class ClojureInstallPreferencePage extends FieldLayoutPreferencePage
 		});
 		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAdd.setText("Add...");
+		new Label(container, SWT.NONE);
 		
 		Button btnEdit = new Button(container, SWT.NONE);
 		btnEdit.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnEdit.setText("Edit...");
+		new Label(container, SWT.NONE);
 		
 		Button btnRemove = new Button(container, SWT.NONE);
 		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
