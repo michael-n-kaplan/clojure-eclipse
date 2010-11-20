@@ -2,6 +2,7 @@ package org.maschinenstuermer.clojure.ui.console;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.Launch;
@@ -86,7 +87,12 @@ public class ClojureReplConsoleFactory implements IConsoleFactory {
 				} catch (CoreException e) { }
 				if (classPath != null) {
 					VMRunnerConfiguration vmConfig = 
-						new VMRunnerConfiguration("clojure.lang.Repl", classPath);
+						new VMRunnerConfiguration("clojure.main", classPath);
+					final IProject project = javaProject.getProject();
+					final IPath location = project.getLocation();
+					final String workingDir = location.toOSString();
+					vmConfig.setWorkingDirectory(workingDir);
+					vmConfig.setProgramArguments(new String[] { "--repl" });
 					ILaunch launch = new Launch(null, ILaunchManager.RUN_MODE, null);
 					vmRunner.run(vmConfig, launch, null);
 					clojureConsole.connect(launch);

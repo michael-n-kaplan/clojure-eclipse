@@ -35,7 +35,8 @@ class ClojureInstallLabelProvider implements ITableLabelProvider, ICheckStatePro
 		final ClojureInstall clojureInstall = (ClojureInstall) element;			
 		switch (columnIndex) {
 		case 0: return clojureInstall.getName();
-		case 1: return clojureInstall.getLocation();
+		case 1: return clojureInstall.getVersion().toString();
+		case 2: return clojureInstall.getLocation();
 		default: return null;
 		}
 	}
