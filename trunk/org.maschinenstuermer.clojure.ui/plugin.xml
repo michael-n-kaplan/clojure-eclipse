@@ -252,5 +252,14 @@
                   value="org.maschinenstuermer.clojure.ui.console.ClojureConsole">
             </instanceof></enablement>
       </consolePageParticipant>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.maschinenstuermer.clojure.ui.ClojureReplPerspectiveFactory"
+            icon="icons/clojure-repl.png"
+            id="org.maschinenstuermer.clojure.ui.ClojurePerspective"
+            name="Clojure REPL">
+      </perspective>
    </extension>  
 </plugin>
