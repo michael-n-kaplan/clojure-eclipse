@@ -12,7 +12,9 @@ import org.eclipse.debug.core.model.IFlushableStreamMonitor;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.swt.SWT;
@@ -22,10 +24,8 @@ import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleInputStream;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.TextConsoleViewer;
-import org.eclipse.ui.internal.console.IOConsolePage;
 import org.eclipse.ui.part.IPageBookViewPage;
 
-@SuppressWarnings("restriction")
 public class ClojureConsole extends IOConsole {
 	private final class StreamListener implements IStreamListener, ITextListener {
 
@@ -111,7 +111,7 @@ public class ClojureConsole extends IOConsole {
 		}
 	}
 
-	private IOConsolePage page;
+	private ClojureConsolePage page;
 	private IProcess process;
 
 	public ClojureConsole(final String name, final ImageDescriptor imageDescriptor) {
@@ -120,8 +120,7 @@ public class ClojureConsole extends IOConsole {
 
 	@Override
 	public IPageBookViewPage createPage(final IConsoleView view) {
-		final IOConsolePage page = (IOConsolePage) super.createPage(view);
-		this.page = page;
+		page = new ClojureConsolePage(this, view);
 		return page;
 	}
 
@@ -132,6 +131,12 @@ public class ClojureConsole extends IOConsole {
 	public void connect(final ILaunch launch) {
 		process = launch.getProcesses()[0];
 		final IStreamsProxy streamsProxy = process.getStreamsProxy();
+		
+		final IOConsoleOutputStream errorStream = newOutputStream();
+		errorStream.setActivateOnWrite(true);
+		errorStream.setColor(JFaceResources.getColorRegistry().get(JFacePreferences.ERROR_COLOR));
+		final IStreamMonitor errorStreamMonitor = streamsProxy.getErrorStreamMonitor();
+		errorStreamMonitor.addListener(new StreamListener(errorStreamMonitor, errorStream));
 		
 		final IOConsoleOutputStream outputStream = newOutputStream();
 		outputStream.setActivateOnWrite(true);

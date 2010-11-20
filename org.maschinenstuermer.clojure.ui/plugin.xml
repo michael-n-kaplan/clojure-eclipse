@@ -241,5 +241,16 @@
             icon="icons/clojure-repl.png"
             label="Clojure REPL">
       </consoleFactory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="org.maschinenstuermer.clojure.ui.console.ClojureConsolePageParticipant"
+            id="org.maschinenstuermer.clojure.ui.ClojureConsolePageParticipant">
+         <enablement>
+            <instanceof
+                  value="org.maschinenstuermer.clojure.ui.console.ClojureConsole">
+            </instanceof></enablement>
+      </consolePageParticipant>
    </extension>  
 </plugin>
