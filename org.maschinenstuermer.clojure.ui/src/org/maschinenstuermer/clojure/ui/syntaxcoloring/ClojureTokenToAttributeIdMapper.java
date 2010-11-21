@@ -39,7 +39,7 @@ public class ClojureTokenToAttributeIdMapper extends
 		addIdForTokens(ClojureHighlightingConfiguration.COMMENT_ID, 
 			"RULE_SL_COMMENT");
 		addIdForTokens(ClojureHighlightingConfiguration.MACRO_CALL_ID, 
-			"'defn'", "'defn-'", "'defmacro'",
+			"'defn'", "'defn-'", "'defmacro'", "'defstruct'",
 			"'import'", "'in-ns'",
 			"'ns'");
 	}

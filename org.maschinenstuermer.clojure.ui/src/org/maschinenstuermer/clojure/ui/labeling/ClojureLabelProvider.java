@@ -12,6 +12,8 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 import org.maschinenstuermer.clojure.ClojureUtil;
+import org.maschinenstuermer.clojure.clojure.Defstruct;
+import org.maschinenstuermer.clojure.clojure.Key;
 import org.maschinenstuermer.clojure.clojure.Namespace;
 import org.maschinenstuermer.clojure.clojure.SymbolDef;
 
@@ -33,7 +35,11 @@ public class ClojureLabelProvider extends DefaultEObjectLabelProvider {
 	Image image(final Namespace namespace) {
 		return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_OBJS_PACKAGE);
 	}
-	
+
+	Image image(final Defstruct defstruct) {
+		return JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_OBJS_INNER_CLASS_PUBLIC);
+	}
+
 	ImageDescriptor image(final SymbolDef symbolDef) {
 		if (ClojureUtil.isFn(symbolDef)) {
 			final Image image = JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_MISC_PUBLIC);
@@ -43,5 +49,9 @@ public class ClojureLabelProvider extends DefaultEObjectLabelProvider {
 			final Image image = JavaPlugin.getImageDescriptorRegistry().get(JavaPluginImages.DESC_FIELD_PUBLIC);
 			return new DecorationOverlayIcon(image, JavaPluginImages.DESC_OVR_STATIC, IDecoration.BOTTOM_RIGHT);
 		}
+	}
+	
+	ImageDescriptor image(final Key key) {
+		return JavaPluginImages.DESC_FIELD_PUBLIC;		
 	}
 }
