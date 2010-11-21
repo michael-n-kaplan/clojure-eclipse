@@ -1,8 +1,8 @@
 package org.maschinenstuermer.clojure.ui.handler;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -12,46 +12,43 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.progress.UIJob;
 import org.maschinenstuermer.clojure.ui.console.ClojureConsole;
 import org.maschinenstuermer.clojure.ui.console.ClojureReplConsoleFactory;
 import org.maschinenstuermer.clojure.ui.internal.ClojureActivator;
 
-public class EvaluateSelectionInRepl extends AbstractHandler implements IHandler {
+public abstract class AbstractEvaluateInReplHandler extends AbstractHandler {
 
 	private static final class ScheduleCopySelection implements IDocumentListener {
-		private final IDocument document;
-		private final String selectedText;
-
-		private ScheduleCopySelection(final IDocument document, final String selectedText) {
-			this.document = document;
-			this.selectedText = selectedText;
-		}
-
-		@Override
-		public void documentChanged(final DocumentEvent _) {
-			boolean isWaitingForInput = isWaitingForInput(document);
-			
-			final IDocumentListener documentListener = this;
-			if (isWaitingForInput) {
-				final Job copySelectionJob = new UIJob("Copy selection to console!") {
-					@Override
-					public IStatus runInUIThread(final IProgressMonitor monitor) {
-						document.removeDocumentListener(documentListener);
-						return copyText(document, selectedText);
-					}
-				};
-				copySelectionJob.schedule();
+			private final IDocument document;
+			private final String selectedText;
+	
+			private ScheduleCopySelection(final IDocument document, final String selectedText) {
+				this.document = document;
+				this.selectedText = selectedText;
+			}
+	
+			@Override
+			public void documentChanged(final DocumentEvent _) {
+				boolean isWaitingForInput = isWaitingForInput(document);
+				
+				final IDocumentListener documentListener = this;
+				if (isWaitingForInput) {
+					final Job copySelectionJob = new UIJob("Copy selection to console!") {
+						@Override
+						public IStatus runInUIThread(final IProgressMonitor monitor) {
+							document.removeDocumentListener(documentListener);
+							return copyText(document, selectedText);
+						}
+					};
+					copySelectionJob.schedule();
+				}
+			}
+	
+			@Override
+			public void documentAboutToBeChanged(final DocumentEvent event) {
 			}
 		}
-
-		@Override
-		public void documentAboutToBeChanged(final DocumentEvent event) {
-		}
-	}
 
 	private static boolean isWaitingForInput(final IDocument document) {
 		final int lastLine = document.getNumberOfLines() - 1;
@@ -81,9 +78,7 @@ public class EvaluateSelectionInRepl extends AbstractHandler implements IHandler
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {		
-		final ISelection selection = HandlerUtil.getCurrentSelection(event);
-		final ITextSelection textSelection = (ITextSelection) selection;
-		final String selectedText = textSelection.getText().concat("\n");
+		final String selectedText = getTextToEvaluate(event).concat("\n");
 		
 		final ClojureReplConsoleFactory consoleFactory = ClojureReplConsoleFactory.getDefault();
 		final ClojureConsole clojureConsole = consoleFactory.openAndShowConsole();		
@@ -95,4 +90,6 @@ public class EvaluateSelectionInRepl extends AbstractHandler implements IHandler
 		}
 		return null;
 	}
+
+	public abstract String getTextToEvaluate(ExecutionEvent event);
 }
