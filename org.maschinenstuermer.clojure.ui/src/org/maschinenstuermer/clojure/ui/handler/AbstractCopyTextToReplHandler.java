@@ -17,7 +17,7 @@ import org.maschinenstuermer.clojure.ui.console.ClojureConsole;
 import org.maschinenstuermer.clojure.ui.console.ClojureReplConsoleFactory;
 import org.maschinenstuermer.clojure.ui.internal.ClojureActivator;
 
-public abstract class AbstractEvaluateInReplHandler extends AbstractHandler {
+public abstract class AbstractCopyTextToReplHandler extends AbstractHandler {
 
 	private static final class ScheduleCopySelection implements IDocumentListener {
 			private final IDocument document;
@@ -78,10 +78,10 @@ public abstract class AbstractEvaluateInReplHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {		
-		final String selectedText = getTextToEvaluate(event).concat("\n");
+		final String selectedText = getTextToCopy(event);
 		
 		final ClojureReplConsoleFactory consoleFactory = ClojureReplConsoleFactory.getDefault();
-		final ClojureConsole clojureConsole = consoleFactory.openAndShowConsole();		
+		final ClojureConsole clojureConsole = consoleFactory.openAndShowConsole();
 		final IDocument document = clojureConsole.getDocument();
 		if (isWaitingForInput(document)) {
 			copyText(document, selectedText);
@@ -91,5 +91,5 @@ public abstract class AbstractEvaluateInReplHandler extends AbstractHandler {
 		return null;
 	}
 
-	public abstract String getTextToEvaluate(ExecutionEvent event);
+	public abstract String getTextToCopy(ExecutionEvent event);
 }
