@@ -265,7 +265,11 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl"
+            class="org.maschinenstuermer.clojure.ui.handler.LoadFileInReplHandler"
+            commandId="org.maschinenstuermer.clojure.ui.LoadFileInReplHandler">
+      </handler>
+      <handler
+            class="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInReplHandler"
             commandId="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl">
          <enabledWhen>
             <with
@@ -283,6 +287,10 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
+            id="org.maschinenstuermer.clojure.ui.LoadFileInReplHandler"
+            name="Load File in REPL">
+      </command>
+      <command
             id="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl"
             name="Eval in REPL">
       </command>
@@ -291,6 +299,10 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:#TextEditorContext?before=group.edit">
+         <command
+               commandId="org.maschinenstuermer.clojure.ui.LoadFileInReplHandler"
+               style="push">
+         </command>
          <command
                commandId="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl"
                style="push">
