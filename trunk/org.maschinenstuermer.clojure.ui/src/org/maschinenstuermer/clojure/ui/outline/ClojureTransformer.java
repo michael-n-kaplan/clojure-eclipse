@@ -9,7 +9,9 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.ui.editor.outline.ContentOutlineNode;
 import org.eclipse.xtext.ui.editor.outline.transformer.AbstractDeclarativeSemanticModelTransformer;
 import org.maschinenstuermer.clojure.ClojureUtil;
+import org.maschinenstuermer.clojure.clojure.Defstruct;
 import org.maschinenstuermer.clojure.clojure.Form;
+import org.maschinenstuermer.clojure.clojure.Key;
 import org.maschinenstuermer.clojure.clojure.Namespace;
 import org.maschinenstuermer.clojure.clojure.SymbolDef;
 
@@ -24,7 +26,6 @@ public class ClojureTransformer extends AbstractDeclarativeSemanticModelTransfor
 
 	public ContentOutlineNode createNode(final Namespace namespace, final ContentOutlineNode parentNode) {
 		final ContentOutlineNode node = super.newOutlineNode(namespace, parentNode);
-		node.setLabel(node.getLabel());
 		return node;
 	}
 
@@ -35,10 +36,20 @@ public class ClojureTransformer extends AbstractDeclarativeSemanticModelTransfor
 	public List<EObject> getChildren(final Form parent) {
 		return Lists.newArrayList(Iterables.filter(parent.eContents(), ClojureUtil.IS_DEF));
 	}
+
+
+	public List<Key> getChildren(final Defstruct defstruct) {
+		return Lists.newArrayList(defstruct.getKeys());
+	}
+
+	public ContentOutlineNode createNode(final Key key, final ContentOutlineNode parentNode) {
+		final ContentOutlineNode node = super.newOutlineNode(key, parentNode);
+		node.setLabel(key.getKey());
+		return node;
+	}
 	
 	public ContentOutlineNode createNode(final SymbolDef symbolDef, final ContentOutlineNode parentNode) {
 		final ContentOutlineNode node = super.newOutlineNode(symbolDef, parentNode);
-		node.setLabel(node.getLabel());
 		return node;
 	}
 }

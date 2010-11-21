@@ -57,7 +57,7 @@ QuotedLiteral:
 SimpleLiteral:
 	value='nil'|
 	value=STRING|
-	value=NUMBER|
+	value=Number|
 	value=KEYWORD|
 	value=CHAR|
 	value=Boolean;
@@ -110,6 +110,7 @@ SymbolDef:
 	Defn|
 	DefnPriv|
 	Defmacro|
+	Defstruct|
 	Fn;
 	 
 // Special forms
@@ -123,6 +124,12 @@ Defn:
 DefnPriv:
 	'(' 'defn-' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
 
+Defstruct:
+	'(' 'defstruct' meta=ReaderMeta? name=Symbol keys+=Key* ')';
+	
+Key:
+	key=KEYWORD;
+	
 Defmacro:
 	'(' 'defmacro' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
 	 
@@ -192,6 +199,7 @@ ModuleImport:
 	prefixLists+=PrefixLib;
 	
 SymbolImport:
+	lib=Symbol|
 	'(' lib=Symbol fns+=Symbol* ')';
 	
 LibSpec:
@@ -344,6 +352,9 @@ N:
 	'/'|
 	NAME;
 	
+Number:
+	('+'|'+')? NUM;
+	
 // Terminals
 	
 terminal KEYWORD:
@@ -355,7 +366,7 @@ terminal NAME:
 terminal SYMBOL_START:
 	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'%'|'&';
 
-terminal NUMBER: 
+terminal NUM: 
 	DIGIT+(('.' DIGIT*)|('r' DIGIT+))?'M'?;
 	
 terminal DIGIT:
