@@ -27,6 +27,8 @@ import org.eclipse.ui.console.TextConsoleViewer;
 import org.eclipse.ui.part.IPageBookViewPage;
 
 public class ClojureConsole extends IOConsole {
+	public static final String TYPE = ClojureConsole.class.getName();
+	
 	private final class StreamListener implements IStreamListener, ITextListener {
 
 		private final IOConsoleOutputStream outputStream;
@@ -115,7 +117,7 @@ public class ClojureConsole extends IOConsole {
 	private IProcess process;
 
 	public ClojureConsole(final String name, final ImageDescriptor imageDescriptor) {
-		super(name, imageDescriptor);
+		super(name, TYPE, imageDescriptor);
 	}
 
 	@Override
