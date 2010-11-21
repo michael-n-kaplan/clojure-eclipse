@@ -261,5 +261,50 @@
             id="org.maschinenstuermer.clojure.ui.ClojurePerspective"
             name="Clojure REPL">
       </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl"
+            commandId="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl">
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <adapt
+                     type="org.eclipse.jface.text.ITextSelection">
+                  <test
+                        property="org.maschinenstuermer.clojure.ui.textSelection.notEmpty">
+                  </test>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl"
+            name="Eval in REPL">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:#TextEditorContext?before=group.edit">
+         <command
+               commandId="org.maschinenstuermer.clojure.ui.handler.EvaluateSelectionInRepl"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.maschinenstuermer.clojure.ui.TextSelectionPropertyTester"
+            id="org.maschinenstuermer.clojure.ui.TextSelectionPropertyTester"
+            namespace="org.maschinenstuermer.clojure.ui.textSelection"
+            properties="notEmpty"
+            type="org.eclipse.jface.text.ITextSelection">
+      </propertyTester>
    </extension>  
 </plugin>
