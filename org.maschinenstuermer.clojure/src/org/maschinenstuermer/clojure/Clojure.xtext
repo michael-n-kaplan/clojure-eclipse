@@ -1,5 +1,4 @@
 grammar org.maschinenstuermer.clojure.Clojure
-hidden (WSS,SL_COMMENT)
 
 generate clojure "http://www.maschinenstuermer.org/clojure/Clojure"
 
@@ -8,13 +7,13 @@ import "http://www.eclipse.org/xtext/common/JavaVMTypes" as types
 
 // file structure
 
-File:
+File hidden(WSS,SL_COMMENT):
 	namespaces+=Namespace*|
 	exprs+=Form*;
 Form:
 	SimpleForm|
 	SymbolRef;
-SymbolRef:
+SymbolRef hidden():
 	type=[types::JvmType|QualifiedName] ('/' member=[types::JvmFeature|Symbol])?;
 SimpleForm:
 	SimpleLiteral|
@@ -42,7 +41,7 @@ ReaderMacro:
 	
 Deref:
 	'@' form=Form;
-ReaderLambda:
+ReaderLambda returns Lambda:
 	{ Lambda } '#(' exprs+=Form* ')';	
 ReaderMeta:
 	{ Meta } '#'?'^' data=Form; // # is required for clojure < 1.2
@@ -123,9 +122,9 @@ Def:
 Do:
 	{ Do } '(' 'do' exprs+=Form* ')';
 Dot: // uses Symbol for name so that core.clj can be parsed
-	'(' '.' type=QualifiedName (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
+	'(' '.' type=JavaType (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
 	'(' '.' instance=SimpleForm    (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
-	'(' '.' member=Symbol (type=QualifiedName|instance=SimpleForm) args+=Form* ')';
+	'(' '.' member=Symbol (type=JavaType|instance=SimpleForm) args+=Form* ')';
 //FormWithMeta:
 //	meta=ReaderMeta form=Form;
 Fn:
@@ -142,7 +141,7 @@ Let:
 Loop:
 	{ Loop } '(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 New:
-	'(' 'new' type=QualifiedName args+=Form* ')';
+	'(' 'new' type=JavaType args+=Form* ')';
 Meta:
 	'(' 'meta' data=Form ')';
 MonitorEnter:
@@ -193,8 +192,8 @@ Seq:
 	Vector;
 	
 Call:
-	'(' target=QualifiedName args+=Form* ')'|
-	{ New } '(' type=QualifiedName '.' args+=Form* ')';
+	{ New } '(' type=NewJavaType args+=Form* ')'|
+	'(' target=QualifiedName args+=Form* ')';
 List:
 	{ List }
 	'(' (values+=SimpleForm values+=Form*)? ')';
@@ -241,6 +240,11 @@ Defs:
 Boolean:
 	'true'|
 	'false';
+
+JavaType hidden():
+	type=[types::JvmType|QualifiedName];
+NewJavaType returns JavaType hidden():
+	type=[types::JvmType|QualifiedName] '.'; 
 
 QualifiedName:
 	Symbol (('$'|'.') Symbol)*;
