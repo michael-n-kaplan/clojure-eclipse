@@ -4,6 +4,7 @@
 package org.maschinenstuermer.clojure.scoping;
 
 import static org.eclipse.xtext.scoping.Scopes.scopeFor;
+import static org.maschinenstuermer.clojure.ClojureUtil.IS_DEF;
 import static org.maschinenstuermer.clojure.ClojureUtil.IS_JVM_FEATURE_CLAZZ;
 
 import java.util.ArrayList;
@@ -27,13 +28,11 @@ import org.eclipse.xtext.util.Tuples;
 import org.maschinenstuermer.clojure.clojure.Binding;
 import org.maschinenstuermer.clojure.clojure.KeyBinding;
 import org.maschinenstuermer.clojure.clojure.LexicalScope;
-import org.maschinenstuermer.clojure.clojure.Literal;
 import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SimpleBinding;
+import org.maschinenstuermer.clojure.clojure.SymbolRef;
 import org.maschinenstuermer.clojure.clojure.VectorBinding;
 import org.maschinenstuermer.clojure.clojure.util.ClojureSwitch;
-
-import static org.maschinenstuermer.clojure.ClojureUtil.*;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -99,8 +98,8 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 		final boolean isReadOnly = Boolean.TRUE.equals(readOnly);
 		
 		if (IS_JVM_FEATURE_CLAZZ.apply(reference.getEReferenceType())) {
-			final Literal literal = (Literal) context;
-			return typeScopeProvider.createMemberScope(literal.getType(), filter, names, IScope.NULLSCOPE);
+			final SymbolRef symbolRef = (SymbolRef) context;
+			return typeScopeProvider.createMemberScope(symbolRef.getType(), filter, names, IScope.NULLSCOPE);
 		} else { 
 			final LexicalScope lexicalScope = getLexicalScope(context);
 			if (!isReadOnly && lexicalScope != null) {
