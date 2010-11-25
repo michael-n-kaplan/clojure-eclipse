@@ -6,12 +6,13 @@ import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.junit.AbstractXtextTests;
 import org.maschinenstuermer.clojure.ClojureStandaloneSetup;
-import org.maschinenstuermer.clojure.clojure.Call;
 import org.maschinenstuermer.clojure.clojure.Def;
 import org.maschinenstuermer.clojure.clojure.Dot;
 import org.maschinenstuermer.clojure.clojure.File;
 import org.maschinenstuermer.clojure.clojure.Form;
+import org.maschinenstuermer.clojure.clojure.Lambda;
 import org.maschinenstuermer.clojure.clojure.Namespace;
+import org.maschinenstuermer.clojure.clojure.New;
 import org.maschinenstuermer.clojure.clojure.SimpleLiteral;
 import org.maschinenstuermer.clojure.clojure.SymbolRef;
 import org.maschinenstuermer.clojure.clojure.Throw;
@@ -46,6 +47,36 @@ public class ClojureParserTest extends AbstractXtextTests {
 		
 		file= (File) getModel("(def ..)");
 		thenEqualsDef("..", file);
+	}
+	
+	public void testSymbolRef() throws Exception {
+		getModelAndExpect("java.math. BigDecimal", 1);
+	}
+	
+	public void testReaderLambda() throws Exception {
+		file = (File) getModel("#()");
+		
+		EList<Form> exprs = file.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Lambda);
+		
+		file = (File) getModel("#(% %1)");
+		
+		exprs = file.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Lambda);
+		final Lambda lambda = (Lambda) exprs.get(0);
+		
+		EList<Form> lambdaExprs = lambda.getExprs();
+		assertEquals(2, lambdaExprs.size());
+		
+		assertTrue(lambdaExprs.get(0) instanceof SimpleLiteral);
+		final SimpleLiteral param1 = (SimpleLiteral) lambdaExprs.get(0);
+		assertEquals("%", param1.getParam());
+
+		assertTrue(lambdaExprs.get(1) instanceof SimpleLiteral);
+		final SimpleLiteral param2 = (SimpleLiteral) lambdaExprs.get(1);
+		assertEquals("%1", param2.getParam());
 	}
 
 	public void testStaticMember() throws Exception {
@@ -94,10 +125,10 @@ public class ClojureParserTest extends AbstractXtextTests {
 		
 		assertTrue(exprs.get(0) instanceof Throw);
 		final Throw t = (Throw) exprs.get(0);
-		assertTrue(t.getExpr() instanceof Call);
-		final Call call = (Call) t.getExpr();
+		assertTrue(t.getExpr() instanceof New);
+		final New newCall = (New) t.getExpr();
 		assertEquals(IllegalArgumentException.class.getCanonicalName(), 
-				call.getTarget());
+				newCall.getType().getType().getCanonicalName());
 	}
 	
 //	public void _testReaderQuotedDot() throws Exception {
@@ -112,7 +143,7 @@ public class ClojureParserTest extends AbstractXtextTests {
 //	}
 
 	public void testDot() throws Exception {
-		file = (File) getModel("(. java.math.BigDecimal)");
+		file = (File) getModel("(. java.math.BigDecimal valueOf)");
 		
 		final EList<Form> exprs = file.getExprs();
 		assertEquals(1, exprs.size());
@@ -124,12 +155,10 @@ public class ClojureParserTest extends AbstractXtextTests {
 		
 		final EList<Form> exprs = file.getExprs();
 		assertEquals(1, exprs.size());
-		assertTrue(exprs.get(0) instanceof Call);
-		final Call call = (Call) exprs.get(0);
-		final String target = call.getTarget();
-		assertNotNull(target);
+		assertTrue(exprs.get(0) instanceof New);
+		final New newCall = (New) exprs.get(0);
 		assertEquals(BigDecimal.class.getCanonicalName(), 
-				target);
+				newCall.getType().getType().getCanonicalName());
 	}
 
 	public void testImport() throws Exception {

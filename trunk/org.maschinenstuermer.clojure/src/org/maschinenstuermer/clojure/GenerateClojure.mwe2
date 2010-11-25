@@ -51,7 +51,7 @@ Workflow {
 			fragment = parser.antlr.XtextAntlrGeneratorFragment {
 			  	options = {
 					backtrack = true
-					memoize =true
+					memoize = true
 				}
 			}
 
@@ -95,7 +95,7 @@ Workflow {
 			fragment = parser.antlr.XtextAntlrUiGeneratorFragment {
 			  	options = {
 					backtrack = true
-					memoize =true
+					memoize = true
 				}
 			}
 
