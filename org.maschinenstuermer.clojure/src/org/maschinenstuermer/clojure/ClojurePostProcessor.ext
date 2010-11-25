@@ -9,17 +9,21 @@ process(ecore::EPackage this):
  
 process(ecore::EClass this):
 	switch (name) {
-		case "NameBinding" : processNameBinding(this) 
 		case "Lambda": removeStructuralFeature(this, "bindings")
-		case "LexicalScope": addChildReference(this, "bindings", ePackage.getEClassifier("Binding"))
+		case "LexicalScope": addStructuralFeature(this, 
+			newChildReference("bindings", ePackage.getEClassifier("Binding"), -1))
 		case "Let": removeStructuralFeature(this, "bindings")
 		case "Loop": removeStructuralFeature(this, "bindings")
-		case "SymbolDef": addSuperType(this, org::eclipse::xtext::common::types::TypesPackage::eINSTANCE.getEClassifier("JvmType"))
-		default:	null
+		case "SymbolDef": processSymbolDef(this)
+		default: (this.eSuperTypes.contains(ePackage.getEClassifier("SymbolDef")) ? processChildOfSymbolDef(this) : this)
 	};
 	
-processNameBinding(ecore::EClass this):
-	addSuperType(this, ePackage.getEClassifier("SymbolDef"))->
+processSymbolDef(ecore::EClass this):
+	addSuperType(this, org::eclipse::xtext::common::types::TypesPackage::eINSTANCE.getEClassifier("JvmDeclaredType"))->
+	addStructuralFeature(this, newAttribute("name", org::eclipse::emf::ecore::EcorePackage::eINSTANCE.getEClassifier("EString")))->
+	addStructuralFeature(this, newChildReference("meta", ePackage.getEClassifier("ReaderMeta"), 1));
+	
+processChildOfSymbolDef(ecore::EClass this):
 	removeStructuralFeature(this, "name")->
 	removeStructuralFeature(this, "meta");
 	
@@ -27,20 +31,26 @@ addSuperType(ecore::EClass this, ecore::EClassifier c):
 	this.eSuperTypes.add(c)->
 	this;
 
-addChildReference(ecore::EClass this, String name, ecore::EClassifier type):
-	if this.getEStructuralFeature(name) == null then
-		this.eStructuralFeatures.add(newChildReference(name, type))->
+addStructuralFeature(ecore::EClass this, ecore::EStructuralFeature f):
+	if this.getEStructuralFeature(f.name) == null then
+		this.eStructuralFeatures.add(f)->
 		this;
 	
 removeStructuralFeature(ecore::EClass this, String ref):
 	this.eStructuralFeatures.remove(this.getEStructuralFeature(ref))->
 	this;
-	
-newChildReference(String name, ecore::EClassifier type):
+
+newAttribute(String name, ecore::EClassifier type):
+	let r = new ecore::EAttribute :
+		r.setName(name)->
+		r.setEType(type)->
+		r;
+			
+newChildReference(String name, ecore::EClassifier type, int upperBound):
 	let r = new ecore::EReference :
 		r.setName(name)->
 		r.setEType(type)->
 		r.setContainment(true)->
-		r.setUpperBound(-1)->
+		r.setUpperBound(upperBound)->
 		r.setLowerBound(0)->
 		r;

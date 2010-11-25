@@ -13,7 +13,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 import org.maschinenstuermer.clojure.ClojureUtil;
 import org.maschinenstuermer.clojure.clojure.Defstruct;
-import org.maschinenstuermer.clojure.clojure.Key;
 import org.maschinenstuermer.clojure.clojure.Namespace;
 import org.maschinenstuermer.clojure.clojure.SymbolDef;
 
@@ -51,7 +50,7 @@ public class ClojureLabelProvider extends DefaultEObjectLabelProvider {
 		}
 	}
 	
-	ImageDescriptor image(final Key key) {
-		return JavaPluginImages.DESC_FIELD_PUBLIC;		
-	}
+//	ImageDescriptor image(final Key key) {
+//		return JavaPluginImages.DESC_FIELD_PUBLIC;		
+//	}
 }

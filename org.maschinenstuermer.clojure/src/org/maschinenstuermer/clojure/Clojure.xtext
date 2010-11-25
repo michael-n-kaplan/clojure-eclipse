@@ -1,4 +1,4 @@
-grammar org.maschinenstuermer.clojure.Clojure 
+grammar org.maschinenstuermer.clojure.Clojure
 hidden (WSS,SL_COMMENT)
 
 generate clojure "http://www.maschinenstuermer.org/clojure/Clojure"
@@ -6,381 +6,317 @@ generate clojure "http://www.maschinenstuermer.org/clojure/Clojure"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 import "http://www.eclipse.org/xtext/common/JavaVMTypes" as types
 
+// file structure
+
 File:
 	namespaces+=Namespace*|
 	exprs+=Form*;
-
-SimpleForm:
-	SimpleLiteral|
-	SpecialForm|
-	ReaderMacro|
-	Seq;
-		
 Form:
 	SimpleForm|
-	Literal;
-		
-QuotedForm:
-	QuotedLiteral|
-	ReaderMacro|
-	QuotedDot|
-	QuotedSeq;
-
-QuotedSeq:
-	QuotedList|
-	QuotedVector|
-	QuotedMap|
-	QuotedSet;
-	
-QuotedList:
-	{ List }
-	'(' elements+=QuotedForm* ')';
-
-QuotedVector:
-	{ Vector }
-	'[' elements+=QuotedForm* ']';
-		
-QuotedMap:
-	{ Map }
-	'{' (keys+=QuotedForm elements+=QuotedForm)* '}';
-	
-QuotedSet:
-	{ Set }
-	'#{' elements+=QuotedForm* '}';
-
-QuotedLiteral:
-	{ QuotedLiteral }
-	( literal=SimpleLiteral|
-	  varArgs='&'|
-	  type=Symbol ('/' member = N?)?);
-	
+	SymbolRef;
+SymbolRef:
+	type=[types::JvmType|QualifiedName] ('/' member=[types::JvmFeature|Symbol])?;
+SimpleForm:
+	SimpleLiteral|
+	ImportForm|
+	Defs|
+	SpecialForm|
+	Seq|
+	ReaderMacro;	
 SimpleLiteral:
-	value='nil'|
-	value=STRING|
-	value=Number|
-	value=KEYWORD|
-	value=CHAR|
-	value=Boolean;
-	
-Literal:
-	type=[types::JvmType|Symbol] ('/' member=[types::JvmFeature|NAME])?;
-	
-	
-Boolean:
-	"true"|"false";
-	
+	value=(NUMBER|Keyword|Boolean|STRING|CHAR|'nil')|
+	param=PARAM_NAME;
+
+// reader macros
+
 ReaderMacro:
 	Deref|
 	ReaderLambda|
-	ReaderMetaMacro|
+	ReaderMeta|
 	ReaderQuote|
 	ReaderVar|
 	Regex|
 	SyntaxQuote|
 	Unquote|
-	UnquoteSplicing;
+	UnquoteSplicing;	
 	
-ReaderMetaMacro:
-	ReaderMeta form=Form;
-	
-ReaderLambda:
-	{ ReaderLambda }
-	'#(' exprs+=Form* ')';
-	
-SpecialForm:
-	Do|
-	Dot|
-	If|
-	Import|
-	Let|
-	Loop|
-	Meta|
-	MonitorEnter|
-	MonitorExit|
-	New|
-	Quote|
-	Recur|
-	SymbolDef|
-	Throw|
-	Try|
-	Var;
-
-SymbolDef:
-	Def|
-	Defn|
-	DefnPriv|
-	Defmacro|
-	Defstruct|
-	Fn;
-	 
-// Special forms
-
-Def:
-	'(' 'def' meta=ReaderMeta? name=Symbol init=Form? ')';
-	
-Defn:
-	'(' 'defn' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
-
-DefnPriv:
-	'(' 'defn-' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
-
-Defstruct:
-	'(' 'defstruct' meta=ReaderMeta? name=Symbol keys+=Key* ')';
-	
-Key:
-	key=KEYWORD;
-	
-Defmacro:
-	'(' 'defmacro' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
-	 
 Deref:
 	'@' form=Form;
+ReaderLambda:
+	{ Lambda } '#(' exprs+=Form* ')';	
+ReaderMeta:
+	{ Meta } '#'?'^' data=Form; // # is required for clojure < 1.2
+ReaderQuote:
+	{ Quote } '\'' form=QuotedForm;	
+ReaderVar:
+	{ Var } ('#\'' symbol=Symbol);
+Regex:
+	'#' regex=STRING;
+SyntaxQuote:
+	'`' form=QuotedForm;
+Unquote:
+	'~' form=QuotedForm;
+UnquoteSplicing:
+	'~@' form=QuotedForm;
 	
-Do:
-	{ Do }
-	'(' 'do' exprs+=Form* ')';
+	QuotedForm:
+		form=Form;
 
-QuotedDot:
-	'(' '.' args+=QuotedForm+ ')';
-	
-Dot:
-	'(' '.' args+=Form+ ')';
-	
-Fn:
-	{ Fn }
-	('(' ('fn'|'fn*') meta=ReaderMeta? name=Symbol? body=Body ')');
-	
-If:
-	'(' 'if' test=Form then=Form else=Form? ')';
-	
-Import:
-	'(' 'import' ('\'' packages+=PackageImport )+ ')';
-
-PackageImport:
-	'(' package=Symbol classes+=Symbol* ')';
-	
-LexicalScope:
-	Lambda|
-	Let|
-	Loop;
-	
-Let:
-	{ Let }
-	'(' 'let' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
-	
-Loop:
-	{ Loop }
-	'(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
+// namespaces
 	
 Namespace:
 	Ns|
 	InNs;
 	
 Ns:
-	'(' 'ns' meta=ReaderMeta? name=Symbol attributes=Map? 
-		refs+=Reference* ')'
-		exprs += Form*;
-
+	'(' 'ns' meta=ReaderMeta? name=QualifiedName attributes=Map? 
+		refs+=Reference* ')' exprs += Form*;
 InNs:
-	'(' 'in-ns' '\'' name=Symbol ')'
-		exprs += Form*;
+	'(' 'in-ns' '\'' meta=ReaderMeta? name=QualifiedName ')' exprs += Form*;
 
-Reference:
-{Reference}
-	('(' ':import' packages+=PackageImport+ ')'|
-	 '(' ':use' uses+=ModuleImport+ ')'|
-	 '(' ':require' requires+=ModuleImport+ ')'|
-	 '(' ':refer-clojure' (':exclude' '(' excludes+=Symbol+ ')')? ')');
+	Reference:
+		{Reference} ('(' ':import' packages+=PackageImport+ ')'|
+	 	'(' ':use' uses+=ModuleImport+ ')'|
+	 	'(' ':require' requires+=ModuleImport+ ')'|
+	 	'(' ':refer-clojure' (':exclude' '(' excludes+=Symbol+ ')')? ')');
+		PackageImport:
+			'(' package=QualifiedName classes+=Symbol* ')'|
+			class=QualifiedName;
+		ModuleImport:
+			requires+=SymbolImport|
+			libSpecs+=LibSpec|
+			flags+=Keyword|
+			prefixLists+=PrefixLib;
+			SymbolImport:
+				'(' lib=QualifiedName fns+=Symbol* ')'|
+				lib=QualifiedName;	
+			LibSpec:
+				'[' lib=QualifiedName ':as' alias=Symbol ']';
+			PrefixLib:
+				'(' prefix=QualifiedName libSpecs+=LibSpec+ ')';
+	
+ImportForm:
+	'(' 'import' ('\'' packages+=PackageImport )+ ')';
+	
+// special forms
 
-ModuleImport:
-	requires+=SymbolImport|
-	libSpecs+=LibSpec|
-	flags+=KEYWORD|
-	prefixLists+=PrefixLib;
+SpecialForm:
+	Def|
+	Do|
+	Dot|
+//	FormWithMeta|
+	Fn|
+	If|
+	Let|
+	Loop|
+	Meta|
+	MonitorEnter|MonitorExit|
+	New|
+	Recur|
+	Quote|
+	Throw|
+	Try|
+	Var;
 	
-SymbolImport:
-	lib=Symbol|
-	'(' lib=Symbol fns+=Symbol* ')';
-	
-LibSpec:
-	'[' lib=Symbol ':as' alias=Symbol ']';
-	
-PrefixLib:
-	'(' prefix=Symbol libSpecs+=LibSpec+ ')';
-	
+Def:
+	'(' 'def' meta=ReaderMeta? name=Symbol init=Form? ')';
+Do:
+	{ Do } '(' 'do' exprs+=Form* ')';
+Dot: // uses Symbol for name so that core.clj can be parsed
+	'(' '.' type=QualifiedName (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
+	'(' '.' instance=SimpleForm    (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
+	'(' '.' member=Symbol (type=QualifiedName|instance=SimpleForm) args+=Form* ')';
+//FormWithMeta:
+//	meta=ReaderMeta form=Form;
+Fn:
+	{ Fn }	('(' ('fn'|'fn*') meta=ReaderMeta? name=Symbol? body=Body ')');
+	Body:
+		lambdas+=Lambda | 
+		('(' lambdas+=Lambda ')')+;
+	Lambda:
+		{ Lambda } '[' bindings+=Binding* ']' exprs+=Form*;	
+If:
+	'(' 'if' cond=Form then=Form else=Form? ')';
+Let:
+	{ Let }	'(' 'let' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
+Loop:
+	{ Loop } '(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
+New:
+	'(' 'new' type=QualifiedName args+=Form* ')';
 Meta:
 	'(' 'meta' data=Form ')';
-	
-ReaderMeta:
-	'#'?'^' data=Form;
-
 MonitorEnter:
 	'(' 'monitor-enter' form=Form ')';
-		
 MonitorExit:
 	'(' 'monitor-exit' form=Form ')';
-		
-New:
-	'(' 'new' class=[types::JvmType|NAME] args+=Form*')';
-	
 Recur:
-	{ Recur }
-	'(' 'recur' exprs+=Form* ')';
-	
-ReaderQuote:
-	'\'' form=QuotedForm;
-	
+	{ Recur } '(' 'recur' exprs+=Form* ')';			
 Quote:
-	'(' 'quote' form=QuotedForm ')';
-		
-Regex:
-	'#' regex=STRING;
-	
-SyntaxQuote:
-	'`' form=QuotedForm;
-	
+	'(' 'quote' quoted=Form ')';
 Throw:
-	'(' 'throw' expr=Form ')';
-	
+	'(' 'throw' expr=Form ')';	
 Try:
 	{ Try }
 	'(' 'try' exprs+=Form* (catchClauses+=CatchClause)* finallyClause=FinallyClause? ')';
-	
-CatchClause:
-	'(' 'catch' className=Symbol name=Symbol exprs+=Form* ')';
-	
-FinallyClause:
-	{ FinallyClause }
-	'(' 'finally' exprs+=Form* ')';
-	
-Unquote:
-	'~' form=Form;
-	
-UnquoteSplicing:
-	'~@' form=Form;
-	
-ReaderVar:
-	('#\'' symbol=[SymbolDef|Symbol]);
-	
+	CatchClause:
+		'(' 'catch' className=Symbol name=Symbol exprs+=Form* ')';
+	FinallyClause:
+		{ FinallyClause } '(' 'finally' exprs+=Form* ')';
 Var:
-	('(' 'var' symbol=[SymbolDef|Symbol] ')');
-
-// Bindings
+	('(' 'var' symbol=NAME ')');
 	
-Binding:
-	SimpleBinding |
-	VectorBinding |
-	MapBinding;
+// bindings
 
-NameBinding:
-	meta=ReaderMeta? (varArg?='&'|keyWord=KEYWORD)? name=Symbol;
-			
+Binding:
+	MapBinding|
+	SimpleBinding|
+	VectorBinding;
+
+MapBinding:
+	{ MapBinding } '{' bindings+=KeyBinding* '}';
+	KeyBinding:
+		binding+=Binding key+=Keyword;
 SimpleBinding:
 	bindings+=NameBinding;
-	
+	NameBinding:
+		meta=ReaderMeta? (keyWord=Keyword)? name=Symbol;
 VectorBinding:
-	{ VectorBinding }
-	'[' bindings+=Binding* ']';
-	
-MapBinding:
-	{ MapBinding }
-	'{' bindings+=KeyBinding* '}';
+	{ VectorBinding } '[' bindings+=Binding* ']';
 
-KeyBinding:
-	binding+=Binding key += KEYWORD; 
+// seqs
 
-// fn 
-	
-Body:
-	lambdas+=Lambda | 
-	('(' lambdas+=Lambda ')')+;
-	
-Lambda:
-	{ Lambda }
-	'[' bindings+=Binding* ']' exprs+=Form*;
-
-// Sequences
-	
 Seq:
 	Call|
 	List|
-	Vector|
 	Map|
-	Set;
+	Set|
+	Vector;
 	
 Call:
-	'(' target=CallTarget isNew?='.'? args+=Form* ')';
-	
-
-CallTarget:
-	type=[types::JvmType|N] ('/' member=[types::JvmFeature|NAME])?;
-
+	'(' target=QualifiedName args+=Form* ')'|
+	{ New } '(' type=QualifiedName '.' args+=Form* ')';
 List:
 	{ List }
-	'(' (elements+=SimpleForm elements+=Form*)? ')';
-
-Vector:
-	{ Vector }
-	'[' elements+=Form* ']';
-		
+	'(' (values+=SimpleForm values+=Form*)? ')';
 Map:
-	{ Map }
-	'{' (keys+=Form elements+=Form)* '}';
-	
+	{ Map } '{' (keys+=Form values+=Form)* '}'; 
 Set:
-	{ Set }
-	'#{' elements+=Form* '}';
+	{ Set } '#{' values+=Form* '}';
+Vector:
+	{ Vector } '[' values+=Form* ']';
+		
+	
+// scoping
 
+SymbolDef:
+	Def|
+	Defs|
+	Fn|
+	NameBinding;
+
+LexicalScope:
+	Lambda|
+	Let|
+	Loop;
+
+// further def forms
+
+Defs:
+	Defn|
+	DefnPriv|
+	Defmacro|
+	Defstruct;
+	
+	Defn:
+		'(' 'defn' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
+	DefnPriv:
+		'(' 'defn-' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
+	Defmacro:
+		'(' 'defmacro' meta=ReaderMeta? name=Symbol doc=STRING? attributes=Map? body=Body ')';
+	Defstruct:
+		'(' 'defstruct' meta=ReaderMeta? name=Symbol keys+=Keyword* ')';
+ 	
 // data type rules
+
+Boolean:
+	'true'|
+	'false';
+
+QualifiedName:
+	Symbol (('$'|'.') Symbol)*;
 	
 Symbol:
 	NAME|
-	'catch'|
-	'def'|'defn'|'defn-'|'defmacro'|'do'|
-	'fn'|'fn*'|'finally'|
-	'if'|'in-ns'|'import'|
-	'let'|'loop'|
-	'meta'|'monitor-enter'|'monitor-exit'|
-	'ns'|'new'|
-	'quote'|
-	'throw'|'try'|
-	'recur'|
-	'var'|
-	'/';
-
-N:
 	'/'|
-	NAME;
+	'.'|'..'|
+	'catch'|
+	'def'|
+	'defn'|'defn-'|
+	'defmacro'|
+	'defstruct'|
+	'do'|
+	'finally'|
+	'fn'|'fn*'|
+	'if'|
+	'import'|
+	'in-ns'|
+	'let'|
+	'loop'|
+	'meta'|
+	'M'|
+	'monitor-enter'|'monitor-exit'|
+	'new'|
+	'nil'|
+	'ns'|
+	'r'|
+	'recur'|
+	'quote'|
+	'throw'|
+	'try'|
+	'var';
+				
+Keyword:
+	KEY_WORD|
+	':as'|
+	':exclude'|
+	':import'|
+	':require'|
+	':refer-clojure'|
+	':use';
 	
-Number:
-	('+'|'+')? NUM;
+// terminal rules
 	
-// Terminals
-	
-terminal KEYWORD:
-	':' NAME;
-	
-terminal NAME: 
-	SYMBOL_START (SYMBOL_START|DIGIT|'.'|'$')* |'..';
-		
-terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'+'|'-'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'%'|'&';
+terminal NUMBER:
+	SIGN? DIGIT+(('.' DIGIT*)|('r' DIGIT+))?'M'?;
 
-terminal NUM: 
-	DIGIT+(('.' DIGIT*)|('r' DIGIT+))?'M'?;
+terminal KEY_WORD:
+	':'':'? NAME;
 	
-terminal DIGIT:
-	('0'..'9');
+terminal PARAM_NAME:
+	'%' DIGIT*;
+	
+terminal NAME:
+	SIGN (SYMBOL_START (SYMBOL_START|DIGIT|SIGN)*)?|
+	SYMBOL_START (SYMBOL_START|DIGIT|SIGN)*;
 	
 terminal STRING	: 
 	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'"'|"'"|'\\') | !('\\'|'"') )* '"';
 	
 terminal CHAR:
-	'\\' !(' '|'\t'|'\r'|'\n')+;
+	'\\' !(' '|'\t'|'\r'|'\n'|'('|')'|'['|']'|'{'|'}')+;
 	
+terminal SIGN:
+	('-'|'+');
+	
+terminal SYMBOL_START:
+	'a'..'z'|'A'..'Z'|'_'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'&';
+	
+terminal DIGIT:
+	('0'..'9');
+		
 terminal WSS: 
 	(' '|'\t'|'\r'|'\n'|',')+;
 	
 terminal SL_COMMENT: 
 	';' !('\n'|'\r')* ('\r'? '\n')?;
-		
+
