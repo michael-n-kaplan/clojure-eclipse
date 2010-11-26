@@ -11,6 +11,7 @@ import org.maschinenstuermer.clojure.clojure.Call;
 import org.maschinenstuermer.clojure.clojure.Def;
 import org.maschinenstuermer.clojure.clojure.Dot;
 import org.maschinenstuermer.clojure.clojure.File;
+import org.maschinenstuermer.clojure.clojure.FinallyClause;
 import org.maschinenstuermer.clojure.clojure.Form;
 import org.maschinenstuermer.clojure.clojure.Lambda;
 import org.maschinenstuermer.clojure.clojure.Namespace;
@@ -21,6 +22,7 @@ import org.maschinenstuermer.clojure.clojure.ReaderQuote;
 import org.maschinenstuermer.clojure.clojure.SimpleLiteral;
 import org.maschinenstuermer.clojure.clojure.SymbolRef;
 import org.maschinenstuermer.clojure.clojure.Throw;
+import org.maschinenstuermer.clojure.clojure.Try;
 import org.maschinenstuermer.clojure.clojure.Var;
 import org.maschinenstuermer.clojure.clojure.Vector;
 
@@ -269,9 +271,20 @@ public class ClojureParserTest extends AbstractXtextTests {
 				newCall.getTarget().getType().getCanonicalName());
 	}
 
+	public void testTryFinally() throws Exception {
+		file = (File) getModel("(try (12) (finally (11)))");
+		
+		EList<Form> exprs = file.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Try);
+		Try try_ = (Try) exprs.get(0);
+		exprs = try_.getExprs();
+		assertEquals(2, exprs.size());
+		assertTrue(exprs.get(1) instanceof FinallyClause);
+	}
+	
 	public void testImport() throws Exception {
-		file= (File) 
-		getModel("(import '(java.math BigDecimal))" 
+		file = (File) getModel("(import '(java.math BigDecimal))" 
 				+ "(def z BigDecimal/ZERO)");
 
 		final EList<Form> exprs = file.getExprs();
