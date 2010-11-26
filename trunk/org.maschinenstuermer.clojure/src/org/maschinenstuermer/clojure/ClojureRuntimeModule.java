@@ -3,8 +3,10 @@
  */
 package org.maschinenstuermer.clojure;
 
+import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.scoping.IGlobalScopeProvider;
+import org.maschinenstuermer.clojure.conversion.ClojureNameConverterService;
 import org.maschinenstuermer.clojure.naming.ClojureQualifiedNameProvider;
 import org.maschinenstuermer.clojure.scoping.ClojureGlobalScopeProvider;
 import org.maschinenstuermer.clojure.scoping.ClojureImportedNamespaceAwareLocalScopeProvider;
@@ -28,5 +30,10 @@ public class ClojureRuntimeModule extends org.maschinenstuermer.clojure.Abstract
 	@Override
 	public Class<? extends IGlobalScopeProvider> bindIGlobalScopeProvider() {
 		return ClojureGlobalScopeProvider.class;
+	}
+	
+	@Override
+	public Class<? extends IValueConverterService> bindIValueConverterService() {
+		return ClojureNameConverterService.class;
 	}
 }

@@ -13,9 +13,13 @@ import org.maschinenstuermer.clojure.clojure.Form;
 import org.maschinenstuermer.clojure.clojure.Lambda;
 import org.maschinenstuermer.clojure.clojure.Namespace;
 import org.maschinenstuermer.clojure.clojure.New;
+import org.maschinenstuermer.clojure.clojure.Quote;
+import org.maschinenstuermer.clojure.clojure.QuotedSymbol;
+import org.maschinenstuermer.clojure.clojure.ReaderQuote;
 import org.maschinenstuermer.clojure.clojure.SimpleLiteral;
 import org.maschinenstuermer.clojure.clojure.SymbolRef;
 import org.maschinenstuermer.clojure.clojure.Throw;
+import org.maschinenstuermer.clojure.clojure.Vector;
 
 public class ClojureParserTest extends AbstractXtextTests {
 	private File file;
@@ -105,17 +109,6 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertEquals("java.util.Map$Entry",	
 				symbolRef.getType().getCanonicalName());
 	}
-	
-//	public void testReaderQuotedVarArgs() throws Exception {
-//		final File file = (File) getModel("'&");
-//		
-//		assertEquals(1, file.getExprs().size());
-//		assertTrue(file.getExprs().get(0) instanceof ReaderQuote);
-//		final ReaderQuote readerQuote = (ReaderQuote) file.getExprs().get(0);
-//		assertTrue(readerQuote.getForm() instanceof SymbolRef);
-//		final QuotedLiteral quotedLiteral = (QuotedLiteral) readerQuote.getForm();
-//		assertEquals("&", quotedLiteral.getVarArgs());
-//	}
 
 	public void testThrow() throws Exception {
 		file = (File) getModel("(in-ns 'test) (throw (IllegalArgumentException.))");
@@ -128,26 +121,49 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertTrue(t.getExpr() instanceof New);
 		final New newCall = (New) t.getExpr();
 		assertEquals(IllegalArgumentException.class.getCanonicalName(), 
-				newCall.getType().getType().getCanonicalName());
+				newCall.getType().getCanonicalName());
 	}
 	
-//	public void _testReaderQuotedDot() throws Exception {
-//		final File file = (File) getModel("'.");
-//		
-//		assertEquals(1, file.getExprs().size());
-//		assertTrue(file.getExprs().get(0) instanceof ReaderQuote);
-//		final ReaderQuote readerQuote = (ReaderQuote) file.getExprs().get(0);
-//		assertTrue(readerQuote.getForm() instanceof QuotedLiteral);
-//		final QuotedLiteral quotedLiteral = (QuotedLiteral) readerQuote.getForm();
-//		assertEquals(".", quotedLiteral.getVarArgs());
-//	}
+	public void testReaderQuoted() throws Exception {
+		file = (File) getModel("'.");
+		thenQuotedSymbolEquals(".", file);
+		
+		file = (File) getModel("'&");
+		thenQuotedSymbolEquals("&", file);
+		
+		file = (File) getModel("'[coll items]");
+		final Quote quote = thenExpectQuote(file);
+		assertTrue(quote.getQuoted() instanceof Vector);
+		final Vector vector = (Vector) quote.getQuoted();
+		final EList<Form> values = vector.getValues();
+		assertEquals(2, values.size());
+		assertTrue(values.get(0) instanceof QuotedSymbol);
+		assertTrue(values.get(1) instanceof QuotedSymbol);
+	}
 
+	private static void thenQuotedSymbolEquals(final String expectedSymbol, final File file) {
+		final Quote readerQuote = thenExpectQuote(file);
+		assertTrue(readerQuote.getQuoted() instanceof QuotedSymbol);
+		final QuotedSymbol quotedSymbol = (QuotedSymbol) readerQuote.getQuoted();
+		assertEquals(expectedSymbol, quotedSymbol.getSymbol());		
+	}
+
+	private static Quote thenExpectQuote(final File file) {
+		final EList<Form> exprs = file.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof ReaderQuote);
+		final Quote readerQuote = (Quote) exprs.get(0);
+		return readerQuote;
+	}
+	
 	public void testDot() throws Exception {
 		file = (File) getModel("(. java.math.BigDecimal valueOf)");
 		
 		final EList<Form> exprs = file.getExprs();
 		assertEquals(1, exprs.size());
 		assertTrue(exprs.get(0) instanceof Dot);
+		
+		file = (File) getModel("(def anObject java.lang.Object.)(.hashCode anObject)");
 	}
 	
 	public void testConstructorCall() throws Exception {
@@ -158,7 +174,7 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertTrue(exprs.get(0) instanceof New);
 		final New newCall = (New) exprs.get(0);
 		assertEquals(BigDecimal.class.getCanonicalName(), 
-				newCall.getType().getType().getCanonicalName());
+				newCall.getType().getCanonicalName());
 	}
 
 	public void testImport() throws Exception {
