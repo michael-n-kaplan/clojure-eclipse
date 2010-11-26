@@ -7,16 +7,18 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.builder.clustering.CurrentDescriptions;
 import org.eclipse.xtext.resource.IResourceDescriptions;
 import org.eclipse.xtext.scoping.impl.AbstractGlobalScopeProvider;
-import org.eclipse.xtext.ui.editor.contentassist.PrefixMatcher;
 import org.eclipse.xtext.ui.editor.contentassist.AbstractJavaBasedContentProposalProvider.ReferenceProposalCreator;
+import org.eclipse.xtext.ui.editor.contentassist.PrefixMatcher;
 import org.eclipse.xtext.ui.editor.outline.transformer.ISemanticModelTransformer;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.IHighlightingConfiguration;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.ISemanticHighlightingCalculator;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.antlr.AbstractAntlrTokenToAttributeIdMapper;
 import org.eclipse.xtext.ui.wizard.IProjectCreator;
+import org.maschinenstuermer.clojure.resource.IUriConverterProvider;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojurePrefixMatcher;
 import org.maschinenstuermer.clojure.ui.contentassist.ClojureReferenceProposalCreator;
 import org.maschinenstuermer.clojure.ui.outline.ClojureTransformer;
+import org.maschinenstuermer.clojure.ui.resource.JavaUriConverterProvider;
 import org.maschinenstuermer.clojure.ui.syntaxcoloring.ClojureHighlightingConfiguration;
 import org.maschinenstuermer.clojure.ui.syntaxcoloring.ClojureSemanticHighlightingCalculator;
 import org.maschinenstuermer.clojure.ui.syntaxcoloring.ClojureTokenToAttributeIdMapper;
@@ -68,5 +70,9 @@ public class ClojureUiModule extends org.maschinenstuermer.clojure.ui.AbstractCl
 		binder.bind(IResourceDescriptions.class).annotatedWith(  
 				Names.named(AbstractGlobalScopeProvider.NAMED_BUILDER_SCOPE))  
 					.to(CurrentDescriptions.ResourceSetAware.class);  
+	}
+	
+	public Class<? extends IUriConverterProvider> bindIUriConverterProvider() {
+		return JavaUriConverterProvider.class;
 	}
 }
