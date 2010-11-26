@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.xtext,
  org.eclipse.core.resources;bundle-version="3.6.0",
  org.eclipse.core.runtime;bundle-version="3.6.0",
  org.eclipse.jdt.launching;bundle-version="3.5.100",
- org.eclipse.debug.core;bundle-version="3.6.0"
+ org.eclipse.debug.core;bundle-version="3.6.0",
+ org.eclipse.xtext.ui;bundle-version="1.0.1"
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.maschinenstuermer.clojure,

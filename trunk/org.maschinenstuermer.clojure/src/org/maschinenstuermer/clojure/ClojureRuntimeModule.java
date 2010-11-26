@@ -5,9 +5,15 @@ package org.maschinenstuermer.clojure;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.scoping.IGlobalScopeProvider;
+import org.eclipse.xtext.ui.resource.IStorage2UriMapper;
+import org.eclipse.xtext.ui.resource.Storage2UriMapperJavaImpl;
 import org.maschinenstuermer.clojure.conversion.ClojureNameConverterService;
 import org.maschinenstuermer.clojure.naming.ClojureQualifiedNameProvider;
+import org.maschinenstuermer.clojure.resource.ClojureResource;
+import org.maschinenstuermer.clojure.resource.IUriConverterProvider;
+import org.maschinenstuermer.clojure.resource.JavaUriConverterProvider;
 import org.maschinenstuermer.clojure.scoping.ClojureGlobalScopeProvider;
 import org.maschinenstuermer.clojure.scoping.ClojureImportedNamespaceAwareLocalScopeProvider;
 
@@ -35,5 +41,18 @@ public class ClojureRuntimeModule extends org.maschinenstuermer.clojure.Abstract
 	@Override
 	public Class<? extends IValueConverterService> bindIValueConverterService() {
 		return ClojureNameConverterService.class;
+	}
+	
+	@Override
+	public Class<? extends XtextResource> bindXtextResource() {
+		return ClojureResource.class;
+	}
+	
+	public Class<? extends IUriConverterProvider> bindIUriConverterProvider() {
+		return JavaUriConverterProvider.class;
+	}
+	
+	public Class<? extends IStorage2UriMapper> bindIStorage2UriMapper() {
+		return Storage2UriMapperJavaImpl.class;
 	}
 }
