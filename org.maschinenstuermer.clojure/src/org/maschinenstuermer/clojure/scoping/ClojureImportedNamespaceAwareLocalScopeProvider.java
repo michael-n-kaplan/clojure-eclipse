@@ -1,5 +1,7 @@
 package org.maschinenstuermer.clojure.scoping;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +54,7 @@ public class ClojureImportedNamespaceAwareLocalScopeProvider extends
 		
 		public Set<ImportNormalizer> caseNs(final Ns object) {
 			final HashSet<ImportNormalizer> imports = new HashSet<ImportNormalizer>();
-			addPackage("java.lang.*", imports);
+			addDefaultImports(imports);
 			final boolean addClojureCoreImport = object.getName() == null || 
 				!"clojure.core".equals(object.getName());
 			if (addClojureCoreImport)
@@ -70,8 +72,14 @@ public class ClojureImportedNamespaceAwareLocalScopeProvider extends
 
 		public Set<ImportNormalizer> caseInNs(InNs _) {
 			final HashSet<ImportNormalizer> imports = new HashSet<ImportNormalizer>();
-			addPackage("java.lang.*", imports);
+			addDefaultImports(imports);
 			return imports;
+		}
+
+		private void addDefaultImports(final HashSet<ImportNormalizer> imports) {
+			addPackage("java.lang.*", imports);
+			addPackage(BigDecimal.class.getCanonicalName(), imports);
+			addPackage(BigInteger.class.getCanonicalName(), imports);
 		};
 		
 		private void addPackage(final String packageName, final Set<ImportNormalizer> imports) {
