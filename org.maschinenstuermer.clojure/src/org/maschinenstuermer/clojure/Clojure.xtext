@@ -176,7 +176,7 @@ Try:
 	FinallyClause:
 		{ FinallyClause } '(' 'finally' exprs+=Form* ')';
 Var:
-	('(' 'var' symbol=NAME ')');
+	('(' 'var' symbol=Symbol ')');
 	
 // bindings
 
