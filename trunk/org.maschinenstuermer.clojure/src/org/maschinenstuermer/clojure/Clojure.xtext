@@ -64,7 +64,7 @@ UnquoteSplicing:
 		ReaderMacro| // might cause problems with ^!!
 		QuotedSeq;
 	QuotedSymbol:
-		symbol=Symbol;
+		symbol=QualifiedName;
 	QuotedSeq returns Seq:
 		{ List } '(' values+=QuotedForm* ')'|
 		{ Map }'{' (keys+=QuotedForm values+=QuotedForm)* '}'|
@@ -165,7 +165,7 @@ MonitorExit:
 Recur:
 	{ Recur } '(' 'recur' exprs+=Form* ')';			
 Quote:
-	'(' 'quote' quoted=Form ')';
+	'(' 'quote' quoted=QuotedForm ')';
 Throw:
 	'(' 'throw' expr=Form ')';	
 Try:

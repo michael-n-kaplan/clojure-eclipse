@@ -124,14 +124,37 @@ public class ClojureParserTest extends AbstractXtextTests {
 				newCall.getType().getCanonicalName());
 	}
 	
-	public void testReaderQuoted() throws Exception {
+	public void testReaderQuote() throws Exception {
 		file = (File) getModel("'.");
 		thenQuotedSymbolEquals(".", file);
 		
 		file = (File) getModel("'&");
 		thenQuotedSymbolEquals("&", file);
-		
+
+		file = (File) getModel("'java.math.BigDecimal");
+		thenQuotedSymbolEquals("java.math.BigDecimal", file);
+
 		file = (File) getModel("'[coll items]");
+		final Quote quote = thenExpectQuote(file);
+		assertTrue(quote.getQuoted() instanceof Vector);
+		final Vector vector = (Vector) quote.getQuoted();
+		final EList<Form> values = vector.getValues();
+		assertEquals(2, values.size());
+		assertTrue(values.get(0) instanceof QuotedSymbol);
+		assertTrue(values.get(1) instanceof QuotedSymbol);
+	}
+
+	public void testQuote() throws Exception {
+		file = (File) getModel("(quote .)");
+		thenQuotedSymbolEquals(".", file);
+		
+		file = (File) getModel("(quote &)");
+		thenQuotedSymbolEquals("&", file);
+
+		file = (File) getModel("(quote java.math.BigDecimal)");
+		thenQuotedSymbolEquals("java.math.BigDecimal", file);
+
+		file = (File) getModel("(quote [coll items])");
 		final Quote quote = thenExpectQuote(file);
 		assertTrue(quote.getQuoted() instanceof Vector);
 		final Vector vector = (Vector) quote.getQuoted();
