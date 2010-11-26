@@ -46,7 +46,7 @@ ReaderLambda returns Lambda:
 ReaderMeta:
 	{ Meta } '#'?'^' data=Form; // # is required for clojure < 1.2
 ReaderQuote:
-	{ Quote } '\'' form=QuotedForm;	
+	{ Quote } '\'' quoted=QuotedForm;	
 ReaderVar:
 	{ Var } ('#\'' symbol=Symbol);
 Regex:
@@ -58,9 +58,19 @@ Unquote:
 UnquoteSplicing:
 	'~@' form=QuotedForm;
 	
-	QuotedForm:
-		form=Form;
-
+	QuotedForm returns Form:
+		SimpleLiteral|
+		QuotedSymbol|
+		ReaderMacro| // might cause problems with ^!!
+		QuotedSeq;
+	QuotedSymbol:
+		symbol=Symbol;
+	QuotedSeq returns Seq:
+		{ List } '(' values+=QuotedForm* ')'|
+		{ Map }'{' (keys+=QuotedForm values+=QuotedForm)* '}'|
+		{ Set } '#{' values+=QuotedForm* '}'|
+		{ Vector } '[' values+=QuotedForm* ']';
+		
 // namespaces
 	
 Namespace:
@@ -71,8 +81,10 @@ Ns:
 	'(' 'ns' meta=ReaderMeta? name=QualifiedName attributes=Map? 
 		refs+=Reference* ')' exprs += Form*;
 InNs:
-	'(' 'in-ns' '\'' meta=ReaderMeta? name=QualifiedName ')' exprs += Form*;
-
+	'(' 'in-ns' meta=ReaderMeta? name=QuotedQualifiedName ')' exprs += Form*;
+	QuotedQualifiedName returns ecore::EString hidden():
+		'\'' QualifiedName;
+		
 	Reference:
 		{Reference} ('(' ':import' packages+=PackageImport+ ')'|
 	 	'(' ':use' uses+=ModuleImport+ ')'|
@@ -122,9 +134,11 @@ Def:
 Do:
 	{ Do } '(' 'do' exprs+=Form* ')';
 Dot: // uses Symbol for name so that core.clj can be parsed
-	'(' '.' type=JavaType (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
-	'(' '.' instance=SimpleForm    (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
-	'(' '.' member=Symbol (type=JavaType|instance=SimpleForm) args+=Form* ')';
+	'(' member=MemberSymbol (instance=SimpleForm|type=[types::JvmType|JavaType]) args+=Form* ')'|
+	'(' '.' type=[types::JvmType|JavaType] (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')'|
+	'(' '.' instance=SimpleForm    (member=Symbol args+=Form*| '(' member=Symbol args+=Form* ')') ')';
+	MemberSymbol returns ecore::EString hidden():
+		'.' Symbol;
 //FormWithMeta:
 //	meta=ReaderMeta form=Form;
 Fn:
@@ -141,7 +155,7 @@ Let:
 Loop:
 	{ Loop } '(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 New:
-	'(' 'new' type=JavaType args+=Form* ')';
+	'(' 'new' type=[types::JvmType|JavaType] args+=Form* ')';
 Meta:
 	'(' 'meta' data=Form ')';
 MonitorEnter:
@@ -192,7 +206,7 @@ Seq:
 	Vector;
 	
 Call:
-	{ New } '(' type=NewJavaType args+=Form* ')'|
+	{ New } '(' type=[types::JvmType|NewJavaType] args+=Form* ')'|
 	'(' target=QualifiedName args+=Form* ')';
 List:
 	{ List }
@@ -241,10 +255,10 @@ Boolean:
 	'true'|
 	'false';
 
-JavaType hidden():
-	type=[types::JvmType|QualifiedName];
-NewJavaType returns JavaType hidden():
-	type=[types::JvmType|QualifiedName] '.'; 
+JavaType returns ecore::EString hidden():
+	QualifiedName;
+NewJavaType returns ecore::EString hidden():
+	QualifiedName '.'; 
 
 QualifiedName:
 	Symbol (('$'|'.') Symbol)*;
@@ -305,7 +319,7 @@ terminal NAME:
 	
 terminal STRING	: 
 	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'"'|"'"|'\\') | !('\\'|'"') )* '"';
-	
+		
 terminal CHAR:
 	'\\' !(' '|'\t'|'\r'|'\n'|'('|')'|'['|']'|'{'|'}')+;
 	
