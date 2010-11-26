@@ -155,7 +155,7 @@ Let:
 Loop:
 	{ Loop } '(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 New:
-	'(' 'new' target=NewTarget args+=Form* ')';
+	'(' 'new' target=SymbolRef args+=Form* ')';
 Meta:
 	'(' 'meta' data=Form ')';
 MonitorEnter:
