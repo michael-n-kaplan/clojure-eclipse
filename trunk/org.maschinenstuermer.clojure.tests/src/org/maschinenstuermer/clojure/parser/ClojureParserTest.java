@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.junit.AbstractXtextTests;
 import org.maschinenstuermer.clojure.ClojureStandaloneSetup;
+import org.maschinenstuermer.clojure.clojure.Call;
 import org.maschinenstuermer.clojure.clojure.Def;
 import org.maschinenstuermer.clojure.clojure.Dot;
 import org.maschinenstuermer.clojure.clojure.File;
@@ -121,7 +122,7 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertTrue(t.getExpr() instanceof New);
 		final New newCall = (New) t.getExpr();
 		assertEquals(IllegalArgumentException.class.getCanonicalName(), 
-				newCall.getType().getCanonicalName());
+				newCall.getTarget().getType().getCanonicalName());
 	}
 	
 	public void testReaderQuote() throws Exception {
@@ -201,6 +202,18 @@ public class ClojureParserTest extends AbstractXtextTests {
 		file = (File) getModel("(def anObject java.lang.Object.)(.hashCode anObject)");
 	}
 	
+	public void testCall() throws Exception {
+		file = (File) getModel("(in-ns 'test) (Math/sqrt 1.5)");
+
+		final List<Form> exprs = thenHasOneNamespaceWithExprs(1, file);
+		assertTrue(exprs.get(0) instanceof Call);
+		final Call call = (Call) exprs.get(0);
+		assertEquals(Math.class.getCanonicalName(), 
+				call.getTarget().getType().getCanonicalName());
+		assertEquals(Math.class.getCanonicalName().concat(".sqrt(double)"), 
+				call.getTarget().getMember().getCanonicalName());
+	}
+	
 	public void testConstructorCall() throws Exception {
 		file = (File) getModel("(java.math.BigDecimal.)");
 		
@@ -209,7 +222,7 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertTrue(exprs.get(0) instanceof New);
 		final New newCall = (New) exprs.get(0);
 		assertEquals(BigDecimal.class.getCanonicalName(), 
-				newCall.getType().getCanonicalName());
+				newCall.getTarget().getType().getCanonicalName());
 	}
 
 	public void testImport() throws Exception {

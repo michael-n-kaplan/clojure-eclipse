@@ -155,7 +155,7 @@ Let:
 Loop:
 	{ Loop } '(' 'loop' '['(bindings+=Binding inits+=Form)*']' exprs+=Form* ')';
 New:
-	'(' 'new' type=[types::JvmType|JavaType] args+=Form* ')';
+	'(' 'new' target=NewTarget args+=Form* ')';
 Meta:
 	'(' 'meta' data=Form ')';
 MonitorEnter:
@@ -206,8 +206,10 @@ Seq:
 	Vector;
 	
 Call:
-	{ New } '(' type=[types::JvmType|NewJavaType] args+=Form* ')'|
-	'(' target=QualifiedName args+=Form* ')';
+	{ New } '(' target=NewTarget args+=Form* ')'|
+	'(' target=SymbolRef args+=Form* ')';
+	NewTarget returns SymbolRef:
+		type=[types::JvmType|NewJavaType];
 List:
 	{ List }
 	'(' (values+=SimpleForm values+=Form*)? ')';
