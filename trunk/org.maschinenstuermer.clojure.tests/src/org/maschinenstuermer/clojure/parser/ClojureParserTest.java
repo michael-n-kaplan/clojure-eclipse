@@ -1,6 +1,7 @@
 package org.maschinenstuermer.clojure.parser;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
@@ -85,7 +86,28 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertEquals("%1", param2.getParam());
 	}
 
-	public void testStaticMember() throws Exception {
+	public void testSymbolRef_DefaultImports() throws Exception {
+		file = (File) getModel("(in-ns 'test) BigDecimal");
+
+		List<Form> exprs = 
+			thenHasOneNamespaceWithExprs(1, file);
+		
+		assertTrue(exprs.get(0) instanceof SymbolRef);
+		SymbolRef symbolRef = (SymbolRef) exprs.get(0);
+		assertEquals(BigDecimal.class.getCanonicalName(), 
+				symbolRef.getType().getCanonicalName());
+
+		file = (File) getModel("(in-ns 'test) BigInteger");
+
+		exprs = thenHasOneNamespaceWithExprs(1, file);
+		
+		assertTrue(exprs.get(0) instanceof SymbolRef);
+		symbolRef = (SymbolRef) exprs.get(0);
+		assertEquals(BigInteger.class.getCanonicalName(), 
+				symbolRef.getType().getCanonicalName());
+	}
+
+	public void testSymbolRef_StaticMember() throws Exception {
 		file = (File) getModel("(in-ns 'test) System/out");
 
 		final List<Form> exprs = 
@@ -289,7 +311,7 @@ public class ClojureParserTest extends AbstractXtextTests {
 		file = (File) 
 			getModel("(defstruct test :key1 :key2)");
 	}
-		
+	
 	private static void thenEqualsDef(final String expectedName, final File file) {
 		final EList<Form> exprs = file.getExprs();
 		assertEquals(1, exprs.size());
