@@ -53,8 +53,8 @@ public class ClojureParserTest extends AbstractXtextTests {
 		thenEqualsDef("..", file);
 	}
 	
-	public void testSymbolRef() throws Exception {
-		getModelAndExpect("java.math. BigDecimal", 1);
+	public void testBrokenSymbolRef() throws Exception {
+		getModelAndExpect("java.math. BigDecimal", 3);
 	}
 	
 	public void testReaderLambda() throws Exception {
