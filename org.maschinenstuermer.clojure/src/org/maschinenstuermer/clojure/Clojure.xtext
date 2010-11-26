@@ -169,12 +169,16 @@ Quote:
 Throw:
 	'(' 'throw' expr=Form ')';	
 Try:
-	{ Try }
-	'(' 'try' exprs+=Form* (catchClauses+=CatchClause)* finallyClause=FinallyClause? ')';
-	CatchClause:
-		'(' 'catch' className=Symbol name=Symbol exprs+=Form* ')';
-	FinallyClause:
-		{ FinallyClause } '(' 'finally' exprs+=Form* ')';
+	{ Try } '(' 'try' exprs+=TryForm* ')'; // correct ordering of clauses must be checked with validation!
+	TryForm returns Form:
+		CatchClause|
+		FinallyClause|
+		Form;
+		
+		CatchClause:
+			'(' 'catch' className=Symbol name=Symbol exprs+=Form* ')';
+		FinallyClause:
+			{ FinallyClause } '(' 'finally' exprs+=Form* ')';
 Var:
 	('(' 'var' symbol=Symbol ')');
 	
