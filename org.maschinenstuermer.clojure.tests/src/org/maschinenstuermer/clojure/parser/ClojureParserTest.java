@@ -131,6 +131,12 @@ public class ClojureParserTest extends AbstractXtextTests {
 		file = (File) getModel("'&");
 		thenQuotedSymbolEquals("&", file);
 
+		file = (File) getModel("'.meta");
+		thenQuotedSymbolEquals(".meta", file);
+
+		file = (File) getModel("'Object.");
+		thenQuotedSymbolEquals("Object.", file);
+
 		file = (File) getModel("'java.math.BigDecimal");
 		thenQuotedSymbolEquals("java.math.BigDecimal", file);
 
@@ -150,6 +156,12 @@ public class ClojureParserTest extends AbstractXtextTests {
 		
 		file = (File) getModel("(quote &)");
 		thenQuotedSymbolEquals("&", file);
+
+		file = (File) getModel("(quote .meta)");
+		thenQuotedSymbolEquals(".meta", file);
+
+		file = (File) getModel("(quote Object.)");
+		thenQuotedSymbolEquals("Object.", file); // . is removed
 
 		file = (File) getModel("(quote java.math.BigDecimal)");
 		thenQuotedSymbolEquals("java.math.BigDecimal", file);

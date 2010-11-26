@@ -64,7 +64,7 @@ UnquoteSplicing:
 		ReaderMacro| // might cause problems with ^!!
 		QuotedSeq;
 	QuotedSymbol:
-		symbol=QualifiedName;
+		symbol=(MemberSymbol|NewJavaType|QualifiedName);
 	QuotedSeq returns Seq:
 		{ List } '(' values+=QuotedForm* ')'|
 		{ Map }'{' (keys+=QuotedForm values+=QuotedForm)* '}'|
