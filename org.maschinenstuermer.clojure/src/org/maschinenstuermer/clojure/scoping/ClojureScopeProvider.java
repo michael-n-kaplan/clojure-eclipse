@@ -26,9 +26,11 @@ import org.eclipse.xtext.scoping.impl.AbstractScopeProvider;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.Tuples;
 import org.maschinenstuermer.clojure.clojure.Binding;
+import org.maschinenstuermer.clojure.clojure.Body;
+import org.maschinenstuermer.clojure.clojure.Fn;
 import org.maschinenstuermer.clojure.clojure.KeyBinding;
+import org.maschinenstuermer.clojure.clojure.Lambda;
 import org.maschinenstuermer.clojure.clojure.LexicalScope;
-import org.maschinenstuermer.clojure.clojure.NameBinding;
 import org.maschinenstuermer.clojure.clojure.SimpleBinding;
 import org.maschinenstuermer.clojure.clojure.SymbolRef;
 import org.maschinenstuermer.clojure.clojure.VectorBinding;
@@ -129,10 +131,10 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 		return scopeCache.get(Tuples.pair("lexical", lexicalScope), context.eResource(), new Provider<IScope>() {
 			@Override
 			public IScope get() {
-				final List<NameBinding> namesInScope = NameBindings.all(lexicalScope);
+				final List<EObject> namesInScope = NameBindings.all(lexicalScope);
 				final LexicalScope nextLexicalScope = getLexicalScope(lexicalScope.eContainer());
 				final IScope outerScope = nextLexicalScope == null ? 
-						defScope(context, reference) :scope(nextLexicalScope, reference);
+						defScope(context, reference) : scope(nextLexicalScope, reference);
 				return scopeFor(namesInScope, outerScope);
 			}
 		});
@@ -154,29 +156,39 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 		return getDelegate().getScope(context, reference);
 	}
 	
-	private static class NameBindings extends ClojureSwitch<List<NameBinding>> {
-		private final List<NameBinding> nameBindings = 
-			new ArrayList<NameBinding>();
+	private static class NameBindings extends ClojureSwitch<List<EObject>> {
+		private final List<EObject> nameBindings = 
+			new ArrayList<EObject>();
 		
-		public static List<NameBinding> all(final LexicalScope lexicalScope) {
+		public static List<EObject> all(final LexicalScope lexicalScope) {
 			return new NameBindings().doSwitch(lexicalScope);
 		}
 		
 		@Override
-		public List<NameBinding> caseLexicalScope(LexicalScope lexicalScope) {
+		public List<EObject> caseLambda(final Lambda object) {
+			caseLexicalScope(object);
+			final EObject eContainer = object.eContainer();
+			if (eContainer instanceof Body && eContainer.eContainer() instanceof Fn) 
+				nameBindings.add(eContainer.eContainer());
+			
+			return nameBindings;
+		}
+		
+		@Override
+		public List<EObject> caseLexicalScope(LexicalScope lexicalScope) {
 			for(Binding binding : lexicalScope.getBindings())
 				doSwitch(binding);
 			return nameBindings;
 		}
 		
 		@Override
-		public List<NameBinding> caseSimpleBinding(final SimpleBinding simpleBinding) {
+		public List<EObject> caseSimpleBinding(final SimpleBinding simpleBinding) {
 			nameBindings.addAll(simpleBinding.getBindings());
 			return nameBindings;
 		}
 		
 		@Override
-		public List<NameBinding> caseKeyBinding(final KeyBinding keyBinding) {
+		public List<EObject> caseKeyBinding(final KeyBinding keyBinding) {
 			for (final Binding binding : keyBinding.getBinding()) 
 				doSwitch(binding);
 			
@@ -184,7 +196,7 @@ public class ClojureScopeProvider extends AbstractScopeProvider {
 		}
 		
 		@Override
-		public List<NameBinding> caseVectorBinding(final VectorBinding vectorBinding) {
+		public List<EObject> caseVectorBinding(final VectorBinding vectorBinding) {
 			for (final Binding binding : vectorBinding.getBindings()) 
 				doSwitch(binding);
 			
