@@ -213,7 +213,18 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertEquals(Math.class.getCanonicalName().concat(".sqrt(double)"), 
 				call.getTarget().getMember().getCanonicalName());
 	}
+
 	
+	public void testNew() throws Exception {
+		file = (File) getModel("(in-ns 'test) (new Object)");
+
+		final List<Form> exprs = thenHasOneNamespaceWithExprs(1, file);
+		assertTrue(exprs.get(0) instanceof New);
+		final New new_ = (New) exprs.get(0);
+		assertEquals(Object.class.getCanonicalName(),
+				new_.getTarget().getType().getCanonicalName());
+	}
+
 	public void testConstructorCall() throws Exception {
 		file = (File) getModel("(java.math.BigDecimal.)");
 		
