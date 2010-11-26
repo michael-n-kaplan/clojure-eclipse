@@ -12,6 +12,7 @@ import org.maschinenstuermer.clojure.clojure.Def;
 import org.maschinenstuermer.clojure.clojure.Dot;
 import org.maschinenstuermer.clojure.clojure.File;
 import org.maschinenstuermer.clojure.clojure.FinallyClause;
+import org.maschinenstuermer.clojure.clojure.Fn;
 import org.maschinenstuermer.clojure.clojure.Form;
 import org.maschinenstuermer.clojure.clojure.Lambda;
 import org.maschinenstuermer.clojure.clojure.Namespace;
@@ -88,6 +89,28 @@ public class ClojureParserTest extends AbstractXtextTests {
 		assertEquals("%1", param2.getParam());
 	}
 
+	public void testFn() throws Exception {
+		file = (File) getModel("(def identity (fn i [] (i)))");
+		
+		EList<Form> exprs = file.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Def);
+		final Def def = (Def) exprs.get(0);
+		assertTrue(def.getInit() instanceof Fn);
+		final Fn fn = (Fn) def.getInit();
+		assertEquals("i", fn.getName());
+		final EList<Lambda> lambdas = fn.getBody().getLambdas();
+		assertEquals(1, lambdas.size());
+		final Lambda lambda = lambdas.get(0);
+		exprs = lambda.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Call);
+		final Call call = (Call) exprs.get(0);
+		assertTrue(call.getTarget().getType() instanceof Fn);
+		assertEquals(fn, 
+				call.getTarget().getType());
+	}
+	
 	public void testSymbolRef_DefaultImports() throws Exception {
 		file = (File) getModel("(in-ns 'test) BigDecimal");
 
