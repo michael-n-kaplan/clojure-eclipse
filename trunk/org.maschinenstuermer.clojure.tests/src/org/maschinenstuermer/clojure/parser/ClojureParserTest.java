@@ -20,6 +20,7 @@ import org.maschinenstuermer.clojure.clojure.ReaderQuote;
 import org.maschinenstuermer.clojure.clojure.SimpleLiteral;
 import org.maschinenstuermer.clojure.clojure.SymbolRef;
 import org.maschinenstuermer.clojure.clojure.Throw;
+import org.maschinenstuermer.clojure.clojure.Var;
 import org.maschinenstuermer.clojure.clojure.Vector;
 
 public class ClojureParserTest extends AbstractXtextTests {
@@ -223,6 +224,16 @@ public class ClojureParserTest extends AbstractXtextTests {
 		final New new_ = (New) exprs.get(0);
 		assertEquals(Object.class.getCanonicalName(),
 				new_.getTarget().getType().getCanonicalName());
+	}
+
+	public void testVar() throws Exception {
+		file = (File) getModel("(var defmacro)");
+		
+		final EList<Form> exprs = file.getExprs();
+		assertEquals(1, exprs.size());
+		assertTrue(exprs.get(0) instanceof Var);
+		final Var var = (Var) exprs.get(0);
+		assertEquals("defmacro", var.getSymbol());
 	}
 
 	public void testConstructorCall() throws Exception {
