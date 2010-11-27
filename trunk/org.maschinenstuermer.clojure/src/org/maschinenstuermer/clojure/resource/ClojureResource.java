@@ -17,7 +17,7 @@ public class ClojureResource extends LazyLinkingResource {
 		if (resourceSet != null) {
 			final URIConverter uriConverter = resourceSet.getURIConverter();
 			if (!converterProvider.isConverted(uriConverter)) {
-				converterProvider.getURIConverter(uriConverter);
+//				converterProvider.getURIConverter(uriConverter);
 			}
 		}
 		return super.basicSetResourceSet(resourceSet, notifications);
