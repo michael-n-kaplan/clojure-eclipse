@@ -311,32 +311,26 @@ Keyword:
 // terminal rules
 	
 terminal NUMBER:
-	SIGN? DIGIT+(('.' DIGIT*)|('r' DIGIT+))?'M'?;
+	('-'|'+')? ('0'..'9')+(('.' ('0'..'9')*)|('r' ('0'..'9')+))?'M'?;
 
 terminal KEY_WORD:
 	':'':'? NAME;
 	
 terminal PARAM_NAME:
-	'%' DIGIT*;
+	'%' ('0'..'9')*;
 	
 terminal NAME:
-	SIGN (SYMBOL_START (SYMBOL_START|DIGIT|SIGN)*)?|
-	SYMBOL_START (SYMBOL_START|DIGIT|SIGN)*;
+	('-'|'+') (('a'..'z'|'A'..'Z'|'_'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'&') 
+	('a'..'z'|'A'..'Z'|'_'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'&'|'0'..'9'|'-'|'+')*)?
+	|
+	('a'..'z'|'A'..'Z'|'_'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'&') 
+	('a'..'z'|'A'..'Z'|'_'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'&'|'0'..'9'|'-'|'+')*;
 	
 terminal STRING	: 
 	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'"'|"'"|'\\') | !('\\'|'"') )* '"';
 		
 terminal CHAR:
 	'\\' !(' '|'\t'|'\r'|'\n'|'('|')'|'['|']'|'{'|'}')+;
-	
-terminal SIGN:
-	('-'|'+');
-	
-terminal SYMBOL_START:
-	'a'..'z'|'A'..'Z'|'_'|'*'|'!'|'?'|'='|'#'|'<'|'>'|'&';
-	
-terminal DIGIT:
-	('0'..'9');
 		
 terminal WSS: 
 	(' '|'\t'|'\r'|'\n'|',')+;
