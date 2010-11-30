@@ -2,6 +2,7 @@ package org.maschinenstuermer.clojure.parser;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
@@ -307,18 +308,20 @@ public class ClojureParserTest extends AbstractXtextTests {
 	}
 	
 	public void testImport() throws Exception {
-		file = (File) getModel("(import '(java.math BigDecimal))" 
-				+ "(def z BigDecimal/ZERO)");
+		file = (File) getModel("(import '(java.util Collections))" 
+				+ "(def empty Collections/EMPTY_LIST)");
 
 		final EList<Form> exprs = file.getExprs();
 		assertEquals(2, exprs.size());
 		assertTrue(exprs.get(1) instanceof Def);
-		final Def defZ = (Def) exprs.get(1);
-		assertEquals("z", defZ.getName());
-		assertTrue(defZ.getInit() instanceof SymbolRef);
-		final SymbolRef symbolRef = (SymbolRef) defZ.getInit();
-		assertEquals("java.math.BigDecimal", symbolRef.getType().getCanonicalName());
-		assertEquals("java.math.BigDecimal.ZERO", symbolRef.getMember().getCanonicalName());
+		final Def defEmpty = (Def) exprs.get(1);
+		assertEquals("empty", defEmpty.getName());
+		assertTrue(defEmpty.getInit() instanceof SymbolRef);
+		final SymbolRef symbolRef = (SymbolRef) defEmpty.getInit();
+		assertEquals(Collections.class.getCanonicalName(), 
+				symbolRef.getType().getCanonicalName());
+		assertEquals(Collections.class.getCanonicalName().concat(".EMPTY_LIST"), 
+				symbolRef.getMember().getCanonicalName());
 	}
 
 	public void testNsWithImport() throws Exception {
