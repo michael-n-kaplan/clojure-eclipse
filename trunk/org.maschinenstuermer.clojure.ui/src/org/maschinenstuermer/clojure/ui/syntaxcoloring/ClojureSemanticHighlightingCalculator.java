@@ -11,6 +11,7 @@ import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.IHighlightedPositionAcceptor;
 import org.eclipse.xtext.ui.editor.syntaxcoloring.ISemanticHighlightingCalculator;
 import org.maschinenstuermer.clojure.clojure.Call;
+import org.maschinenstuermer.clojure.clojure.SymbolRef;
 
 public class ClojureSemanticHighlightingCalculator 
 	implements ISemanticHighlightingCalculator {
@@ -26,6 +27,7 @@ public class ClojureSemanticHighlightingCalculator
 		private IHighlightedPositionAcceptor acceptor;
 
 		private boolean inCall;
+		private boolean nextSymbolRefIsCallTarget;
 
 		@Override
 		public void provideHighlightingFor(final XtextResource resource,
@@ -40,9 +42,21 @@ public class ClojureSemanticHighlightingCalculator
 
 		@Override
 		public Boolean caseCompositeNode(final CompositeNode compositeNode) {
-			inCall = compositeNode.getElement() instanceof Call; 
-			for (final AbstractNode child : compositeNode.getChildren()) {
-				doSwitch(child);
+			final boolean isCall = compositeNode.getElement() instanceof Call;
+			if (isCall)
+				inCall = isCall;
+			if (nextSymbolRefIsCallTarget && compositeNode.getElement() instanceof SymbolRef) {
+				nextSymbolRefIsCallTarget = false;
+				acceptor.addPosition(compositeNode.getOffset(), compositeNode.getLength(), 
+						ClojureHighlightingConfiguration.FUNCTION_CALL_ID);
+			}
+			try {
+				for (final AbstractNode child : compositeNode.getChildren()) {
+					doSwitch(child);
+				}
+			} finally { 
+				if (isCall)
+					inCall = false;
 			}
 			return true;
 		}
@@ -62,11 +76,9 @@ public class ClojureSemanticHighlightingCalculator
 					&& !parenIdIndexStack.isEmpty()) {
 				final int parenIdIndex = parenIdIndexStack.pop();
 				addParenPosition(leafNode, parenIdIndex);
-			} else if (inCall) {
-				if ("fn".equals(leafNode.getFeature())) {
-					acceptor.addPosition(leafNode.getOffset(), leafNode.getLength(), 
-							ClojureHighlightingConfiguration.FUNCTION_CALL_ID);
-				}
+			} 
+			if (inCall && "(".equals(leafNode.getText())) {
+				nextSymbolRefIsCallTarget = true;
 			}
 			return true;
 		}
