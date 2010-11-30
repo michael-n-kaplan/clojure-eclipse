@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.scoping.impl.ImportedNamespaceAwareLocalScopeProvider;
-import org.eclipse.xtext.util.IResourceScopeCache;
 import org.maschinenstuermer.clojure.clojure.ImportForm;
 import org.maschinenstuermer.clojure.clojure.InNs;
 import org.maschinenstuermer.clojure.clojure.ModuleImport;
@@ -17,14 +16,8 @@ import org.maschinenstuermer.clojure.clojure.PackageImport;
 import org.maschinenstuermer.clojure.clojure.Reference;
 import org.maschinenstuermer.clojure.clojure.util.ClojureSwitch;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 public class ClojureImportedNamespaceAwareLocalScopeProvider extends
 		ImportedNamespaceAwareLocalScopeProvider {
-	
-	@Inject
-	private IResourceScopeCache importNormalizerCache;
 	
 	private final ClojureSwitch<Set<ImportNormalizer>> importNormalizer = new ClojureSwitch<Set<ImportNormalizer>>() {		
 		public Set<ImportNormalizer> defaultCase(final EObject object) {
@@ -37,9 +30,7 @@ public class ClojureImportedNamespaceAwareLocalScopeProvider extends
 					for (EObject sibling : siblings) {
 						imports.addAll(internalGetImportNormalizers(sibling));
 					}
-				} else {
-					imports.addAll(internalGetImportNormalizers(eContainer));
-				}
+				} 
 			}
 			return imports;
 		};
@@ -120,12 +111,6 @@ public class ClojureImportedNamespaceAwareLocalScopeProvider extends
 	
 	@Override
 	protected Set<ImportNormalizer> internalGetImportNormalizers(final EObject context) {
-		return importNormalizerCache.get(context, context.eResource(), new Provider<Set<ImportNormalizer>>() {
-
-			@Override
-			public Set<ImportNormalizer> get() {
-				return importNormalizer.doSwitch(context);
-			}
-		});
+		return importNormalizer.doSwitch(context);
 	}
 }
